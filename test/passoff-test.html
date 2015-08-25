@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Pass Off Test Runner</title>
+
+    <link rel="shortcut icon" type="image/png" href="jasmine_favicon.png">
+    <link rel="stylesheet" href="jasmine.min.css">
+
+    <script src="jasmine.min.js"></script>
+    <script src="jasmine-html.min.js"></script>
+    <script src="boot.min.js"></script>
+    <script src="jasmine-es6-promise-matchers.min.js"></script>
+
+    <!-- include source files here... -->
+    <script>
+        // If Promise is not supported, include the polyfill
+        // https://github.com/taylorhakes/promise-polyfill
+        window.Promise || document.write("<script src=Promise.min.js><\/script>");
+
+    </script>
+    <script src="AddressBook.js"></script>
+    <script src="/pbkdf2.js"></script>
+    <script src="/hmac-sha256.js"></script>
+    <script src="/passoff.js"></script>
+
+    <!-- include spec files here... -->
+    <script src="passoff-spec.js"></script>
+
+
+
+</head>
+
+<body>
+</body>
+
+</html>

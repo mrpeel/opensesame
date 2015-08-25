@@ -65,8 +65,8 @@ body {
 .show-password {
     box-sizing: border-box;
     position: absolute;
-    right: 0px;
-    z-index: 2;
+    right: -15px;
+    overflow: visible;
 }
 .mdl-card {
     width: 512px;

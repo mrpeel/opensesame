@@ -10,7 +10,7 @@ var passOff, passwordType, fullName, supportsCopy, calculatedDomainName, error, 
 function clearPassword() {
     hideElement(passwordCard);
     password.textContent = "";
-    clearClipboard();
+    //clearClipboard();
     setPasswordButton();
 }
 
@@ -22,12 +22,19 @@ function generatePassword() {
 
     setPasswordButton();
 
-    fullName = givenName.value.trim() + familyName.value.trim();
+    fullName = givenName.value.trim().toLowerCase() + familyName.value.trim().toLowerCase();
 
     if ((fullName === "" || passPhrase.value.trim().length === 0) || (passwordType === "answer" && securityQuestion.value.trim().length === 0)) {
         hideElement(loaderDetails);
         return;
     }
+
+    if (passwordType === "answer" && securityQuestion.value.trim().length === 0) {
+        //Security question must be present to generate an answer
+        hideElement(loaderDetails);
+        return;
+    }
+
 
     //Reset optional values
     passOff.userName = "";
@@ -38,11 +45,12 @@ function generatePassword() {
     passOff.passPhrase = passPhrase.value;
     passOff.domainName = calculatedDomainName;
     if (userName.value.trim().length > 0) {
-        passOff.userName = userName.value.trim();
+        passOff.userName = userName.value.trim().toLowerCase();
     }
 
     if (passwordType === "answer" && securityQuestion.value.trim().length > 0) {
-        passOff.securityQuestion = securityQuestion.value.trim();
+        //Remove any punctuation, remove any consecutive spaces and convert to lower case
+        passOff.securityQuestion = securityQuestion.value.trim().replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()?'"]/g, "").replace(/  +/g, ' ').toLowerCase();
     }
 
     if (passwordType) {
@@ -201,7 +209,7 @@ function setType(passwordSelection) {
 function updateDomainName() {
     var posWWW;
 
-    calculatedDomainName = domainName.value.trim();
+    calculatedDomainName = domainName.value.trim().toLowerCase();
 
     //Ignore the start of www.
     if (calculatedDomainName === "w" || calculatedDomainName === "ww" || calculatedDomainName === "www") {
@@ -227,8 +235,9 @@ function hidePasswordToggle() {
 }
 
 function togglePasswordView() {
+    //Toggle pass phrase between visible as a text area, and obscured like a normal password
     if (passPhrase.type === "password") {
-        passPhrase.type = "text";
+        passPhrase.type = "text-area";
     } else {
         passPhrase.type = "password";
     }
@@ -271,10 +280,6 @@ window.addEventListener("load", function () {
     passPhrase.addEventListener("focusin", showPasswordToggle, false);
     passPhrase.addEventListener("blur", hidePasswordToggle, false);
     passPhrase.addEventListener("focusout", hidePasswordToggle, false);
-    passwordToggle.addEventListener("focus", showPasswordToggle, false);
-    passwordToggle.addEventListener("focusin", showPasswordToggle, false);
-    passwordToggle.addEventListener("blur", hidePasswordToggle, false);
-    passwordToggle.addEventListener("focusout", hidePasswordToggle, false);
     securityQuestion.addEventListener("input", clearPassword, false);
     domainName.addEventListener("input", updateDomainName, false);
     userName.addEventListener("input", clearPassword, false);

@@ -184,8 +184,8 @@ PassOff.prototype.generatePassword = function (passwordType) {
         return Promise.reject(new Error("Domain name not present"));
     }
 
-    if (this.passPhrase.length === 0) {
-        return Promise.reject(new Error("Pass phrase not present"));
+    if (passwordType === "answer" && this.securityQuestion.length === 0) {
+        return Promise.reject(new Error("Security question not present"));
     }
 
 
