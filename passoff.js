@@ -204,32 +204,45 @@ PassOff.prototype.generatePassword = function (passwordType) {
             }
 
             //Set up parameters for PBKDF2 and HMAC functions
-            var salt = passNS + "." + passOffContext.fullName;
-            var domainValue = passOffContext.domainName;
+            var fullNameValue = passOffContext.fullName.trim().toLowerCase();
+            var salt = passNS + "." + fullNameValue;
+            var userNameValue = passOffContext.userName.trim().toLowerCase();
+            var domainValue = passOffContext.domainName.trim().toLowerCase();
+            var posWWW = 0;
+
+            //Trim a leading www. value if present
+            posWWW = domainValue.indexOf("www.");
+            if (posWWW === 0) {
+                domainValue = domainValue.substr(4);
+            }
+
+            var securityQuestionValue = "";
 
             //If  a specific user has been specified, then add to domain value
-            if (passOffContext.userName && passOffContext.userName.length) {
-                domainValue = passOffContext.userName + "@" + domainValue;
+            if (userNameValue && userNameValue.length > 0) {
+                domainValue = userNameValue + "@" + domainValue;
             }
 
-            //If a security question has been specified, add to domain value
-            if (passOffContext.securityQuestion && passOffContext.securityQuestion.length) {
-                domainValue = domainValue + ":" + passOffContext.securityQuestion;
-            }
+            //For an answer, add the security question to domain value
 
+            if (passwordType === "answer") {
+                //Strip out any punctuation or multiple spaces and convert to lower case 
+                securityQuestionValue = passOffContext.securityQuestion.trim().replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()?'"]/g, "").replace(/  +/g, ' ').toLowerCase();
+                domainValue = domainValue + ":" + securityQuestionValue;
+            }
 
 
             return passOffContext.PBKDF2(passOffContext.passPhrase, salt)
                 .then(function (key) {
-                    console.log("Derived key: " + key);
+                    //console.log("Derived key: " + key);
 
                     return passOffContext.HMACSHA256(domainValue, key);
                 }).then(function (seed) {
-                    console.log("HMAC result seed hex: " + seed);
+                    //console.log("HMAC result seed hex: " + seed);
                     var seedArray = passOffContext.convertWordArrayToUint8Array(seed);
 
-                    console.log("HMAC result seed array: " + seedArray);
-                    console.log(performance.now() - t0 + " ms");
+                    //console.log("HMAC result seed array: " + seedArray);
+                    //console.log(performance.now() - t0 + " ms");
                     return seedArray;
                 }).then(function (seedArray) {
                     // Find the selected template array
@@ -237,8 +250,8 @@ PassOff.prototype.generatePassword = function (passwordType) {
 
                     // Select the specific template based on seed[0]
                     var template = templateType[seedArray[0] % templateType.length];
-                    console.log("Selected template: " + template);
-                    console.log(performance.now() - t0 + " ms");
+                    //console.log("Selected template: " + template);
+                    //console.log(performance.now() - t0 + " ms");
 
                     // Split the template string
                     var password = template.split("").map(function (c, i) {
@@ -249,9 +262,9 @@ PassOff.prototype.generatePassword = function (passwordType) {
                         // Select the character using seed[i + 1]
                         return chars[seedArray[i + 1] % chars.length];
                     }).join(""); /*Re-join as password*/
-                    console.log("Generated password: " + password);
-                    console.log(performance.now() - t0 + " ms");
-                    console.log("All done");
+                    //console.log("Generated password: " + password);
+                    //console.log(performance.now() - t0 + " ms");
+                    //console.log("All done");
 
                     resolve(password);
                 })

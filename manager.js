@@ -4,7 +4,7 @@
 var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, copyPasswordDiv, loaderDetails, loaderPassword, closePassword, copyPassword, passwordSel, passwordToggle;
 
 //Variable for calculations
-var passOff, passwordType, fullName, supportsCopy, calculatedDomainName, error, id = 0;
+var passOff, passwordType, fullName, supportsCopy, error, id = 0;
 
 
 function clearPassword() {
@@ -22,7 +22,7 @@ function generatePassword() {
 
     setPasswordButton();
 
-    fullName = givenName.value.trim().toLowerCase() + familyName.value.trim().toLowerCase();
+    fullName = givenName.value.trim() + familyName.value.trim();
 
     if ((fullName === "" || passPhrase.value.trim().length === 0) || (passwordType === "answer" && securityQuestion.value.trim().length === 0)) {
         hideElement(loaderDetails);
@@ -43,14 +43,14 @@ function generatePassword() {
     //Set values required for calculation
     passOff.fullName = fullName;
     passOff.passPhrase = passPhrase.value;
-    passOff.domainName = calculatedDomainName;
+    passOff.domainName = domainName.value.trim();
     if (userName.value.trim().length > 0) {
-        passOff.userName = userName.value.trim().toLowerCase();
+        passOff.userName = userName.value.trim();
     }
 
     if (passwordType === "answer" && securityQuestion.value.trim().length > 0) {
         //Remove any punctuation, remove any consecutive spaces and convert to lower case
-        passOff.securityQuestion = securityQuestion.value.trim().replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()?'"]/g, "").replace(/  +/g, ' ').toLowerCase();
+        passOff.securityQuestion = securityQuestion.value.trim();
     }
 
     if (passwordType) {
@@ -73,6 +73,14 @@ function generatePassword() {
 }
 
 function setPasswordButton() {
+
+    var calculatedDomainName = domainName.value.trim().toLowerCase();
+
+    //Ignore the start of www.
+    if (calculatedDomainName === "w" || calculatedDomainName === "ww" || calculatedDomainName === "www") {
+        calculatedDomainName = "";
+    }
+
     //Check if minimum values have been completed - all types need name and domain
     if ((givenName.value.trim().length > 0 || familyName.value.trim().length > 0) && calculatedDomainName.length > 0 &&
         //For an answer type, a question must also be set 
@@ -206,7 +214,7 @@ function setType(passwordSelection) {
     clearPassword();
 }
 
-function updateDomainName() {
+/*function updateDomainName() {
     var posWWW;
 
     calculatedDomainName = domainName.value.trim().toLowerCase();
@@ -223,7 +231,7 @@ function updateDomainName() {
     }
 
     clearPassword();
-}
+}*/
 
 function showPasswordToggle() {
     showElement(passwordToggle);
@@ -281,7 +289,7 @@ window.addEventListener("load", function () {
     passPhrase.addEventListener("blur", hidePasswordToggle, false);
     passPhrase.addEventListener("focusout", hidePasswordToggle, false);
     securityQuestion.addEventListener("input", clearPassword, false);
-    domainName.addEventListener("input", updateDomainName, false);
+    domainName.addEventListener("input", clearPassword, false);
     userName.addEventListener("input", clearPassword, false);
 
     //Loop through different values and add a listener
@@ -292,13 +300,12 @@ window.addEventListener("load", function () {
     //Check if browser supports copy operation
     //Set to false by default
     supportsCopy = false;
-    //Chrome supports copy
-    if (navigator.userAgent.indexOf("Chrome") !== -1) {
+    //Chrome, IE 9, IE10, IE11 and Edge support copy
+    if (navigator.userAgent.indexOf("Chrome") !== -1 || navigator.userAgent.indexOf("MSIE 9") !== -1 ||
+        navigator.userAgent.indexOf("MSIE 10") !== -1 || navigator.userAgent.indexOf("rv: 11.0") !== -1) {
         supportsCopy = true;
-    }
-
-    //Firefox supports copy from Version 41
-    if (navigator.userAgent.indexOf("Firefox") !== -1) {
+    } else if (navigator.userAgent.indexOf("Firefox") !== -1) {
+        //Firefox supports copy from Version 41
         var versionNum = navigator.userAgent.substring(navigator.userAgent.indexOf("Firefox") + 8);
 
         if (versionNum >= 41) {
@@ -308,7 +315,6 @@ window.addEventListener("load", function () {
 
 
     //Set initial type
-    calculatedDomainName = "";
     setType("long-password");
     generatePasswordButton.addEventListener("click", generatePassword, false);
     passwordToggle.addEventListener("click", togglePasswordView, false);
