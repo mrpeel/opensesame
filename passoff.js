@@ -70,6 +70,9 @@ var PassOff = function () {
         pin: [
 		"nnnn"
 	],
+        "pin-6": [
+		"nnnnnn"
+	],
         login: [
 		"cvccvcvcv"
 	],
@@ -227,7 +230,7 @@ PassOff.prototype.generatePassword = function (passwordType) {
 
             if (passwordType === "answer") {
                 //Strip out any punctuation or multiple spaces and convert to lower case 
-                securityQuestionValue = passOffContext.securityQuestion.trim().replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()?'"]/g, "").replace(/  +/g, ' ').toLowerCase();
+                securityQuestionValue = passOffContext.securityQuestion.replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()?'"]/g, "").replace(/  +/g, ' ').trim().toLowerCase();
                 domainValue = domainValue + ":" + securityQuestionValue;
             }
 
