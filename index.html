@@ -33,25 +33,19 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="mdl-color--grey-200 mdl-base">
-    <!--<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">-->
-    <div class="mdl-layout mdl-js-layout">
-        <!--<header class="mdl-layout__header mdl-layout__header--waterfall mdl-color--white mdl-shadow--2dp">
-            <div class="mdl-layout__header-row mdl-color-text--primary ">
-                <div class="page-title">pass&nbsp;out</div>
-            </div>
-        </header>-->
-        <main class="mdl-layout__content">
-            <div class="page-content mdl-color--grey-100">
+<body class="mdl-color--grey-200 mdl-base overflow-x-visible">
+    <div class="mdl-layout mdl-js-layout overflow-x-visible">
+        <main class="mdl-layout__content overflow-x-visible">
+            <div class="page-content mdl-color--grey-100 overflow-x-visible">
 
-                <section class="section--center mdl-grid password-grid">
-                    <div class="mdl-card mdl-cell mdl-cell--6-col mdl-shadow--2dp">
+                <section class="section--center mdl-grid password-grid overflow-x-visible">
+                    <div class="mdl-card mdl-cell mdl-cell--6-col mdl-shadow--2dp overflow-x-visible">
 
-                        <div class="mdl-color--primary mdl-color-text--white">
+                        <div class="mdl-color--primary mdl-color-text--white overflow-x-visible">
                             <div class="header-circle mdl-color--teal-600">
-                                <a href="test/passoff-test.html" target="_blank">
+                                <button id="header-key" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon circle-icon">
                                     <i class="material-icons circle-icon">vpn_key</i>
-                                </a>
+                                </button>
                             </div>
                             <h5>Pass Off</h5>
                             <div class="header-upper-right">
@@ -74,30 +68,23 @@
                         </div>
 
 
-                        <div class="mdl-layout__content mdl-card__supporting-text">
-                            <div id="load-bar-details" class="loader-four-balls hidden">
-                                <div class="load-ball"></div>
-                                <div class="load-ball"></div>
-                                <div class="load-ball"></div>
-                                <div class="load-ball"></div>
-                            </div>
+                        <div class="mdl-layout__content mdl-card__supporting-text overflow-x-visible">
 
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                                 <input class="mdl-textfield__input" type="text" id="given-name" />
-                                <label class="mdl-textfield__label" for="given-name">Given name</label>
+                                <label class="mdl-textfield__label required-field" for="given-name">Given name</label>
                             </div>
-                            <br>
 
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                                 <input class="mdl-textfield__input" type="text" id="family-name" />
-                                <label class="mdl-textfield__label" for="family-name">Family name</label>
+                                <label class="mdl-textfield__label required-field" for="family-name">Family name</label>
                             </div>
-                            <br>
+
 
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                                 <input class="mdl-textfield__input passphrase" type="password" id="passphrase" />
-                                <label class="mdl-textfield__label" for="passphrase">Pass phrase</label>
-                                <button id="show-password" class="show-password mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--grey-700 hidden">
+                                <label class="mdl-textfield__label required-field" for="passphrase">Pass phrase</label>
+                                <button id="show-password" class="show-password mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--grey-700 hidden" tabindex="-1">
                                     <i class="material-icons">visibility</i>
                                 </button>
                             </div>
@@ -106,23 +93,23 @@
 
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                                 <input class="mdl-textfield__input" type="text" id="domain" />
-                                <label class="mdl-textfield__label" for="domain">Web site</label>
+                                <label class="mdl-textfield__label required-field" for="domain">Web site</label>
                             </div>
-                            <br>
+
+                            <div id="security-question-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label  textfield-full-width hidden">
+                                <input class="mdl-textfield__input" type="text" id="security-question" />
+                                <label class="mdl-textfield__label required-field" for="security-question">Security question</label>
+                            </div>
 
                             <div id="user-name-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                                 <input class="mdl-textfield__input" type="text" id="user-name" />
                                 <label class="mdl-textfield__label" for="user-name">Website user name (optional)</label>
                             </div>
-                            <br>
-                            <p id="extra-vertical-space" class="hidden"></p>
 
-                            <div id="security-question-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label  textfield-full-width hidden">
-                                <input class="mdl-textfield__input" type="text" id="security-question" />
-                                <label class="mdl-textfield__label" for="security-question">Security question</label>
-                            </div>
+                            <!--<p id="extra-vertical-space" class="hidden"></p>-->
 
-                            <input id="password-select" class="clipboard-field" />
+
+                            <input id="password-select" class="clipboard-field" tabindex="-1" />
 
                         </div>
 
@@ -156,7 +143,7 @@
                                 <div class="load-ball"></div>
                             </div>
                             <!--<div id="load-bar-password" class="loader hidden"></div>-->
-                            <div class="mdl-text-color--teal-700">
+                            <div class="mdl-text-color--teal-700 extra-vertical-padding">
                                 <span class="password"></span>
                             </div>
                             <div><code class=error><noscript>You must have JavaScript enabled for this page to work.</noscript></code></div>
@@ -164,6 +151,9 @@
                                 <button id="copy-password" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect">
                                     Copy Password
                                 </button>
+                                <div id="copied-toast" class="toast hidden">
+                                    Password Copied to Clipboard
+                                </div>
                             </div>
 
                         </div>

@@ -1,7 +1,7 @@
 /*global PassOff, document, window, console, navigator */
 
 //Variables for UI element
-var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, copyPasswordDiv, loaderDetails, loaderPassword, closePassword, copyPassword, passwordSel, passwordToggle;
+var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, copyPasswordDiv, loaderPassword, closePassword, copyPassword, passwordSel, passwordToggle, headerKey, copiedToast;
 
 //Variable for calculations
 var passOff, passwordType, fullName, supportsCopy, error, id = 0;
@@ -16,8 +16,9 @@ function clearPassword() {
 
 function generatePassword() {
 
+    hidePasswordToggle();
+
     showElement(passwordCard);
-    showElement(loaderDetails);
     error.textContent = password.textContent = "";
 
     setPasswordButton();
@@ -25,13 +26,11 @@ function generatePassword() {
     fullName = givenName.value.trim() + familyName.value.trim();
 
     if ((fullName === "" || passPhrase.value.trim().length === 0) || (passwordType === "answer" && securityQuestion.value.trim().length === 0)) {
-        hideElement(loaderDetails);
         return;
     }
 
     if (passwordType === "answer" && securityQuestion.value.trim().length === 0) {
         //Security question must be present to generate an answer
-        hideElement(loaderDetails);
         return;
     }
 
@@ -90,7 +89,6 @@ function setPasswordButton() {
         generatePasswordButton.disabled = true;
 
     }
-    hideElement(loaderDetails);
     hideElement(copyPasswordDiv);
 }
 
@@ -118,6 +116,7 @@ function copyPasswordToClipboard() {
         passwordSel.select();
         document.execCommand("Copy", false, null);
         copyPassword.focus();
+        showToast(copiedToast, copyPassword);
     }
 }
 
@@ -174,6 +173,7 @@ function chooseType() {
 
 function setType(passwordSelection) {
     copyPassword.textContent = "Copy Password";
+    copiedToast.textContext = "Password copied to Clipboard";
     showElement(userNameDiv);
     hideElement(securityQuestionDiv);
     passwordType = passwordSelection;
@@ -181,32 +181,41 @@ function setType(passwordSelection) {
 
     switch (passwordSelection) {
         case "login":
-            generatePassword.textContent = "Generate User name";
+            generatePasswordButton.textContent = "Generate User name";
             copyPassword.textContent = "Copy User name";
+            copiedToast.textContext = "User name copied to Clipboard";
             hideElement(userNameDiv);
             break;
         case "maximum-password":
-            generatePassword.textContent = "Generate Maximum Password";
+            generatePasswordButton.textContent = "Generate Maximum Password";
             break;
         case "long-password":
-            generatePassword.textContent = "Generate Long Password";
+            generatePasswordButton.textContent = "Generate Long Password";
             break;
         case "medium-password":
-            generatePassword.textContent = "Generate Medium Password";
+            generatePasswordButton.textContent = "Generate Medium Password";
             break;
         case "basic-password":
-            generatePassword.textContent = "Generate Basic Password";
+            generatePasswordButton.textContent = "Generate Basic Password";
             break;
         case "short-password":
-            generatePassword.textContent = "Generate Short Password";
+            generatePasswordButton.textContent = "Generate Short Password";
             break;
         case "pin":
-            generatePassword.textContent = "Generate PIN";
+            generatePasswordButton.textContent = "Generate Four Digit PIN";
             copyPassword.textContent = "Copy PIN";
+            copiedToast.textContext = "PIN copied to Clipboard";
+
+            break;
+        case "pin-6":
+            generatePasswordButton.textContent = "Generate Six Digit PIN";
+            copyPassword.textContent = "Copy PIN";
+            copiedToast.textContext = "PIN copied to Clipboard";
             break;
         case "answer":
-            generatePassword.textContent = "Generate Security Answer";
+            generatePasswordButton.textContent = "Generate Security Answer";
             copyPassword.textContent = "Copy Security Answer";
+            copiedToast.textContext = "Answer copied to Clipboard";
             showElement(securityQuestionDiv);
             break;
     }
@@ -254,10 +263,27 @@ function togglePasswordView() {
 
 }
 
+function runTests() {
+    window.open("test/passoff-test.html");
+}
+
+
+function showToast(toastElement, coveredElement) {
+    //Show toast element
+    hideElement(coveredElement);
+    showElement(toastElement);
+    //Hide again after 5 seconds
+    window.setTimeout(function () {
+        showElement(coveredElement);
+        hideElement(toastElement);
+    }, 5000);
+}
+
 window.addEventListener("load", function () {
 
     passOff = new PassOff();
 
+    headerKey = document.querySelector("[id=header-key]");
     givenName = document.querySelector("[id=given-name]");
     familyName = document.querySelector("[id=family-name]");
     passPhrase = document.querySelector("[id=passphrase]");
@@ -273,24 +299,32 @@ window.addEventListener("load", function () {
     password = document.querySelector(".password");
     error = document.querySelector(".error");
     passwordSel = document.querySelector("[id=password-select]");
+    copiedToast = document.querySelector("[id=copied-toast]");
     copyPassword = document.querySelector("[id=copy-password]");
     copyPasswordDiv = document.querySelector("[id=copy-password-div]");
-    loaderDetails = document.querySelector("[id=load-bar-details]");
     loaderPassword = document.querySelector("[id=load-bar-ball]");
     closePassword = document.querySelector("[id=close-password]");
 
     givenName.disabled = familyName.disabled = passPhrase.disabled = domainName.disabled = userName.disabled = type.disabled = false;
 
     givenName.addEventListener("input", clearPassword, false);
+    givenName.addEventListener("focus", hidePasswordToggle, false);
+    givenName.addEventListener("focusin", hidePasswordToggle, false);
     familyName.addEventListener("input", clearPassword, false);
+    familyName.addEventListener("focus", hidePasswordToggle, false);
+    familyName.addEventListener("focusin", hidePasswordToggle, false);
     passPhrase.addEventListener("input", clearPassword, false);
     passPhrase.addEventListener("focus", showPasswordToggle, false);
     passPhrase.addEventListener("focusin", showPasswordToggle, false);
-    passPhrase.addEventListener("blur", hidePasswordToggle, false);
-    passPhrase.addEventListener("focusout", hidePasswordToggle, false);
     securityQuestion.addEventListener("input", clearPassword, false);
+    securityQuestion.addEventListener("focus", hidePasswordToggle, false);
+    securityQuestion.addEventListener("focusin", hidePasswordToggle, false);
     domainName.addEventListener("input", clearPassword, false);
+    domainName.addEventListener("focus", hidePasswordToggle, false);
+    domainName.addEventListener("focusin", hidePasswordToggle, false);
     userName.addEventListener("input", clearPassword, false);
+    userName.addEventListener("focus", hidePasswordToggle, false);
+    userName.addEventListener("focusin", hidePasswordToggle, false);
 
     //Loop through different values and add a listener
     for (var lCounter = 0; lCounter < type.children.length; lCounter++) {
@@ -316,6 +350,7 @@ window.addEventListener("load", function () {
 
     //Set initial type
     setType("long-password");
+    headerKey.addEventListener("click", runTests, false);
     generatePasswordButton.addEventListener("click", generatePassword, false);
     passwordToggle.addEventListener("click", togglePasswordView, false);
     copyPassword.addEventListener("click", copyPasswordToClipboard, false);

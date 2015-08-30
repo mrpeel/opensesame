@@ -8,10 +8,33 @@ body {
     margin: 0;
     padding: 0;
 }
+.required-field {
+    color: #C08080;
+    /*AA5555;*/
+}
+.extra-vertical-padding {
+    padding-top: 18px;
+    padding-bottom: 18px;
+}
+.toast {
+    font-family: 'Roboto', 'Helvetica', sans-serif;
+    font-size: 14px;
+    background-color: #323232;
+    color: white;
+    margin-left: -20px;
+    margin-bottom: -10px;
+    width: 120%;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    padding-left: 24px;
+}
 .clipboard-field {
     border: none;
     color: white;
     font-size: 1px;
+    line-height: 1px;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 .page-title {
     font-family: 'And Black', 'Helvetica', 'Arial', sans-serif;
@@ -56,6 +79,12 @@ body {
     font-size: 32px;
     position: relative;
 }
+.icon-left {
+    box-sizing: border-box;
+    position: absolute;
+    overflow: visible;
+    left: -30px;
+}
 .password {
     margin-top: 42px;
     margin-bottom: 54px;
@@ -65,8 +94,12 @@ body {
 .show-password {
     box-sizing: border-box;
     position: absolute;
-    right: -15px;
+    right: -30px;
     overflow: visible;
+}
+.overflow-x-visible,
+.mdl-layout__container {
+    overflow: visible !important;
 }
 .mdl-card {
     width: 512px;
@@ -95,28 +128,6 @@ body {
 .mdl-layout:not(.is-small-screen) .mdl-layout__tab-bar-container {
     overflow: visible;
 }
-.mdl-layout__tab-bar-container {
-    height: 64px;
-}
-.mdl-layout__tab-bar {
-    padding: 0;
-    padding-left: 16px;
-    box-sizing: border-box;
-    height: 100%;
-    width: 100%;
-}
-.mdl-layout__tab-bar .mdl-layout__tab {
-    height: 64px;
-    line-height: 64px;
-}
-.mdl-layout__tab-bar .mdl-layout__tab.is-active::after {
-    background-color: white;
-    height: 4px;
-}
-main > .mdl-layout__tab-panel {
-    padding: 8px;
-    padding-top: 48px;
-}
 .mdl-card {
     height: auto;
     display: flex;
@@ -132,6 +143,7 @@ main > .mdl-layout__tab-panel {
     padding: 10px;
     color: inherit;
     width: calc(100% - 80px);
+    overflow: visible;
 }
 .mdl-card__supporting-text h4 {
     margin-top: 0;
@@ -163,9 +175,6 @@ main > .mdl-layout__tab-panel {
 }
 section.section--center {
     max-width: 860px;
-}
-#features section.section--center {
-    max-width: 620px;
 }
 section > header {
     display: flex;
