@@ -30,7 +30,7 @@
     <link href='//fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en' rel='stylesheet' type='text/css'>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="material.1.04.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.min.css">
 </head>
 
 <body class="mdl-color--grey-200 mdl-base overflow-x-visible">
@@ -148,19 +148,22 @@
                             </div>
                             <div><code class=error><noscript>You must have JavaScript enabled for this page to work.</noscript></code></div>
                             <div id="copy-password-div" class="mdl-card__actions hidden">
-                                <button id="copy-password" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect">
+                                <button id="copy-password" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect fade-in">
                                     Copy Password
                                 </button>
-                                <div id="copied-toast" class="toast hidden">
-                                    Password Copied to Clipboard
-                                </div>
+                            </div>
+                            <div id="copied-toast" class="toast hidden">
+                                Password Copied to Clipboard
                             </div>
 
                         </div>
+
                     </div>
-                    <div class="mdl-cell mdl-cell--3-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+
+
 
                 </section>
+
             </div>
 
 
@@ -180,8 +183,8 @@
     <script src="material.1.04.min.js"></script>
     <script src="pbkdf2.js"></script>
     <script src="hmac-sha256.js"></script>
-    <script src="passoff.js"></script>
-    <script src="manager.js"></script>
+    <script src="passoff.min.js"></script>
+    <script src="manager.min.js"></script>
 </body>
 
 </html>

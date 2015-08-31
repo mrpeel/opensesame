@@ -61,6 +61,12 @@ function generatePassword() {
 
                 if (supportsCopy) {
                     showElement(copyPasswordDiv);
+                    password.scrollIntoView();
+                    //Copy password to clipboard after 0.5 second
+                    window.setTimeout(function () {
+                        copyPasswordToClipboard();
+                    }, 500);
+
                 }
 
             })
@@ -116,56 +122,9 @@ function copyPasswordToClipboard() {
         passwordSel.select();
         document.execCommand("Copy", false, null);
         copyPassword.focus();
-        showToast(copiedToast, copyPassword);
+        showToast(copiedToast, copyPasswordDiv);
     }
 }
-
-
-/*function updatePassword() {
-    showElement(loaderPassword);
-
-    error.textContent = password.textContent = "";
-
-
-    if (userName.value !== '') {
-        calculatedDomainName = userName.value + calculatedDomainName;
-    }
-
-    if (!mpw || calculatedDomainName === '' || templateType === '' || passwordType === '') {
-        hideElement(loaderPassword);
-        return;
-    }
-
-    var cid = ++id;
-    var value;
-
-    showElement(passwordCard);
-
-    if (type.value === "answer") {
-        value = mpw.generateAnswer(calculatedDomainName, COUNTER, securityQuestion, templateType);
-    } else {
-        value = mpw["generate" + passwordType](calculatedDomainName, COUNTER, templateType);
-    }
-
-    value.then(function (pass) {
-        if (cid === id) {
-            password.textContent = pass;
-            passwordSel.value = pass;
-            hideElement(loaderPassword);
-            if (supportsCopy) {
-                showElement(copyPasswordDiv);
-            }
-
-        }
-    }, function (err) {
-        hideElement(loaderPassword);
-        if (cid === id) {
-            error.textContent = err.message;
-        }
-
-        console.error(err);
-    });
-}*/
 
 function chooseType() {
     setType(this.id);
@@ -223,25 +182,6 @@ function setType(passwordSelection) {
     clearPassword();
 }
 
-/*function updateDomainName() {
-    var posWWW;
-
-    calculatedDomainName = domainName.value.trim().toLowerCase();
-
-    //Ignore the start of www.
-    if (calculatedDomainName === "w" || calculatedDomainName === "ww" || calculatedDomainName === "www") {
-        calculatedDomainName = "";
-    }
-
-    //Trim a leading www. value if present
-    posWWW = calculatedDomainName.indexOf("www.");
-    if (posWWW === 0) {
-        calculatedDomainName = calculatedDomainName.substr(4);
-    }
-
-    clearPassword();
-}*/
-
 function showPasswordToggle() {
     showElement(passwordToggle);
 }
@@ -272,11 +212,20 @@ function showToast(toastElement, coveredElement) {
     //Show toast element
     hideElement(coveredElement);
     showElement(toastElement);
+
+    toastElement.scrollIntoView();
     //Hide again after 5 seconds
     window.setTimeout(function () {
-        showElement(coveredElement);
-        hideElement(toastElement);
-    }, 5000);
+        hideToast(toastElement, coveredElement);
+    }, 5200);
+}
+
+function hideToast(toastElement, coveredElement) {
+
+    showElement(coveredElement);
+    hideElement(toastElement);
+
+
 }
 
 window.addEventListener("load", function () {
@@ -355,12 +304,6 @@ window.addEventListener("load", function () {
     passwordToggle.addEventListener("click", togglePasswordView, false);
     copyPassword.addEventListener("click", copyPasswordToClipboard, false);
     closePassword.addEventListener("click", clearPassword, false);
-
-
-    /*MPW.test().catch(function (err) {
-        console.error(err);
-        error.textContent = err.toString();
-    });*/
 
     givenName.focus();
 

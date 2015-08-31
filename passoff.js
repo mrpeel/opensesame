@@ -282,12 +282,3 @@ PassOff.prototype.generatePassword = function (passwordType) {
     }
 
 };
-
-
-/*PassOff.prototype.test() {
-    // Pretty simple test here
-    return new MPW("user", "password").generate("example.com", 1, null, "long", MPW.NS).then(function (password) {
-        console.assert(password === "Zugf8.RuqeLugu", `Self-test failed; expected: Zugf8.RuqeLugu; got: ${password}`);
-        return password === "Zugf8.RuqeLugu" ? Promise.resolve() : Promise.reject(new Error(`Self-test failed; expected: ZedaFaxcZaso9*; got: ${password}`));
-    });
-};*/
