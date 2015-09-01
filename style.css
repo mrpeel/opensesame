@@ -40,10 +40,8 @@ body {
     100% {
         opacity: 0;
     }
-    20%,
-    40%,
-    60%,
-    80% {
+    25%,
+    75% {
         opacity: 0.9;
     }
 }
@@ -52,10 +50,8 @@ body {
     100% {
         opacity: 0;
     }
-    20%,
-    40%,
-    60%,
-    80% {
+    25%,
+    75% {
         opacity: 0.9;
     }
 }
@@ -64,10 +60,8 @@ body {
     100% {
         opacity: 0;
     }
-    20%,
-    40%,
-    60%,
-    80% {
+    25%,
+    75% {
         opacity: 0.9;
     }
 }
@@ -133,17 +127,24 @@ body {
     padding-bottom: 18px;
 }
 .header-circle {
-    width: 48px;
-    height: 48px;
-    border-radius: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
     margin: 9px 12px 9px 12px;
     border-style: solid;
     border-width: 1px;
     border-color: #b6b6b6;
 }
 .circle-icon {
-    left: 8px;
-    top: 8px;
+    left: 7px;
+    top: 5px;
+    font-size: 32px;
+    position: relative;
+}
+.circle-icon-tall {
+    left: 1px;
+    top: 6px;
+    border-radius: 0px;
     font-size: 32px;
     position: relative;
 }
