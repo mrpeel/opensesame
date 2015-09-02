@@ -148,7 +148,7 @@ function setType(passwordSelection) {
         case "login":
             generatePasswordButton.textContent = "Generate User name";
             copyPassword.textContent = "Copy User name";
-            copiedToast.textContext = "User name copied to Clipboard";
+            copiedToast.textContent = "User name copied to Clipboard";
             hideElement(userNameDiv);
             break;
         case "maximum-password":
@@ -175,12 +175,12 @@ function setType(passwordSelection) {
         case "pin-6":
             generatePasswordButton.textContent = "Generate Six Digit PIN";
             copyPassword.textContent = "Copy PIN";
-            copiedToast.textContext = "PIN copied to Clipboard";
+            copiedToast.textContent = "PIN copied to Clipboard";
             break;
         case "answer":
             generatePasswordButton.textContent = "Generate Security Answer";
             copyPassword.textContent = "Copy Security Answer";
-            copiedToast.textContext = "Answer copied to Clipboard";
+            copiedToast.textContent = "Answer copied to Clipboard";
             showElement(securityQuestionDiv);
             break;
     }
