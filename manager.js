@@ -118,10 +118,12 @@ function clearClipboard() {
 }*/
 
 function copyPasswordToClipboard() {
+
     if (supportsCopy === "unknown") {
         //Check if browser supports copy operation
         supportsCopy = document.queryCommandSupported('copy');
     }
+
 
     if (supportsCopy) {
         passwordSel.focus();
@@ -287,7 +289,7 @@ window.addEventListener("load", function () {
     }
 
     //Set supports copy to unknown until - can't check until a user interaction has occured
-    supportsCopy = "uknown";
+    supportsCopy = "unknown";
     //Set to false by default
     /*false;
     //Chrome, IE 9, IE10, IE11 and Edge support copy
