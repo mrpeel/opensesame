@@ -101,6 +101,14 @@ describe("Test Maximum Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = userName;
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
+    });
+
     it("should generate a different password when case is changed for pass phrase", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
@@ -163,6 +171,14 @@ describe("Test Maximum Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = "www." + domainName;
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
+    });
+
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = "";
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -246,6 +262,14 @@ describe("Test Long Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = userName;
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
+    });
+
     it("should generate a different password when case is changed for pass phrase", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
@@ -308,6 +332,14 @@ describe("Test Long Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = "www." + domainName;
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
+    });
+
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = "";
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -392,6 +424,14 @@ describe("Test Medium Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = userName;
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
+    });
+
     it("should generate a different password when case is changed for pass phrase", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
@@ -454,6 +494,14 @@ describe("Test Medium Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = "www." + domainName;
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
+    });
+
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = "";
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -538,6 +586,14 @@ describe("Test Basic Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = userName;
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
+    });
+
     it("should generate a different password when case is changed for pass phrase", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
@@ -600,6 +656,14 @@ describe("Test Basic Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = "www." + domainName;
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
+    });
+
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = "";
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -684,6 +748,14 @@ describe("Test Short Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = userName;
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
+    });
+
     it("should generate a different password when case is changed for pass phrase", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
@@ -746,6 +818,14 @@ describe("Test Short Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = "www." + domainName;
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
+    });
+
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = "";
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -829,6 +909,14 @@ describe("Test Four Digit Pin", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = userName;
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
+    });
+
     it("should generate a different PIN when case is changed for pass phrase", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
@@ -891,6 +979,14 @@ describe("Test Four Digit Pin", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = "www." + domainName;
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
+    });
+
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = "";
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -974,6 +1070,14 @@ describe("Test Six Digit Pin", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = userName;
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
+    });
+
     it("should generate a different PIN when case is changed for pass phrase", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
@@ -1036,6 +1140,14 @@ describe("Test Six Digit Pin", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = "www." + domainName;
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
+    });
+
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = "";
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -1109,6 +1221,14 @@ describe("Test User Name", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = "www." + domainName;
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
+    });
+
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = userName;
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "https://www." + domainName + "/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -1195,6 +1315,15 @@ describe("Test Security Answers", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = "www." + domainName;
+        passOff.securityQuestion = secQuestion;
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
+    });
+
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = userName;
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "https://www." + domainName + "/wtf.html";
         passOff.securityQuestion = secQuestion;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
@@ -1303,6 +1432,15 @@ describe("Test Security Answers", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = "www." + domainName;
+        passOff.securityQuestion = secQuestion;
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
+    });
+
+    it("should generate same password when domain has full URL", function (done) {
+        passOff.fullName = fullName;
+        passOff.userName = "";
+        passOff.passPhrase = passPhrase;
+        passOff.domainName = "https://www." + domainName + "/wtf.html";
         passOff.securityQuestion = secQuestion;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
