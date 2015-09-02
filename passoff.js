@@ -210,14 +210,23 @@ PassOff.prototype.generatePassword = function (passwordType) {
             var fullNameValue = passOffContext.fullName.trim().toLowerCase();
             var salt = passNS + "." + fullNameValue;
             var userNameValue = passOffContext.userName.trim().toLowerCase();
-            var domainValue = passOffContext.domainName.trim().toLowerCase();
-            var posWWW = 0;
+            var posDomain = 0;
+
+            //REtrieve domain value and trim the leading http:// or https://
+            var domainValue = passOffContext.domainName.replace("https://", "").replace("http://", "").trim().toLowerCase();
 
             //Trim a leading www. value if present
-            posWWW = domainValue.indexOf("www.");
-            if (posWWW === 0) {
+            posDomain = domainValue.indexOf("www.");
+            if (posDomain === 0) {
                 domainValue = domainValue.substr(4);
             }
+
+            //Check whether the holw URL is there - remove anything with a '/' onwards
+            posDomain = domainValue.indexOf("/");
+            if (posDomain > 0) {
+                domainValue = domainValue.substr(0, posDomain);
+            }
+
 
             var securityQuestionValue = "";
 

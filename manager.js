@@ -79,7 +79,7 @@ function generatePassword() {
 
 function setPasswordButton() {
 
-    var calculatedDomainName = domainName.value.trim().toLowerCase();
+    var calculatedDomainName = domainName.value.replace("https://", "").replace("http://", "").trim().toLowerCase();
 
     //Ignore the start of www.
     if (calculatedDomainName === "w" || calculatedDomainName === "ww" || calculatedDomainName === "www") {
