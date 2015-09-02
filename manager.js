@@ -128,9 +128,13 @@ function copyPasswordToClipboard() {
     if (supportsCopy) {
         passwordSel.focus();
         passwordSel.select();
-        document.execCommand("Copy", false, null);
+        try {
+            document.execCommand("Copy", false, null);
+            showToast(copiedToast, copyPasswordDiv);
+        } catch (err) {
+            console.log("Copy command failed");
+        }
         copyPassword.focus();
-        showToast(copiedToast, copyPasswordDiv);
     }
 }
 
