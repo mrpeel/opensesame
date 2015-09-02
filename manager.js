@@ -106,6 +106,7 @@ function hideElement(element) {
     element.classList.add("hidden");
 }
 
+/*
 function clearClipboard() {
     if (supportsCopy) {
         var focusedElement = document.activeElement;
@@ -114,9 +115,14 @@ function clearClipboard() {
         document.execCommand("Copy", false, null);
         focusedElement.focus();
     }
-}
+}*/
 
 function copyPasswordToClipboard() {
+    if (supportsCopy === "unknown") {
+        //Check if browser supports copy operation
+        supportsCopy = document.queryCommandSupported('copy');
+    }
+
     if (supportsCopy) {
         passwordSel.focus();
         passwordSel.select();
@@ -280,9 +286,10 @@ window.addEventListener("load", function () {
         type.children[lCounter].addEventListener("click", chooseType, false);
     }
 
-    //Check if browser supports copy operation
+    //Set supports copy to unknown until - can't check until a user interaction has occured
+    supportsCopy = "uknown";
     //Set to false by default
-    supportsCopy = false;
+    /*false;
     //Chrome, IE 9, IE10, IE11 and Edge support copy
     if (navigator.userAgent.indexOf("Chrome") !== -1 || navigator.userAgent.indexOf("MSIE 9") !== -1 ||
         navigator.userAgent.indexOf("MSIE 10") !== -1 || navigator.userAgent.indexOf("rv: 11.0") !== -1) {
@@ -294,7 +301,7 @@ window.addEventListener("load", function () {
         if (versionNum >= 41) {
             supportsCopy = true;
         }
-    }
+    }*/
 
 
     //Set initial type
