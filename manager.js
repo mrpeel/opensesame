@@ -10,7 +10,6 @@ var passOff, passwordType, fullName, supportsCopy, error, id = 0;
 function clearPassword() {
     hideElement(passwordCard);
     password.textContent = "";
-    //clearClipboard();
     setPasswordButton();
 }
 
@@ -56,10 +55,10 @@ function generatePassword() {
         passOff.generatePassword(passwordType)
             .then(function (passwordValue) {
                 password.textContent = passwordValue;
-                passwordSel.value = passwordValue;
+                //passwordSel.value = passwordValue;
                 hideElement(loaderPassword);
 
-                if (supportsCopy) {
+                if (document.queryCommandSupported('copy')) {
                     showElement(copyPasswordDiv);
                     password.scrollIntoView();
                     //Copy password to clipboard after 0.5 second
@@ -119,23 +118,35 @@ function clearClipboard() {
 
 function copyPasswordToClipboard() {
 
-    if (supportsCopy === "unknown") {
-        //Check if browser supports copy operation
-        supportsCopy = document.queryCommandSupported('copy');
+    var range = document.createRange();
+    range.selectNode(password);
+    window.getSelection().addRange(range);
+
+    try {
+        // Now that we've selected the anchor text, execute the copy command  
+        var successful = document.execCommand('copy');
+        /*var msg = successful ? 'successful' : 'unsuccessful';
+        console.log('Copy email command was ' + msg);*/
+        showToast(copiedToast, copyPasswordDiv);
+
+    } catch (err) {
+        console.log("Copy command failed");
     }
 
+    // Remove the selections - NOTE: Should use   
+    // removeRange(range) when it is supported  
+    window.getSelection().removeAllRanges();
 
-    if (supportsCopy) {
-        passwordSel.focus();
-        passwordSel.select();
-        try {
-            document.execCommand("Copy", false, null);
-            showToast(copiedToast, copyPasswordDiv);
-        } catch (err) {
-            console.log("Copy command failed");
-        }
-        copyPassword.focus();
+    /*passwordSel.focus();
+    passwordSel.select();
+    try {
+        document.execCommand("Copy", false, null);
+        showToast(copiedToast, copyPasswordDiv);
+    } catch (err) {
+        console.log("Copy command failed");
     }
+    copyPassword.focus();
+    }*/
 }
 
 function chooseType() {
