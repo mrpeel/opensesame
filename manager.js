@@ -297,8 +297,8 @@ window.addEventListener("load", function () {
     familyName.addEventListener("focus", hidePasswordToggle, false);
     familyName.addEventListener("focusin", hidePasswordToggle, false);
     passPhrase.addEventListener("input", changePassPhrase, false);
-    //passPhrase.addEventListener("focus", showPasswordToggle, false);
-    //passPhrase.addEventListener("focusin", showPasswordToggle, false);
+    passPhrase.addEventListener("focus", showPasswordToggle, false);
+    passPhrase.addEventListener("focusin", showPasswordToggle, false);
     securityQuestion.addEventListener("input", clearPassword, false);
     securityQuestion.addEventListener("focus", hidePasswordToggle, false);
     securityQuestion.addEventListener("focusin", hidePasswordToggle, false);
