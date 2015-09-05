@@ -168,6 +168,10 @@ body {
 .mdl-card {
     width: 512px;
     min-height: 150px;
+    z-index: 0;
+}
+.mdl-card.primary-card {
+    z-index: 1;
 }
 .mdl-card h5 {
     font-family: "Muli";

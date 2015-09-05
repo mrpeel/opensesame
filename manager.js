@@ -1,7 +1,7 @@
 /*global PassOff, document, window, console, navigator */
 
 //Variables for UI element
-var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, copyPasswordDiv, loaderPassword, closePassword, copyPassword, passwordSel, passwordToggle, headerKey, copiedToast;
+var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, passwordCardHeader, copyPasswordDiv, loaderPassword, closePassword, copyPassword, passwordSel, passwordToggle, headerKey, copiedToast;
 
 //Variable for calculations
 var passOff, passwordType, fullName, supportsCopy, error, passChangeRequiredCount, lastPassPhraseLength;
@@ -161,6 +161,7 @@ function chooseType() {
 function setType(passwordSelection) {
     copyPassword.textContent = "Copy Password";
     copiedToast.textContext = "Password copied to Clipboard";
+    passwordCardHeader.textContent = "Password";
     showElement(userNameDiv);
     hideElement(securityQuestionDiv);
     passwordType = passwordSelection;
@@ -171,6 +172,7 @@ function setType(passwordSelection) {
             generatePasswordButton.textContent = "Generate User name";
             copyPassword.textContent = "Copy User name";
             copiedToast.textContent = "User name copied to Clipboard";
+            passwordCardHeader.textContent = "User name";
             hideElement(userNameDiv);
             break;
         case "maximum-password":
@@ -192,17 +194,20 @@ function setType(passwordSelection) {
             generatePasswordButton.textContent = "Generate Four Digit PIN";
             copyPassword.textContent = "Copy PIN";
             copiedToast.textContext = "PIN copied to Clipboard";
+            passwordCardHeader.textContent = "PIN";
 
             break;
         case "pin-6":
             generatePasswordButton.textContent = "Generate Six Digit PIN";
             copyPassword.textContent = "Copy PIN";
             copiedToast.textContent = "PIN copied to Clipboard";
+            passwordCardHeader.textContent = "PIN";
             break;
         case "answer":
             generatePasswordButton.textContent = "Generate Security Answer";
             copyPassword.textContent = "Copy Security Answer";
             copiedToast.textContent = "Answer copied to Clipboard";
+            passwordCardHeader.textContent = "Answer";
             showElement(securityQuestionDiv);
             break;
     }
@@ -279,6 +284,7 @@ window.addEventListener("load", function () {
     userNameDiv = document.querySelector("[id=user-name-div]");
     type = document.querySelector("[id=type]");
     passwordCard = document.querySelector("[id=password-card]");
+    passwordCardHeader = document.querySelector("[id=password-card-header]");
     password = document.querySelector(".password");
     error = document.querySelector(".error");
     passwordSel = document.querySelector("[id=password-select]");
