@@ -4,7 +4,7 @@
 var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, copyPasswordDiv, loaderPassword, closePassword, copyPassword, passwordSel, passwordToggle, headerKey, copiedToast;
 
 //Variable for calculations
-var passOff, passwordType, fullName, supportsCopy, error, id = 0;
+var passOff, passwordType, fullName, supportsCopy, error, passChangeRequiredCount, lastPassPhraseLength;
 
 
 function clearPassword() {
@@ -68,12 +68,35 @@ function generatePassword() {
 
                 }
 
+                setPassChangeRequired();
+
             })
             .catch(function (err) {
                 error.textContent = err.message;
             });
     }
 
+}
+
+function setPassChangeRequired() {
+    //Set the more changes required to 2 
+    passChangeRequiredCount = 2;
+
+    //Set the length to the current pass phrase length
+    // This is an atttempt to give a little more security - a user can't just type in extra characters to reveal
+    //  the password.  Some of the characters need to be changed (still eassy to work around)
+    lastPassPhraseLength = passPhrase.value.length;
+}
+
+function changePassPhrase() {
+    clearPassword();
+
+    //Check if the pass phrase needs to be altered before the view toggle can be displayed
+    if (lastPassPhraseLength > 0 && passChangeRequiredCount > 0 && passPhrase.value.length <= lastPassPhraseLength) {
+        passChangeRequiredCount = passChangeRequiredCount - 1;
+    } else if (lastPassPhraseLength === 0 || passChangeRequiredCount === 0) {
+        showPasswordToggle();
+    }
 }
 
 function setPasswordButton() {
@@ -107,16 +130,6 @@ function hideElement(element) {
     element.classList.add("hidden");
 }
 
-/*
-function clearClipboard() {
-    if (supportsCopy) {
-        var focusedElement = document.activeElement;
-        passwordSel.value = "Move along.  Nothing to see here.";
-        passwordSel.select();
-        document.execCommand("Copy", false, null);
-        focusedElement.focus();
-    }
-}*/
 
 function copyPasswordToClipboard() {
 
@@ -139,16 +152,6 @@ function copyPasswordToClipboard() {
     // removeRange(range) when it is supported  
     window.getSelection().removeAllRanges();
 
-    /*passwordSel.focus();
-    passwordSel.select();
-    try {
-        document.execCommand("Copy", false, null);
-        showToast(copiedToast, copyPasswordDiv);
-    } catch (err) {
-        console.log("Copy command failed");
-    }
-    copyPassword.focus();
-    }*/
 }
 
 function chooseType() {
@@ -208,7 +211,13 @@ function setType(passwordSelection) {
 }
 
 function showPasswordToggle() {
-    showElement(passwordToggle);
+    // Once a pass phrase has been used to generate a values, make sure that it can't be re-displayed
+    //  until at least 3 changes are applied.
+    // This is not providing much security but it at least stops someone displaying the exact pass phrase  
+    //  which was just used.
+    if (passChangeRequiredCount === 0) {
+        showElement(passwordToggle);
+    }
 }
 
 function hidePasswordToggle() {
@@ -287,9 +296,9 @@ window.addEventListener("load", function () {
     familyName.addEventListener("input", clearPassword, false);
     familyName.addEventListener("focus", hidePasswordToggle, false);
     familyName.addEventListener("focusin", hidePasswordToggle, false);
-    passPhrase.addEventListener("input", clearPassword, false);
-    passPhrase.addEventListener("focus", showPasswordToggle, false);
-    passPhrase.addEventListener("focusin", showPasswordToggle, false);
+    passPhrase.addEventListener("input", changePassPhrase, false);
+    //passPhrase.addEventListener("focus", showPasswordToggle, false);
+    //passPhrase.addEventListener("focusin", showPasswordToggle, false);
     securityQuestion.addEventListener("input", clearPassword, false);
     securityQuestion.addEventListener("focus", hidePasswordToggle, false);
     securityQuestion.addEventListener("focusin", hidePasswordToggle, false);
@@ -322,6 +331,9 @@ window.addEventListener("load", function () {
         }
     }*/
 
+    //Set the number of changes required to view a password to 0
+    passChangeRequiredCount = 0;
+    lastPassPhraseLength = 0;
 
     //Set initial type
     setType("long-password");
