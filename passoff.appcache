@@ -1,7 +1,6 @@
 CACHE MANIFEST
-
-# v1 - 2015-09-03
-# Use cache for set crypto and promise polyfill
+# 201509062003
+# Use cache for crypto and promise polyfill
 
 CACHE:
 Promise.min.js
