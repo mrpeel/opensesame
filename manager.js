@@ -1,3 +1,9 @@
+/** --------------------------------------------------------------------------------------------------------------
+  This web app uses the application cache - any change requires the passoff.appcache file to be modified.  
+    Modify the timestamp comment in the 2nd line to force browsers to refresh  
+  ----------------------------------------------------------------------------------------------------------------
+*/
+
 /*global PassOff, document, window, console, navigator */
 
 //Variables for UI element
