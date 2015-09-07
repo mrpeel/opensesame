@@ -1,3 +1,8 @@
+/** --------------------------------------------------------------------------------------------------------------
+  This web app uses the application cache - any change requires the passoff.appcache file to be modified.  
+    Modify the timestamp comment in the 2nd line to force browsers to refresh  
+  ----------------------------------------------------------------------------------------------------------------
+*/
 /** Set up global types so JSHint doesn't trigger warnings that they are not defined */
 
 /*global CryptoJS, Promise, performance, console, Uint8Array */
