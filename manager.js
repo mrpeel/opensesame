@@ -7,10 +7,10 @@
 /*global PassOff, document, window, console, navigator */
 
 //Variables for UI element
-var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, passwordCardHeader, copyPasswordDiv, loaderPassword, closePassword, copyPassword, passwordSel, passwordToggle, headerKey, copiedToast;
+var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, passwordCardHeader, copyPasswordDiv, loaderPassword, closePasswordButton, copyPasswordButton, clipboardVal, passwordToggle, headerKey, copiedToast;
 
 //Variable for calculations
-var passOff, passwordType, fullName, supportsCopy, error, passChangeRequiredCount, lastPassPhraseLength;
+var passOff, passwordType, fullName, error, passChangeRequiredCount, lastPassPhraseLength;
 
 
 function clearPassword() {
@@ -61,16 +61,15 @@ function generatePassword() {
         passOff.generatePassword(passwordType)
             .then(function (passwordValue) {
                 password.textContent = passwordValue;
-                //passwordSel.value = passwordValue;
                 hideElement(loaderPassword);
 
                 if (document.queryCommandSupported('copy')) {
                     showElement(copyPasswordDiv);
                     password.scrollIntoView();
-                    //Copy password to clipboard after 0.5 second
+                    //Copy password to clipboard after 0.2 second
                     window.setTimeout(function () {
                         copyPasswordToClipboard();
-                    }, 500);
+                    }, 200);
 
                 }
 
@@ -90,7 +89,7 @@ function setPassChangeRequired() {
 
     //Set the length to the current pass phrase length
     // This is an atttempt to give a little more security - a user can't just type in extra characters to reveal
-    //  the password.  Some of the characters need to be changed (still eassy to work around)
+    //  the password.  Some of the characters need to be changed (still easy to work around)
     lastPassPhraseLength = passPhrase.value.length;
 }
 
@@ -138,25 +137,37 @@ function hideElement(element) {
 
 
 function copyPasswordToClipboard() {
+    clipboardVal.value = password.textContent;
+    clipboardVal.select();
 
-    var range = document.createRange();
-    range.selectNode(password);
-    window.getSelection().addRange(range);
+    if (document.queryCommandEnabled('copy')) {
 
-    try {
-        // Now that we've selected the anchor text, execute the copy command  
-        var successful = document.execCommand('copy');
-        /*var msg = successful ? 'successful' : 'unsuccessful';
-        console.log('Copy email command was ' + msg);*/
-        showToast(copiedToast, copyPasswordDiv);
+        try {
+            // Now that we've selected the anchor text, execute the copy command  
+            var successful = document.execCommand('copy');
+            showToast(copiedToast, copyPasswordDiv);
 
-    } catch (err) {
-        console.log("Copy command failed");
+        } catch (err) {
+            console.log("Copy command failed");
+        }
+    } else {
+        console.log("Copy command not enabled");
     }
+}
 
-    // Remove the selections - NOTE: Should use   
-    // removeRange(range) when it is supported  
-    window.getSelection().removeAllRanges();
+function clearClipboard() {
+    clipboardVal.value = "Value cleared";
+    clipboardVal.select();
+    if (document.queryCommandSupported('copy')) {
+
+        try {
+            var successful = document.execCommand('copy');
+        } catch (err) {
+            console.log("Copy command failed");
+        }
+    } else {
+        console.log("Copy command not enabled");
+    }
 
 }
 
@@ -165,7 +176,7 @@ function chooseType() {
 }
 
 function setType(passwordSelection) {
-    copyPassword.textContent = "Copy Password";
+    copyPasswordButton.textContent = "Copy Password";
     copiedToast.textContext = "Password copied to Clipboard";
     passwordCardHeader.textContent = "Password";
     showElement(userNameDiv);
@@ -176,7 +187,7 @@ function setType(passwordSelection) {
     switch (passwordSelection) {
         case "login":
             generatePasswordButton.textContent = "Generate User name";
-            copyPassword.textContent = "Copy User name";
+            copyPasswordButton.textContent = "Copy User name";
             copiedToast.textContent = "User name copied to Clipboard";
             passwordCardHeader.textContent = "User name";
             hideElement(userNameDiv);
@@ -198,20 +209,20 @@ function setType(passwordSelection) {
             break;
         case "pin":
             generatePasswordButton.textContent = "Generate Four Digit PIN";
-            copyPassword.textContent = "Copy PIN";
+            copyPasswordButton.textContent = "Copy PIN";
             copiedToast.textContext = "PIN copied to Clipboard";
             passwordCardHeader.textContent = "PIN";
 
             break;
         case "pin-6":
             generatePasswordButton.textContent = "Generate Six Digit PIN";
-            copyPassword.textContent = "Copy PIN";
+            copyPasswordButton.textContent = "Copy PIN";
             copiedToast.textContent = "PIN copied to Clipboard";
             passwordCardHeader.textContent = "PIN";
             break;
         case "answer":
             generatePasswordButton.textContent = "Generate Security Answer";
-            copyPassword.textContent = "Copy Security Answer";
+            copyPasswordButton.textContent = "Copy Security Answer";
             copiedToast.textContent = "Answer copied to Clipboard";
             passwordCardHeader.textContent = "Answer";
             showElement(securityQuestionDiv);
@@ -275,6 +286,13 @@ function hideToast(toastElement, coveredElement) {
 
 window.addEventListener("load", function () {
 
+    window.applicationCache.addEventListener('updateready', function (e) {
+        if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
+            // Browser downloaded a new app cache.
+            window.location.reload();
+        }
+    }, false);
+
     passOff = new PassOff();
 
     headerKey = document.querySelector("[id=header-key]");
@@ -292,13 +310,13 @@ window.addEventListener("load", function () {
     passwordCard = document.querySelector("[id=password-card]");
     passwordCardHeader = document.querySelector("[id=password-card-header]");
     password = document.querySelector(".password");
+    clipboardVal = document.querySelector("[id=clipboard-value]");
     error = document.querySelector(".error");
-    passwordSel = document.querySelector("[id=password-select]");
     copiedToast = document.querySelector("[id=copied-toast]");
-    copyPassword = document.querySelector("[id=copy-password]");
+    copyPasswordButton = document.querySelector("[id=copy-password]");
     copyPasswordDiv = document.querySelector("[id=copy-password-div]");
     loaderPassword = document.querySelector("[id=load-bar-ball]");
-    closePassword = document.querySelector("[id=close-password]");
+    closePasswordButton = document.querySelector("[id=close-password]");
 
     givenName.disabled = familyName.disabled = passPhrase.disabled = domainName.disabled = userName.disabled = type.disabled = false;
 
@@ -326,22 +344,6 @@ window.addEventListener("load", function () {
         type.children[lCounter].addEventListener("click", chooseType, false);
     }
 
-    //Set supports copy to unknown until - can't check until a user interaction has occured
-    supportsCopy = "unknown";
-    //Set to false by default
-    /*false;
-    //Chrome, IE 9, IE10, IE11 and Edge support copy
-    if (navigator.userAgent.indexOf("Chrome") !== -1 || navigator.userAgent.indexOf("MSIE 9") !== -1 ||
-        navigator.userAgent.indexOf("MSIE 10") !== -1 || navigator.userAgent.indexOf("rv: 11.0") !== -1) {
-        supportsCopy = true;
-    } else if (navigator.userAgent.indexOf("Firefox") !== -1) {
-        //Firefox supports copy from Version 41
-        var versionNum = navigator.userAgent.substring(navigator.userAgent.indexOf("Firefox") + 8);
-
-        if (versionNum >= 41) {
-            supportsCopy = true;
-        }
-    }*/
 
     //Set the number of changes required to view a password to 0
     passChangeRequiredCount = 0;
@@ -352,8 +354,8 @@ window.addEventListener("load", function () {
     headerKey.addEventListener("click", runTests, false);
     generatePasswordButton.addEventListener("click", generatePassword, false);
     passwordToggle.addEventListener("click", togglePasswordView, false);
-    copyPassword.addEventListener("click", copyPasswordToClipboard, false);
-    closePassword.addEventListener("click", clearPassword, false);
+    copyPasswordButton.addEventListener("click", copyPasswordToClipboard, false);
+    closePasswordButton.addEventListener("click", clearPassword, false);
 
     givenName.focus();
 

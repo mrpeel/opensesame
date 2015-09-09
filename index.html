@@ -113,7 +113,7 @@
                             <!--<p id="extra-vertical-space" class="hidden"></p>-->
 
 
-                            <!-- <input id="password-select" class="clipboard-field" tabindex="-1" /> -->
+                            <input id="clipboard-value" class="clipboard-field" type="textarea" tabindex="-1" />
 
                         </div>
 
@@ -176,20 +176,6 @@
         </main>
     </div>
 
-    <script>
-        // Check if a new cache is available on page load - force a reload if it has.
-        window.addEventListener('load', function(e) {
-
-            window.applicationCache.addEventListener('updateready', function(e) {
-                if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
-                    // Browser downloaded a new app cache.
-                    window.location.reload();
-                }
-            }, false);
-
-        }, false);
-
-    </script>
 
     <script>
         // If Promise is not supported, include the polyfill
