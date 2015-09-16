@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# 20150909_2051  (update this line to force browsers to refresh)
+# 20150916_1944 (update this line to force browsers to refresh)
 # Use cache for material design files and promise polyfill
 
 CACHE:
@@ -12,8 +12,8 @@ style.min.css
 Promise.min.js
 pbkdf2.js
 hmac-sha256.js
-passoff.min.js
 manager.min.js
+opensesame.min.js
 
 NETWORK:
 *

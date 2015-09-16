@@ -260,7 +260,7 @@ function togglePasswordView() {
 }
 
 function runTests() {
-    window.open("test/passoff-test.html");
+    window.open("test/opensesame-test.html");
 }
 
 
