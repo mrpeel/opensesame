@@ -1,6 +1,6 @@
 /*global PassOff, describe, beforeEach, afterEach, JasminePromiseMatchers, it, expect */
 
-describe("Test PassOff Missing Parameter Rejection", function () {
+describe("Test Open Sesame Missing Parameter Rejection", function () {
     var passOff = new PassOff();
     var passwordType = "maximum-password";
 
@@ -211,13 +211,13 @@ describe("Test Maximum Passwords", function () {
 
 describe("Test Long Passwords", function () {
     var passOff = new PassOff();
-    var passwordUserName = "Bafe5+CenoCebw";
-    var password = "Jume3+HayuKisj";
+    var passwordUserName = "JukuBacqMawu0_";
+    var password = "Yusa1-JuroWuds";
     var passwordType = "long-password";
     var fullName = "JimiHendrix";
     var userName = "jmhendrix";
     var passPhrase = "I see you down on the street, oh foxy";
-    var domainName = "hendrix.com";
+    var domainName = "hendrix.com.au";
 
     beforeEach(JasminePromiseMatchers.install);
 
@@ -254,11 +254,11 @@ describe("Test Long Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
-    it("should generate same password when domain starts with 'www.'", function (done) {
+    it("should generate same password when domain starts with 'mail.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "mail." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -266,7 +266,7 @@ describe("Test Long Passwords", function () {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        passOff.domainName = "https://mail." + domainName + "/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -275,7 +275,7 @@ describe("Test Long Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase.toLowerCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("DobiQage8[Geta", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Bopy3?WajnTado", done);
     });
 
     it("should generate a different password when full name is changed", function (done) {
@@ -283,7 +283,7 @@ describe("Test Long Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Zuts2(FejiNiqe", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Qale1[CucuZiqb", done);
     });
 
     it("should generate a different password when user name is changed", function (done) {
@@ -291,7 +291,7 @@ describe("Test Long Passwords", function () {
         passOff.userName = userName.substring(2);
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("FafuVaroJoto3+", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("CujeXeylMelz2;", done);
     });
 
     it("should generate a different password when domain is changed", function (done) {
@@ -299,7 +299,7 @@ describe("Test Long Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(3);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("VaznZahe4,Peky", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("HobnBahlGega4,", done);
     });
 
 
@@ -327,11 +327,11 @@ describe("Test Long Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
-    it("should generate same password when domain starts with 'www.'", function (done) {
+    it("should generate same password when domain starts with 'mail.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "mail." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -339,7 +339,7 @@ describe("Test Long Passwords", function () {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
+        passOff.domainName = "http://mail." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -348,7 +348,7 @@ describe("Test Long Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase.toUpperCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("YilrRijs1^Cepi", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("FihaGiju3;Toci", done);
     });
 
     it("should generate a different password when full name is changed", function (done) {
@@ -356,7 +356,7 @@ describe("Test Long Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Banh6*BowzJuse", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("YoloMasiPoqa2[", done);
     });
 
     it("should generate a different password when domain is changed", function (done) {
@@ -364,7 +364,7 @@ describe("Test Long Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(1);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("RojaWete9'Bikc", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Gixo1!XopbYubq", done);
     });
 
     afterEach(JasminePromiseMatchers.uninstall);
@@ -373,13 +373,13 @@ describe("Test Long Passwords", function () {
 
 describe("Test Medium Passwords", function () {
     var passOff = new PassOff();
-    var passwordUserName = "GanLun3%";
-    var password = "Hah6+Tut";
+    var passwordUserName = "HayXuj4$";
+    var password = "Yun5%Mux";
     var passwordType = "medium-password";
     var fullName = "JohnKennedy";
     var userName = "jfk";
     var passPhrase = "Ask not wht Pass Off can do for you";
-    var domainName = "grassyknoll.com";
+    var domainName = "grassyknoll.co.nz";
 
     beforeEach(JasminePromiseMatchers.install);
 
@@ -416,11 +416,11 @@ describe("Test Medium Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
-    it("should generate same password when domain starts with 'www.'", function (done) {
+    it("should generate same password when domain starts with 'double.barell.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "double.barell." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -428,7 +428,7 @@ describe("Test Medium Passwords", function () {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        passOff.domainName = "https://double.barell." + domainName + "/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -437,7 +437,7 @@ describe("Test Medium Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase.toLowerCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Fuy7-Jik", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Yeq5&Tul", done);
     });
 
     it("should generate a different password when full name is changed", function (done) {
@@ -445,7 +445,7 @@ describe("Test Medium Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Tuv2!Viz", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Haj8=Nun", done);
     });
 
     it("should generate a different password when user name is changed", function (done) {
@@ -453,7 +453,7 @@ describe("Test Medium Passwords", function () {
         passOff.userName = userName.substring(2);
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("GitFiw3!", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("QisHac6'", done);
     });
 
     it("should generate a different password when domain is changed", function (done) {
@@ -461,7 +461,7 @@ describe("Test Medium Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(3);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Saf4=Cak", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Mer9(Zic", done);
     });
 
 
@@ -489,11 +489,11 @@ describe("Test Medium Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
-    it("should generate same password when domain starts with 'www.'", function (done) {
+    it("should generate same password when domain starts with 'double.barell.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "double.barell." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -501,7 +501,7 @@ describe("Test Medium Passwords", function () {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
+        passOff.domainName = "http://double.barell." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -510,7 +510,7 @@ describe("Test Medium Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase.toUpperCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Pid5%Jur", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("KuhSat3.", done);
     });
 
     it("should generate a different password when full name is changed", function (done) {
@@ -518,7 +518,7 @@ describe("Test Medium Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("DogGum2+", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Was8%Zec", done);
     });
 
     it("should generate a different password when domain is changed", function (done) {
@@ -526,7 +526,7 @@ describe("Test Medium Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(1);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("QohPij9&", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("NerFol8?", done);
     });
 
     afterEach(JasminePromiseMatchers.uninstall);
@@ -535,13 +535,13 @@ describe("Test Medium Passwords", function () {
 
 describe("Test Basic Passwords", function () {
     var passOff = new PassOff();
-    var passwordUserName = "GQa39nHD";
-    var password = "nrs30XCj";
+    var passwordUserName = "iMr42cpW";
+    var password = "Gd11gls8";
     var passwordType = "basic-password";
     var fullName = "BobMarley";
     var userName = "bobm";
     var passPhrase = "Get up Stand Up";
-    var domainName = "bobmarley.com";
+    var domainName = "bobmarley.org.tw";
 
     beforeEach(JasminePromiseMatchers.install);
 
@@ -578,11 +578,11 @@ describe("Test Basic Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
-    it("should generate same password when domain starts with 'www.'", function (done) {
+    it("should generate same password when domain starts with 'accounts.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "accounts." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -590,7 +590,7 @@ describe("Test Basic Passwords", function () {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        passOff.domainName = "https://accounts." + domainName + "/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -599,7 +599,7 @@ describe("Test Basic Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase.toLowerCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Lou6YeJ2", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("pR15qGC2", done);
     });
 
     it("should generate a different password when full name is changed", function (done) {
@@ -607,7 +607,7 @@ describe("Test Basic Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Jo25Mes9", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("maw6yDE2", done);
     });
 
     it("should generate a different password when user name is changed", function (done) {
@@ -615,7 +615,7 @@ describe("Test Basic Passwords", function () {
         passOff.userName = userName.substring(2);
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("eF16jhd0", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Qp67wNf0", done);
     });
 
     it("should generate a different password when domain is changed", function (done) {
@@ -623,7 +623,7 @@ describe("Test Basic Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(3);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("lce94fme", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Msm77bDg", done);
     });
 
 
@@ -651,11 +651,11 @@ describe("Test Basic Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
-    it("should generate same password when domain starts with 'www.'", function (done) {
+    it("should generate same password when domain starts with 'accounts.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "accounts." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -663,7 +663,7 @@ describe("Test Basic Passwords", function () {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
+        passOff.domainName = "http://accounts." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -672,7 +672,7 @@ describe("Test Basic Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase.toUpperCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("rpX1xIf8", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("ls19hhn3", done);
     });
 
     it("should generate a different password when full name is changed", function (done) {
@@ -680,7 +680,7 @@ describe("Test Basic Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("YC71beD8", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("OME4cLd9", done);
     });
 
     it("should generate a different password when domain is changed", function (done) {
@@ -688,7 +688,7 @@ describe("Test Basic Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(1);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("DOB5bqU4", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("dy40iwK2", done);
     });
     afterEach(JasminePromiseMatchers.uninstall);
 });
@@ -697,13 +697,13 @@ describe("Test Basic Passwords", function () {
 
 describe("Test Short Passwords", function () {
     var passOff = new PassOff();
-    var passwordUserName = "Riz4";
-    var password = "Sez8";
+    var passwordUserName = "Tob1";
+    var password = "Kej5";
     var passwordType = "short-password";
     var fullName = "Quantic";
     var userName = "quantic";
     var passPhrase = "Infinite rwgression";
-    var domainName = "soulorchestra.com";
+    var domainName = "soulorchestra.io";
 
     beforeEach(JasminePromiseMatchers.install);
 
@@ -740,11 +740,11 @@ describe("Test Short Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
-    it("should generate same password when domain starts with 'www.'", function (done) {
+    it("should generate same password when domain starts with 'login.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "login." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -752,7 +752,7 @@ describe("Test Short Passwords", function () {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        passOff.domainName = "https://login." + domainName + "/stuff/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -761,7 +761,7 @@ describe("Test Short Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase.toLowerCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Siv1", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Miv9", done);
     });
 
     it("should generate a different password when full name is changed", function (done) {
@@ -769,7 +769,7 @@ describe("Test Short Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Qew4", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Jen9", done);
     });
 
     it("should generate a different password when user name is changed", function (done) {
@@ -777,7 +777,7 @@ describe("Test Short Passwords", function () {
         passOff.userName = userName.substring(2);
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Puc3", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Lac8", done);
     });
 
     it("should generate a different password when domain is changed", function (done) {
@@ -785,7 +785,7 @@ describe("Test Short Passwords", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(3);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Geq7", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Hut5", done);
     });
 
 
@@ -813,11 +813,11 @@ describe("Test Short Passwords", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
-    it("should generate same password when domain starts with 'www.'", function (done) {
+    it("should generate same password when domain starts with 'login.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "login." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -825,7 +825,7 @@ describe("Test Short Passwords", function () {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
+        passOff.domainName = "http://login." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -834,7 +834,7 @@ describe("Test Short Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase.toUpperCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Kep5", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Gut4", done);
     });
 
     it("should generate a different password when full name is changed", function (done) {
@@ -842,7 +842,7 @@ describe("Test Short Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Car1", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Nac5", done);
     });
 
     it("should generate a different password when domain is changed", function (done) {
@@ -850,7 +850,7 @@ describe("Test Short Passwords", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(1);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Ger9", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("Cap7", done);
     });
     afterEach(JasminePromiseMatchers.uninstall);
 });
@@ -858,13 +858,13 @@ describe("Test Short Passwords", function () {
 
 describe("Test Four Digit Pin", function () {
     var passOff = new PassOff();
-    var passwordUserName = "6997";
-    var password = "2902";
+    var passwordUserName = "1759";
+    var password = "6843";
     var passwordType = "pin";
     var fullName = "TylerDurden";
     var userName = "tdurden";
-    var passPhrase = "The first rule of PassO ff is there is no Pass Off";
-    var domainName = "fightclub.com";
+    var passPhrase = "The first rule of Pass Off is there is no Pass Off";
+    var domainName = "fightclub.edu.ca";
 
     beforeEach(JasminePromiseMatchers.install);
 
@@ -901,11 +901,11 @@ describe("Test Four Digit Pin", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
-    it("should generate same PIN when domain starts with 'www.'", function (done) {
+    it("should generate same PIN when domain starts with 'www2.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "www2." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -913,7 +913,7 @@ describe("Test Four Digit Pin", function () {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        passOff.domainName = "https://www2." + domainName + "/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -922,7 +922,7 @@ describe("Test Four Digit Pin", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase.toLowerCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("0466", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("6083", done);
     });
 
     it("should generate a different PIN when full name is changed", function (done) {
@@ -930,7 +930,7 @@ describe("Test Four Digit Pin", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("8751", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("3611", done);
     });
 
     it("should generate a different PIN when user name is changed", function (done) {
@@ -938,7 +938,7 @@ describe("Test Four Digit Pin", function () {
         passOff.userName = userName.substring(2);
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("6539", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("1898", done);
     });
 
     it("should generate a different PIN when domain is changed", function (done) {
@@ -946,7 +946,7 @@ describe("Test Four Digit Pin", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(3);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("2462", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("0978", done);
     });
 
 
@@ -974,11 +974,11 @@ describe("Test Four Digit Pin", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
-    it("should generate same PIN when domain starts with 'www.'", function (done) {
+    it("should generate same PIN when domain starts with 'www2.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "www2." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -986,7 +986,7 @@ describe("Test Four Digit Pin", function () {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
+        passOff.domainName = "http://www2." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -995,7 +995,7 @@ describe("Test Four Digit Pin", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase.toUpperCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("1368", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("8584", done);
     });
 
     it("should generate a different PIN when full name is changed", function (done) {
@@ -1003,7 +1003,7 @@ describe("Test Four Digit Pin", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("2435", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("3233", done);
     });
 
     it("should generate a different PIN when domain is changed", function (done) {
@@ -1011,7 +1011,7 @@ describe("Test Four Digit Pin", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(1);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("0780", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("5600", done);
     });
     afterEach(JasminePromiseMatchers.uninstall);
 });
@@ -1019,13 +1019,13 @@ describe("Test Four Digit Pin", function () {
 
 describe("Test Six Digit Pin", function () {
     var passOff = new PassOff();
-    var passwordUserName = "110723";
-    var password = "243550";
+    var passwordUserName = "684466";
+    var password = "998384";
     var passwordType = "pin-6";
     var fullName = "MrRobot";
     var userName = "elliot";
     var passPhrase = "Evil Corp must die";
-    var domainName = "fsociety.com";
+    var domainName = "fsociety.co.uk";
 
     beforeEach(JasminePromiseMatchers.install);
 
@@ -1062,11 +1062,11 @@ describe("Test Six Digit Pin", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
-    it("should generate same PIN when domain starts with 'www.'", function (done) {
+    it("should generate same PIN when domain starts with 'account.login.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "account.login." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -1074,7 +1074,7 @@ describe("Test Six Digit Pin", function () {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        passOff.domainName = "https://account.login." + domainName + "/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -1083,7 +1083,7 @@ describe("Test Six Digit Pin", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase.toLowerCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("614542", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("240985", done);
     });
 
     it("should generate a different PIN when full name is changed", function (done) {
@@ -1091,7 +1091,7 @@ describe("Test Six Digit Pin", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("850669", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("886527", done);
     });
 
     it("should generate a different PIN when user name is changed", function (done) {
@@ -1099,7 +1099,7 @@ describe("Test Six Digit Pin", function () {
         passOff.userName = userName.substring(2);
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("889590", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("971333", done);
     });
 
     it("should generate a different PIN when domain is changed", function (done) {
@@ -1107,7 +1107,7 @@ describe("Test Six Digit Pin", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(3);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("091960", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("212147", done);
     });
 
 
@@ -1135,11 +1135,11 @@ describe("Test Six Digit Pin", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
-    it("should generate same PIN when domain starts with 'www.'", function (done) {
+    it("should generate same PIN when domain starts with 'account.login.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "account.login." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -1147,7 +1147,7 @@ describe("Test Six Digit Pin", function () {
         passOff.fullName = fullName;
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "http://www." + domainName + "/intothebowels/downthere/wtf.html";
+        passOff.domainName = "http://account.login." + domainName + "/intothebowels/downthere/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(password, done);
     });
 
@@ -1156,7 +1156,7 @@ describe("Test Six Digit Pin", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase.toUpperCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("667535", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("053243", done);
     });
 
     it("should generate a different PIN when full name is changed", function (done) {
@@ -1164,7 +1164,7 @@ describe("Test Six Digit Pin", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("506462", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("446552", done);
     });
 
     it("should generate a different PIN when domain is changed", function (done) {
@@ -1172,7 +1172,7 @@ describe("Test Six Digit Pin", function () {
         passOff.userName = "";
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(1);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("658916", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("767092", done);
     });
     afterEach(JasminePromiseMatchers.uninstall);
 });
@@ -1180,13 +1180,13 @@ describe("Test Six Digit Pin", function () {
 
 describe("Test User Name", function () {
     var passOff = new PassOff();
-    var passwordUserName = "xillosuse";
+    var passwordUserName = "fixyijata";
     var password = "243550";
     var passwordType = "login";
     var fullName = "HumptyDumpty";
     var userName = "";
-    var passPhrase = "I sat ont he wall and had a GREAT fall";
-    var domainName = "nurseryrhymes.com";
+    var passPhrase = "I sat on the wall and had a GREAT fall";
+    var domainName = "nurseryrhymes.com.au";
 
     beforeEach(JasminePromiseMatchers.install);
 
@@ -1216,11 +1216,11 @@ describe("Test User Name", function () {
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
-    it("should generate same user name when domain starts with 'www.'", function (done) {
+    it("should generate same user name when domain starts with 'wwwotherstuff.'", function (done) {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "www." + domainName;
+        passOff.domainName = "wwwotherstuff." + domainName;
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -1228,7 +1228,7 @@ describe("Test User Name", function () {
         passOff.fullName = fullName;
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
-        passOff.domainName = "https://www." + domainName + "/wtf.html";
+        passOff.domainName = "https://wwwotherstuff." + domainName + "/wtf.html";
         expect(passOff.generatePassword(passwordType)).toBeResolvedWith(passwordUserName, done);
     });
 
@@ -1237,7 +1237,7 @@ describe("Test User Name", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase.toLowerCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("tiphixuvu", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("sitteyeja", done);
     });
 
     it("should generate a different user name when full name is changed", function (done) {
@@ -1245,7 +1245,7 @@ describe("Test User Name", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("bibpoyebu", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("weykoqufo", done);
     });
 
     it("should generate a different user name when domain is changed", function (done) {
@@ -1253,7 +1253,7 @@ describe("Test User Name", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(3);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("cokqumugo", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("gabhuziwe", done);
     });
 
     afterEach(JasminePromiseMatchers.uninstall);
@@ -1262,13 +1262,13 @@ describe("Test User Name", function () {
 
 describe("Test Security Answers", function () {
     var passOff = new PassOff();
-    var passwordUserName = "bev natyolede loru";
-    var password = "kez gelwomaqe buhi";
+    var passwordUserName = "hu yifse ciq kujurba";
+    var password = "ceh qisyezoda wolu";
     var passwordType = "answer";
     var fullName = "KruderAndDorfmeister";
     var userName = "kandd";
     var passPhrase = "Bugpowder dust";
-    var domainName = "kanddsessions.com";
+    var domainName = "kanddsessions.cool";
     var secQuestion = "What is your mother's maiden name?";
 
     beforeEach(JasminePromiseMatchers.install);
@@ -1360,7 +1360,7 @@ describe("Test Security Answers", function () {
         passOff.userName = userName;
         passOff.passPhrase = passPhrase.toLowerCase();
         passOff.domainName = domainName;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("bicg hoc vajwibu cun", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("lu lunlo piz zizovwu", done);
     });
 
     it("should generate a different answer when full name is changed", function (done) {
@@ -1369,7 +1369,7 @@ describe("Test Security Answers", function () {
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
         passOff.securityQuestion = secQuestion;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("jix titqenufa xomu", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("mo paltu kib cazojbe", done);
     });
 
     it("should generate a different answer when user name is changed", function (done) {
@@ -1378,7 +1378,7 @@ describe("Test Security Answers", function () {
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
         passOff.securityQuestion = secQuestion;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("wof fiqwawuve potu", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("va sobsu qoj narixqe", done);
     });
 
     it("should generate a different answer when domain is changed", function (done) {
@@ -1387,7 +1387,7 @@ describe("Test Security Answers", function () {
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(3);
         passOff.securityQuestion = secQuestion;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("rucf vud giqmaqa baj", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("qujl fav yenvoju gah", done);
     });
 
     it("should generate a different answer when question is changed", function (done) {
@@ -1396,7 +1396,7 @@ describe("Test Security Answers", function () {
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
         passOff.securityQuestion = secQuestion.substring(8);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("fe gohdo bol xuzapya", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("si culni tob lugorju", done);
     });
 
 
@@ -1478,7 +1478,7 @@ describe("Test Security Answers", function () {
         passOff.passPhrase = passPhrase.toUpperCase();
         passOff.domainName = domainName;
         passOff.securityQuestion = secQuestion;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("duk sarnuhuwe ciwe", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("devk zap kuhsici ber", done);
     });
 
     it("should generate a different answer when full name is changed", function (done) {
@@ -1487,7 +1487,7 @@ describe("Test Security Answers", function () {
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
         passOff.securityQuestion = secQuestion;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("lovk vec nolveme roh", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("dusb cir retzagi meq", done);
     });
 
     it("should generate a different answer when domain is changed", function (done) {
@@ -1496,7 +1496,7 @@ describe("Test Security Answers", function () {
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName.substring(1);
         passOff.securityQuestion = secQuestion;
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("zorc voc bijjole wuw", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("tibr vut mufwuju yoz", done);
     });
 
     it("should generate a different answer when question is changed", function (done) {
@@ -1505,7 +1505,7 @@ describe("Test Security Answers", function () {
         passOff.passPhrase = passPhrase;
         passOff.domainName = domainName;
         passOff.securityQuestion = secQuestion.substring(8);
-        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("li cetqe hiz nivumci", done);
+        expect(passOff.generatePassword(passwordType)).toBeResolvedWith("pucp zuy vopjova met", done);
     });
 
 
