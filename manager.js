@@ -19,6 +19,20 @@ function clearPassword() {
     setPasswordButton();
 }
 
+function trimDomainName() {
+    var posDomain = 0;
+
+    /*Retrieve domain value and trim the leading http:// or https:// */
+    domainName.value = domainName.value.replace(/^https?:\/\//g, "").toLowerCase().trim();
+
+    //Check whether the whole URL is there - remove anything with a '/' onwards
+    posDomain = domainName.value.indexOf("/");
+    if (posDomain > 0) {
+        domainName.value = domainName.value.substr(0, posDomain);
+    }
+
+}
+
 function generatePassword() {
 
     hidePasswordToggle();
@@ -335,6 +349,8 @@ window.addEventListener("load", function () {
     domainName.addEventListener("input", clearPassword, false);
     domainName.addEventListener("focus", hidePasswordToggle, false);
     domainName.addEventListener("focusin", hidePasswordToggle, false);
+    domainName.addEventListener("focusout", trimDomainName, false);
+    domainName.addEventListener("blur", trimDomainName, false);
     userName.addEventListener("input", clearPassword, false);
     userName.addEventListener("focus", hidePasswordToggle, false);
     userName.addEventListener("focusin", hidePasswordToggle, false);
