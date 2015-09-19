@@ -7,7 +7,7 @@
 /*global PassOff, document, window, console, navigator */
 
 //Variables for UI element
-var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, passwordCardHeader, copyPasswordDiv, loaderPassword, closePasswordButton, copyPasswordButton, clipboardVal, passwordToggle, headerKey, copiedToast;
+var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, passwordCardHeader, copyPasswordDiv, loaderPassword, closePasswordButton, copyPasswordButton, clipboardVal, passwordToggle, headerKey, copiedToast, lastPassGenTimeStamp;
 
 //Variable for calculations
 var passOff, passwordType, fullName, error, passChangeRequiredCount, lastPassPhraseLength;
@@ -15,6 +15,7 @@ var passOff, passwordType, fullName, error, passChangeRequiredCount, lastPassPhr
 
 function clearPassword() {
     hideElement(passwordCard);
+    password.textContent = "00000000000000000000000000000000000000000000000000000000000000000000000000000";
     password.textContent = "";
     setPasswordButton();
 }
@@ -31,6 +32,14 @@ function trimDomainName() {
         domainName.value = domainName.value.substr(0, posDomain);
     }
 
+}
+
+function clearValues() {
+    passPhrase.value = "00000000000000000000000000000000000000000000000000000000000000000000000000000";
+    passPhrase.value = "";
+    passChangeRequiredCount = 0;
+
+    clearPassword();
 }
 
 function generatePassword() {
@@ -98,6 +107,8 @@ function generatePassword() {
 }
 
 function setPassChangeRequired() {
+    var thisPasswordTimeStamp;
+
     //Set the more changes required to 2 
     passChangeRequiredCount = 2;
 
@@ -105,6 +116,19 @@ function setPassChangeRequired() {
     // This is an atttempt to give a little more security - a user can't just type in extra characters to reveal
     //  the password.  Some of the characters need to be changed (still easy to work around)
     lastPassPhraseLength = passPhrase.value.length;
+
+    //Set timestamp for last generated password
+    lastPassGenTimeStamp = Date.now();
+    thisPasswordTimeStamp = lastPassGenTimeStamp;
+
+    //Set function to clear passwords after 30 minutes if no other activity has occurred
+    window.setTimeout(function () {
+        //Check of this was the last password generated (timestamp still matches)
+        if (thisPasswordTimeStamp === lastPassGenTimeStamp) {
+            //Too much time has elapsed without any password activity so clear all the values
+            clearValues();
+        }
+    }, 1800000);
 }
 
 function changePassPhrase() {

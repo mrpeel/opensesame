@@ -184,6 +184,18 @@ PassOff.prototype.convertWordArrayToUint8Array = function (wordArray) {
 };
 
 /**
+ * Resets all the values used for calculations
+ * @param {None}.
+ * @return {None}.
+ */
+
+PassOff.prototype.clearPassPhrase = function (wordArray) {
+    "use strict";
+
+    this.passPhrase = "00000000000000000000000000000000000000000000000000000000000000000000000000000";
+    this.passPhrase = "";
+};
+/**
  * Runs the generation of a password by generating a key (PBKDF2) and then using that key to sign (HMAC256) the constructed domain value
  * @param {String} the password type to generate
  * @return {Promise} a promise which will resolve the generated password.
@@ -315,6 +327,15 @@ PassOff.prototype.generatePassword = function (passwordType) {
                     //console.log("Generated password: " + password);
                     //console.log(performance.now() - t0 + " ms");
                     //console.log("All done");
+
+                    //Clear seedArray
+                    for (var seedCounter = 0; seedCounter < seedArray.length; seedCounter++) {
+                        seedArray[seedCounter] = 0;
+                    }
+
+
+                    //Clear pass phrase values
+                    passOffContext.clearPassPhrase();
 
                     resolve(password);
                 })
