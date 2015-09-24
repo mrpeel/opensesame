@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang=en manifest="opensesame.appcache">
+<!-- This web app uses the application cache - any change requires the passoff.appcache file to be modified.  
+    Modify the timestamp comment in the 2nd line to force browsers to refresh  -->
+
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv=Content-Security-Policy content="default-src 'none'; style-src 'self' https://fonts.googleapis.com https://storage.googleapis.com; script-src 'self' 'unsafe-inline' https://storage.googleapis.com;font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self'">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Generate passwords on demand">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>&nbsp;&nbsp;Open Sesame</title>
+
+    <meta name="application-name" content="&nbsp;&nbsp;Open Sesame" />
+    <link rel="icon" href="favicon.ico" />
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" sizes="192x192" href="favicon-192.png">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="white">
+    <meta name="apple-mobile-web-app-title" content="Open Sesame">
+    <link rel="apple-touch-icon-precomposed" href="favicon-152.png">
+
+    <!-- Tile icon for Win8 (144x144 + tile color) -->
+    <meta name="msapplication-TileImage" content="favicon-144.png">
+    <meta name="msapplication-TileColor" content="#FBFBFB">
+
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Muli&text=PassOpSasfYourPwdINAnweUmly' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.teal-pink.min.css" />
+    <link rel="stylesheet" href="opensesame.min.css">
+</head>
+
+<body class="mdl-color--grey-200 mdl-base overflow-x-visible">
+    @@include('opensesame-body.html')
+
+    <script>
+        // If Promise is not supported, include the polyfill
+        window.Promise || document.write("<script src=Promise.min.js><\/script>");
+
+    </script>
+
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+    <script src="pbkdf2.js"></script>
+    <script src="hmac-sha256.js"></script>
+    <script src="opensesame.min.js"></script>
+</body>
+
+</html>
