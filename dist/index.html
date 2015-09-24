@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang=en manifest="opensesame.appcache">
+<!-- This web app uses the application cache - any change requires the passoff.appcache file to be modified.  
+    Modify the timestamp comment in the 2nd line to force browsers to refresh  -->
+
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv=Content-Security-Policy content="default-src 'none'; style-src 'self' https://fonts.googleapis.com https://storage.googleapis.com; script-src 'self' 'unsafe-inline' https://storage.googleapis.com;font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self'">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Generate passwords on demand">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>&nbsp;&nbsp;Open Sesame</title>
+
+    <meta name="application-name" content="&nbsp;&nbsp;Open Sesame" />
+    <link rel="icon" href="favicon.ico" />
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" sizes="192x192" href="favicon-192.png">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="white">
+    <meta name="apple-mobile-web-app-title" content="Open Sesame">
+    <link rel="apple-touch-icon-precomposed" href="favicon-152.png">
+
+    <!-- Tile icon for Win8 (144x144 + tile color) -->
+    <meta name="msapplication-TileImage" content="favicon-144.png">
+    <meta name="msapplication-TileColor" content="#FBFBFB">
+
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Muli&text=PassOpSasfYourPwdINAnweUmly' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.teal-pink.min.css" />
+    <link rel="stylesheet" href="opensesame.min.css">
+</head>
+
+<body class="mdl-color--grey-200 mdl-base overflow-x-visible">
+    <div class="mdl-layout mdl-js-layout overflow-x-visible">
+    <main class="mdl-layout__content overflow-x-visible">
+        <div class="page-content mdl-color--grey-100 overflow-x-visible">
+
+            <section class="section--center mdl-grid password-grid overflow-x-visible">
+                <div class="mdl-card mdl-cell mdl-cell--6-col mdl-shadow--2dp overflow-x-visible primary-card">
+
+                    <div class="mdl-color--primary mdl-color-text--white overflow-x-visible">
+                        <div class="header-circle mdl-color--teal-600">
+                            <button id="header-key" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon circle-icon-tall">
+                                <i class="material-icons circle-icon-tall">phonelink_lock</i>
+                            </button>
+                        </div>
+                        <h4>Open Sesame</h4>
+                        <div class="header-upper-right">
+                            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--white icon-uper-right" id="password-options">
+                                <i class="material-icons">more_vert</i>
+                            </button>
+
+                            <ul id="type" class="mdl-menu mdl-js-menu mdl-menu--bottom-right" for="password-options">
+                                <li id="maximum-password" class="mdl-menu__item">Maximum Password</li>
+                                <li id="long-password" class="mdl-menu__item">Long Password</li>
+                                <li id="medium-password" class="mdl-menu__item">Medium Password</li>
+                                <li id="basic-password" class="mdl-menu__item">Basic Password</li>
+                                <li id="short-password" class="mdl-menu__item">Short Password</li>
+                                <li id="pin" class="mdl-menu__item">Four Digit PIN</li>
+                                <li id="pin-6" class="mdl-menu__item">Six Digit PIN</li>
+                                <li id="login" class="mdl-menu__item">User name</li>
+                                <li id="answer" class="mdl-menu__item">Security Answer</li>
+                            </ul>
+                        </div>
+                    </div>
+
+
+                    <div class="mdl-layout__content mdl-card__supporting-text overflow-x-visible">
+
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+                            <input class="mdl-textfield__input" type="text" id="given-name" />
+                            <label class="mdl-textfield__label required-field" for="given-name">Given name</label>
+                        </div>
+
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+                            <input class="mdl-textfield__input" type="text" id="family-name" />
+                            <label class="mdl-textfield__label required-field" for="family-name">Family name</label>
+                        </div>
+
+
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+                            <input class="mdl-textfield__input passphrase" type="password" id="passphrase" />
+                            <label class="mdl-textfield__label required-field" for="passphrase">Pass phrase</label>
+                            <button id="show-password" class="show-password mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--grey-700 hidden" tabindex="-1">
+                                <i class="material-icons">visibility</i>
+                            </button>
+                        </div>
+
+
+
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+                            <input class="mdl-textfield__input" type="text" id="domain" />
+                            <label class="mdl-textfield__label required-field" for="domain">Web site</label>
+                        </div>
+
+                        <div id="security-question-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label  textfield-full-width hidden">
+                            <input class="mdl-textfield__input" type="text" id="security-question" />
+                            <label class="mdl-textfield__label required-field" for="security-question">Security question</label>
+                        </div>
+
+                        <div id="user-name-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+                            <input class="mdl-textfield__input" type="text" id="user-name" />
+                            <label class="mdl-textfield__label" for="user-name">Website user name (optional)</label>
+                        </div>
+
+                        <!--<p id="extra-vertical-space" class="hidden"></p>-->
+
+
+                        <input id="clipboard-value" class="clipboard-field" type="textarea" tabindex="-1" />
+
+                    </div>
+
+                    <div class="mdl-card__actions">
+                        <div class="mdl-card__supporting-text">
+                            <button id="generate-password" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">
+                                Generate Long Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mdl-cell mdl-cell--1-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+
+                <div id="password-card" class="mdl-card mdl-cell mdl-cell--middle mdl-cell--6-col mdl-shadow--2dp hidden">
+                    <div class="mdl-color--primary mdl-color-text--white">
+                        <div class="header-circle mdl-color--teal-600">
+                            <i class="material-icons circle-icon">lock_open</i>
+                        </div>
+                        <h4><span id="password-card-header">Password</span></h4>
+                    </div>
+
+                    <button class="close-button-top-right mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--white" id="close-password">
+                        <i class="material-icons">close</i>
+                    </button>
+                    <div class="mdl-layout__content mdl-card__supporting-text">
+                        <div id="load-bar-ball" class="loader-four-balls hidden">
+                            <div class="load-ball"></div>
+                            <div class="load-ball"></div>
+                            <div class="load-ball"></div>
+                            <div class="load-ball"></div>
+                        </div>
+                        <!--<div id="load-bar-password" class="loader hidden"></div>-->
+                        <div class="mdl-text-color--teal-700 extra-vertical-padding">
+                            <span class="password"></span>
+                        </div>
+                        <div><code class=error><noscript>You must have JavaScript enabled for this page to work.</noscript></code></div>
+                        <div id="copy-password-div" class="mdl-card__actions hidden">
+                            <button id="copy-password" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect fade-in">
+                                Copy Password
+                            </button>
+                        </div>
+                        <div id="copied-toast" class="toast hidden">
+                            Password Copied to Clipboard
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+            </section>
+
+        </div>
+
+
+
+
+    </main>
+</div>
+
+
+    <script>
+        // If Promise is not supported, include the polyfill
+        window.Promise || document.write("<script src=Promise.min.js><\/script>");
+
+    </script>
+
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
+    <script src="pbkdf2.js"></script>
+    <script src="hmac-sha256.js"></script>
+    <script src="opensesame.min.js"></script>
+</body>
+
+</html>

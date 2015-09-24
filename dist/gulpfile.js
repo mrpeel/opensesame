@@ -12,7 +12,7 @@ var connect = require('gulp-connect');
 var ghPages = require('gulp-gh-pages');
 
 
-gulp.task('default', ['buildstandalonehtml', 'appcachetimestamp', 'buildjs', 'minifycss', 'copytodist', 'copytodisttest']);
+gulp.task('default', ['buildstandalonehtml', 'appcachetimestamp', 'buildjs', 'minifycss', 'copytodist']);
 
 gulp.task('buildstandalonehtml', function () {
     gulp.src(['src/standalone-container.html'])
@@ -64,7 +64,7 @@ gulp.task('copytodist', function () {
 });
 
 gulp.task('copytodisttest', function () {
-    gulp.src(['test/*.html', 'test/*.css', 'test/*.min.js', 'test/*.png'])
+    gulp.src(['test/*.html', 'test/*.css', 'test/*.min.js'])
         .pipe(gulp.dest('./dist/test/'));
 });
 
