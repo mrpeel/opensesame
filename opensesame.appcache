@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# 20150919_1343 (update this line to force browsers to refresh)
+# 1443094033823
 # Use cache for material design files and promise polyfill
 
 CACHE:
@@ -8,12 +8,11 @@ favicon.ico
 favicon-192.png
 favicon-152.png
 favicon-144.png
-style.min.css
+opensesame.min.css
+opensesame.min.js
 Promise.min.js
 pbkdf2.js
 hmac-sha256.js
-manager.min.js
-opensesame.min.js
 
 NETWORK:
 *
