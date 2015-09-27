@@ -12,7 +12,7 @@ var connect = require('gulp-connect');
 var ghPages = require('gulp-gh-pages');
 
 
-gulp.task('default', ['buildstandalonehtml', 'appcachetimestamp', 'buildjs', 'minifycss', 'copytodist', 'copytodisttest']);
+gulp.task('default', ['buildstandalonehtml', 'appcachetimestamp', 'buildstandalonejs', 'minifycss', 'copytodist', 'copytodisttest', 'serve']);
 
 gulp.task('buildstandalonehtml', function () {
     gulp.src(['src/standalone-container.html'])
@@ -39,10 +39,10 @@ gulp.task('appcachetimestamp', function () {
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('buildjs', function () {
+gulp.task('buildstandalonejs', function () {
     return gulp.src(['src/passoff.js', 'src/manager.js'])
-        .pipe(concat('opensesame.js'))
         .pipe(sourcemaps.init())
+        .pipe(concat('opensesame.js'))
         .pipe(gulp.dest('./'))
         .pipe(rename('opensesame.min.js'))
         .pipe(uglify())
