@@ -1,0 +1,24 @@
+{
+    "manifest_version": 2,
+    "name": "Chrome Extensions 101",
+    "version": "0.1",
+    "permissions": [
+            "activeTab"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                    "<all_urls>"
+                        ],
+            "js": ["content.js"]
+        }
+    ],
+    "browser_action": {
+        "default_title": "Set this page's password",
+        "default_icon": "ext-icon.png",
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "scripts": ["background.js"]
+    }
+}

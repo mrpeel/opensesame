@@ -1,5 +1,6 @@
 {
     "jscodehints.detectedExclusions": [
-        "/Users/neilkloot/Dev/pass-off/pbkdf2.js"
+        "/Users/neilkloot/Dev/pass-off/pbkdf2.js",
+        "/Users/neilkloot/Dev/opensesame/dist/test/opensesame-spec.min.js"
     ]
 }

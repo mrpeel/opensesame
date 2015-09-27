@@ -4,10 +4,10 @@
   ----------------------------------------------------------------------------------------------------------------
 */
 
-/*global PassOff, document, window, console, navigator */
+/*global PassOff, document, window, console, navigator, isChromeExtension, extHasPassword, generateExtPassword */
 
 //Variables for UI element
-var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, passwordCardHeader, copyPasswordDiv, loaderPassword, closePasswordButton, copyPasswordButton, clipboardVal, passwordToggle, headerKey, copiedToast, lastPassGenTimeStamp;
+var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, passwordCardHeader, copyPasswordDiv, loaderPassword, closePasswordButton, copyPasswordButton, clipboardVal, passwordToggle, headerKey, successToast, lastPassGenTimeStamp, successPrefix;
 
 //Variable for calculations
 var passOff, passwordType, fullName, error, passChangeRequiredCount, lastPassPhraseLength;
@@ -86,15 +86,7 @@ function generatePassword() {
                 password.textContent = passwordValue;
                 hideElement(loaderPassword);
 
-                if (document.queryCommandSupported('copy')) {
-                    showElement(copyPasswordDiv);
-                    password.scrollIntoView();
-                    //Copy password to clipboard after 0.2 second
-                    window.setTimeout(function () {
-                        copyPasswordToClipboard();
-                    }, 200);
-
-                }
+                populateOrCopyPassword();
 
                 setPassChangeRequired();
 
@@ -102,6 +94,43 @@ function generatePassword() {
             .catch(function (err) {
                 error.textContent = err.message;
             });
+    }
+
+}
+
+function populateOrCopyPassword() {
+    var executePasswordCopy = false;
+
+    //Check if this is running within a Chrome extension and a password or PIN is being generated
+    if (typeof isChromeExtension !== 'undefined') {
+        //Call the extension password set function
+        generateExtPassword();
+
+        //Check whether the extension can directly set the password or PIN and if it the correct type
+        //If password can't be set or it is another type (user name or answer) it will just copy to cliboard instead
+        if (extHasPassword !== true || passwordCardHeader.textContent === "User name" || passwordCardHeader.textContent === "Answer") {
+            executePasswordCopy = true;
+        } else {
+            //Password will be directly inserted by ext-backgrounf.js, so show a password / pin inserted toast
+            successToast.textContent = successPrefix + " inserted";
+            window.setTimeout(function () {
+                showToast(successToast, copyPasswordDiv);
+            }, 250);
+        }
+
+    } else if (document.queryCommandSupported('copy')) {
+        //Not running in an extension so check the copy capability of the browser
+        executePasswordCopy = true;
+    }
+
+    if (executePasswordCopy) {
+        showElement(copyPasswordDiv);
+        password.scrollIntoView();
+        //Copy password to clipboard after 0.2 second
+        window.setTimeout(function () {
+            copyPasswordToClipboard();
+        }, 200);
+
     }
 
 }
@@ -183,7 +212,8 @@ function copyPasswordToClipboard() {
         try {
             // Now that we've selected the anchor text, execute the copy command  
             var successful = document.execCommand('copy');
-            showToast(copiedToast, copyPasswordDiv);
+            successToast.textContent = successPrefix + " copied to Clipboard";
+            showToast(successToast, copyPasswordDiv);
 
         } catch (err) {
             console.log("Copy command failed");
@@ -215,7 +245,7 @@ function chooseType() {
 
 function setType(passwordSelection) {
     copyPasswordButton.textContent = "Copy Password";
-    copiedToast.textContext = "Password copied to Clipboard";
+    successPrefix = "Password";
     passwordCardHeader.textContent = "Password";
     showElement(userNameDiv);
     hideElement(securityQuestionDiv);
@@ -226,7 +256,7 @@ function setType(passwordSelection) {
         case "login":
             generatePasswordButton.textContent = "Generate User name";
             copyPasswordButton.textContent = "Copy User name";
-            copiedToast.textContent = "User name copied to Clipboard";
+            successPrefix = "User name";
             passwordCardHeader.textContent = "User name";
             hideElement(userNameDiv);
             break;
@@ -248,20 +278,19 @@ function setType(passwordSelection) {
         case "pin":
             generatePasswordButton.textContent = "Generate Four Digit PIN";
             copyPasswordButton.textContent = "Copy PIN";
-            copiedToast.textContext = "PIN copied to Clipboard";
+            successPrefix = "PIN";
             passwordCardHeader.textContent = "PIN";
-
             break;
         case "pin-6":
             generatePasswordButton.textContent = "Generate Six Digit PIN";
             copyPasswordButton.textContent = "Copy PIN";
-            copiedToast.textContent = "PIN copied to Clipboard";
+            successPrefix = "PIN";
             passwordCardHeader.textContent = "PIN";
             break;
         case "answer":
             generatePasswordButton.textContent = "Generate Security Answer";
             copyPasswordButton.textContent = "Copy Security Answer";
-            copiedToast.textContent = "Answer copied to Clipboard";
+            successPrefix = "Answer";
             passwordCardHeader.textContent = "Answer";
             showElement(securityQuestionDiv);
             break;
@@ -350,7 +379,7 @@ window.addEventListener("load", function () {
     password = document.querySelector(".password");
     clipboardVal = document.querySelector("[id=clipboard-value]");
     error = document.querySelector(".error");
-    copiedToast = document.querySelector("[id=copied-toast]");
+    successToast = document.querySelector("[id=success-toast]");
     copyPasswordButton = document.querySelector("[id=copy-password]");
     copyPasswordDiv = document.querySelector("[id=copy-password-div]");
     loaderPassword = document.querySelector("[id=load-bar-ball]");
