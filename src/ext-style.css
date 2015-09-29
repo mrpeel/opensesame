@@ -1,0 +1,18 @@
+body {
+    width: 512px;
+}
+.ext-pass {
+    height: 510px;
+}
+.ext-answer {
+    height: 542px;
+}
+.ext-pass-generated {
+    height: 680px;
+}
+.ext-answer-generated {
+    height: 714px;
+}
+.mdl-layout__container {
+    width: 512px;
+}
