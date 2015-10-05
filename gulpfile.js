@@ -100,9 +100,10 @@ gulp.task('minifyextcss', function () {
 
 
 gulp.task('copytochromeext', function () {
-    gulp.src(['src/manifest.json', 'src/ext-background.js', 'src/ext-content.js', 'opensesame-38.png', 'src/material.min.js', 'src/material.min.css', 'pbkdf2.js', 'hmac-sha256.js'])
+    gulp.src(['src/manifest.json', 'src/ext-background.js', 'src/ext-content.js', 'opensesame-38.png', 'src/material.min.js', 'src/material.min.css', 'pbkdf2.js', 'hmac-sha256.js', 'fonts/*.woff2'])
         .pipe(gulp.dest('./chrome-ext/'));
 });
+
 
 
 gulp.task('serve', function () {
