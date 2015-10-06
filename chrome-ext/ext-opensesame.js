@@ -612,6 +612,7 @@ function chooseType() {
 }
 
 function setType(passwordSelection) {
+    //console.log('Set password type:' + passwordSelection);
     copyPasswordButton.textContent = "Copy Password";
     successPrefix = "Password";
     passwordCardHeader.textContent = "Password";
@@ -797,7 +798,10 @@ window.addEventListener("load", function () {
     lastPassPhraseLength = 0;
 
     //Set initial type
-    setType("long-password");
+    if (passwordType === undefined) {
+        //console.log('Password type is undefined');
+        setType("long-password");
+    }
     headerKey.addEventListener("click", runTests, false);
     generatePasswordButton.addEventListener("click", generatePassword, false);
     passwordToggle.addEventListener("click", togglePasswordView, false);
@@ -838,6 +842,7 @@ chrome.runtime.onMessage.addListener(
             familyName.value = request.familyName;
             passPhrase.value = request.passPhrase;
             extHasPassword = request.hasPassword;
+            console.log('Populate fields password type: ' + request.passwordType);
             setType(request.passwordType);
         }
 

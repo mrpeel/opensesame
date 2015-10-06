@@ -14,6 +14,7 @@ chrome.runtime.onMessage.addListener(
             extFamilyName = request.familyName;
             extPassPhrase = request.passPhrase;
             extPasswordType = request.passwordType;
+            //console.log('Set password password type: ' + request.passwordType);
 
             if (pageHasPassword) {
                 chrome.tabs.executeScript(null, {
@@ -34,7 +35,11 @@ chrome.runtime.onMessage.addListener(
                 extPasswordType = "long-password";
             }
 
+            extCurrentURL = pageURL;
+
             pageHasPassword = request.hasPassword;
+
+            //console.log('Background page populate fields password type: ' + extPasswordType);
 
             //Supply page values and held values from previously
             chrome.runtime.sendMessage({

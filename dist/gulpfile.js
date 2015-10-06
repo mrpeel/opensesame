@@ -12,7 +12,7 @@ var connect = require('gulp-connect');
 var ghPages = require('gulp-gh-pages');
 
 
-gulp.task('default', ['buildstandalonehtml', 'appcachetimestamp', 'buildstandalonejs', 'minifycss', 'copytodist', 'copytodisttest', 'buildexthtml', 'buildextjs', 'minifyextcss', 'copytochromeext']);
+gulp.task('default', ['buildstandalonehtml', 'appcachetimestamp', 'buildstandalonejs', 'minifycss', 'copytodist', 'copytodisttest', 'buildexthtml', 'buildextjs', 'minifyextcss', 'copytochromeext', 'copytodistchromeext']);
 
 gulp.task('buildstandalonehtml', function () {
     gulp.src(['src/standalone-container.html'])
@@ -21,7 +21,7 @@ gulp.task('buildstandalonehtml', function () {
             basepath: '@file'
         }))
         .pipe(rename('index.html'))
-        .pipe(gulp.dest('./'))
+        .pipe(gulp.dest('./build/'))
         .pipe(gulp.dest('./dist/'));
 });
 
@@ -36,7 +36,7 @@ gulp.task('appcachetimestamp', function () {
       ]
         }))
         .pipe(rename('opensesame.appcache'))
-        .pipe(gulp.dest('./'));
+        .pipe(gulp.dest('./build/'));
 });
 
 gulp.task('buildstandalonejs', function () {
@@ -46,8 +46,8 @@ gulp.task('buildstandalonejs', function () {
         .pipe(gulp.dest('./'))
         .pipe(rename('opensesame.min.js'))
         .pipe(uglify())
-        .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest('./'));
+        .pipe(sourcemaps.write('./build/'))
+        .pipe(gulp.dest('./build/'));
 });
 
 
@@ -59,7 +59,7 @@ gulp.task('minifycss', function () {
 });
 
 gulp.task('copytodist', function () {
-    gulp.src(['./*.png', './*.ico', './*.js', './*.css', './*.html', './*.appcache'])
+    gulp.src(['*.png', '*.ico', '*.js', '*.css', '*.html', '*.appcache', '!./dist/**', '!./dist/**'])
         .pipe(gulp.dest('./dist/'));
 });
 
@@ -75,7 +75,6 @@ gulp.task('buildexthtml', function () {
             basepath: '@file'
         }))
         .pipe(rename('opensesame.html'))
-        .pipe(gulp.dest('./'))
         .pipe(gulp.dest('./chrome-ext/'));
 });
 
@@ -87,7 +86,7 @@ gulp.task('buildextjs', function () {
         .pipe(gulp.dest('./'))
         .pipe(rename('ext-opensesame.min.js'))
         .pipe(uglify())
-        .pipe(sourcemaps.write('./'))
+        .pipe(sourcemaps.write('./chrome-ext/'))
         .pipe(gulp.dest('./chrome-ext/'));
 });
 
@@ -102,6 +101,12 @@ gulp.task('minifyextcss', function () {
 gulp.task('copytochromeext', function () {
     gulp.src(['src/manifest.json', 'src/ext-background.js', 'src/ext-content.js', 'opensesame-38.png', 'src/material.min.js', 'src/material.min.css', 'pbkdf2.js', 'hmac-sha256.js', 'fonts/*.woff2'])
         .pipe(gulp.dest('./chrome-ext/'));
+});
+
+gulp.task('copytodistchromeext', function () {
+    gulp.src(['chrome-ext/*.html', 'chrome-ext/*.css', 'chrome-ext/*.js', 'chrome-ext/*.png', , 'chrome-ext/*.woff2', , 'chrome-ext/*.json'])
+        .pipe(gulp.dest('./dist/chrome-ext/'));
+
 });
 
 
