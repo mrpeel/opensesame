@@ -360,7 +360,7 @@ PassOff.prototype.generatePassword = function (passwordType) {
 /*global PassOff, document, window, console, navigator, isChromeExtension, extHasPassword, generateExtPassword */
 
 //Variables for UI element
-var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, passwordCardHeader, copyPasswordDiv, loaderPassword, closePasswordButton, copyPasswordButton, clipboardVal, passwordToggle, headerKey, successToast, lastPassGenTimeStamp, successPrefix;
+var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, passwordCardHeader, copyPasswordDiv, loaderPassword, closePasswordButton, copyPasswordButton, bodyNode, clipboardVal, passwordToggle, headerKey, successToast, lastPassGenTimeStamp, successPrefix;
 
 //Variable for calculations
 var passOff, passwordType, fullName, error, passChangeRequiredCount, lastPassPhraseLength;
@@ -436,6 +436,15 @@ function generatePassword() {
     if (passwordType) {
         passOff.generatePassword(passwordType)
             .then(function (passwordValue) {
+                clearBodyClasses();
+                if (passwordType === "answer") {
+                    bodyNode.classList.add("ext-answer-generated");
+
+                } else {
+                    bodyNode.classList.add("ext-pass-generated");
+                }
+
+
                 password.textContent = passwordValue;
                 hideElement(loaderPassword);
 
@@ -555,6 +564,12 @@ function hideElement(element) {
     element.classList.add("hidden");
 }
 
+function clearBodyClasses() {
+    bodyNode.classList.remove("ext-pass");
+    bodyNode.classList.remove("ext-answer");
+    bodyNode.classList.remove("ext-pass-generated");
+    bodyNode.classList.remove("ext-answer-generated");
+}
 
 function copyPasswordToClipboard() {
     clipboardVal.value = password.textContent;
@@ -597,6 +612,7 @@ function chooseType() {
 }
 
 function setType(passwordSelection) {
+    //console.log('Set password type:' + passwordSelection);
     copyPasswordButton.textContent = "Copy Password";
     successPrefix = "Password";
     passwordCardHeader.textContent = "Password";
@@ -648,6 +664,15 @@ function setType(passwordSelection) {
             showElement(securityQuestionDiv);
             break;
     }
+
+    clearBodyClasses();
+    if (passwordType === "answer") {
+        bodyNode.classList.add("ext-answer");
+
+    } else {
+        bodyNode.classList.add("ext-pass");
+    }
+
 
     clearPassword();
 }
@@ -737,6 +762,7 @@ window.addEventListener("load", function () {
     copyPasswordDiv = document.querySelector("[id=copy-password-div]");
     loaderPassword = document.querySelector("[id=load-bar-ball]");
     closePasswordButton = document.querySelector("[id=close-password]");
+    bodyNode = document.querySelector("body");
 
     givenName.disabled = familyName.disabled = passPhrase.disabled = domainName.disabled = userName.disabled = type.disabled = false;
 
@@ -772,7 +798,10 @@ window.addEventListener("load", function () {
     lastPassPhraseLength = 0;
 
     //Set initial type
-    setType("long-password");
+    if (passwordType === undefined) {
+        //console.log('Password type is undefined');
+        setType("long-password");
+    }
     headerKey.addEventListener("click", runTests, false);
     generatePasswordButton.addEventListener("click", generatePassword, false);
     passwordToggle.addEventListener("click", togglePasswordView, false);
