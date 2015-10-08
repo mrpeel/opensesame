@@ -270,41 +270,41 @@ function setType(passwordSelection) {
 
     switch (passwordSelection) {
         case "login":
-            generatePasswordButton.textContent = "Generate User name";
+            generatePasswordButton.textContent = "User name";
             copyPasswordButton.textContent = "Copy User name";
             successPrefix = "User name";
             passwordCardHeader.textContent = "User name";
             hideElement(userNameDiv);
             break;
         case "maximum-password":
-            generatePasswordButton.textContent = "Generate Maximum Password";
+            generatePasswordButton.textContent = "Produce Maximum Password";
             break;
         case "long-password":
-            generatePasswordButton.textContent = "Generate Long Password";
+            generatePasswordButton.textContent = "Produce Long Password";
             break;
         case "medium-password":
-            generatePasswordButton.textContent = "Generate Medium Password";
+            generatePasswordButton.textContent = "Produce Medium Password";
             break;
         case "basic-password":
-            generatePasswordButton.textContent = "Generate Basic Password";
+            generatePasswordButton.textContent = "Produce Basic Password";
             break;
         case "short-password":
-            generatePasswordButton.textContent = "Generate Short Password";
+            generatePasswordButton.textContent = "Produce Short Password";
             break;
         case "pin":
-            generatePasswordButton.textContent = "Generate Four Digit PIN";
+            generatePasswordButton.textContent = "Produce Four Digit PIN";
             copyPasswordButton.textContent = "Copy PIN";
             successPrefix = "PIN";
             passwordCardHeader.textContent = "PIN";
             break;
         case "pin-6":
-            generatePasswordButton.textContent = "Generate Six Digit PIN";
+            generatePasswordButton.textContent = "Produce Six Digit PIN";
             copyPasswordButton.textContent = "Copy PIN";
             successPrefix = "PIN";
             passwordCardHeader.textContent = "PIN";
             break;
         case "answer":
-            generatePasswordButton.textContent = "Generate Security Answer";
+            generatePasswordButton.textContent = "Produce Security Answer";
             copyPasswordButton.textContent = "Copy Security Answer";
             successPrefix = "Answer";
             passwordCardHeader.textContent = "Answer";
@@ -352,7 +352,12 @@ function togglePasswordView() {
 }
 
 function runTests() {
-    window.open("test/opensesame-test.html");
+    if (typeof isChromeExtension !== 'undefined') {
+        window.open("https://mrpeel.github.io/opensesame/test/opensesame-test.html");
+    } else {
+        window.open("test/opensesame-test.html");
+    }
+
 }
 
 

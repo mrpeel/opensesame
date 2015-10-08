@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener(
             familyName.value = request.familyName;
             passPhrase.value = request.passPhrase;
             extHasPassword = request.hasPassword;
-            console.log('Populate fields password type: ' + request.passwordType);
+            //console.log('Populate fields password type: ' + request.passwordType);
             setType(request.passwordType);
         }
 
@@ -55,7 +55,7 @@ function generateExtPassword() {
         "givenName": givenName.value,
         "familyName": familyName.value,
         "passPhrase": passPhrase.value,
-        "password": password.value,
+        "password": password.textContent,
         "passwordType": passwordType
     });
 
