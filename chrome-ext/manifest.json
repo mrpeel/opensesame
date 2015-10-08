@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Open Sesame Password Management",
-    "version": "0.2",
+    "version": "0.2.3",
     "permissions": [
             "activeTab"
     ],
@@ -14,7 +14,7 @@
         }
     ],
     "browser_action": {
-        "default_title": "Log in using the Open Sesame password generator",
+        "default_title": "Log in using the Open Sesame password manager",
         "default_icon": "opensesame-38.png",
         "default_popup": "opensesame.html"
     },
