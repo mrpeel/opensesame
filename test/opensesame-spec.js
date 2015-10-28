@@ -1,4 +1,4 @@
-/*global PassOff, describe, beforeEach, afterEach, JasminePromiseMatchers, it, expect */
+/*global PassOff, TemporaryPhraseStore, describe, beforeEach, afterEach, JasminePromiseMatchers, it, expect, runs, console */
 
 describe("Test Open Sesame Missing Parameter Rejection", function () {
     var passOff = new PassOff();
@@ -1510,4 +1510,120 @@ describe("Test Security Answers", function () {
 
 
     afterEach(JasminePromiseMatchers.uninstall);
+});
+
+
+describe("Test Open Sesame Temporary Phrase Store", function () {
+    var encDataHolder, ivHolder;
+
+    //beforeEach(JasminePromiseMatchers.install);
+
+
+    it("should fail when attempting to encrypt empty pass phrase", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+        expect(tempPhraseStore.encryptPhrase("", "")).toBeRejected(done);
+
+    });
+
+    it("should fail when attempting to decrypt empty encypted data", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+        expect(tempPhraseStore.decryptPhrase("Thr", "JohnSmith")).toBeRejected(done);
+    });
+
+    it("should successfully encrypt phrase and name", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+
+        return tempPhraseStore.encryptPhrase("A special pass phrase", "JohnSmith")
+            .then(function (val) {
+                expect(val).toEqual("Success");
+                expect(tempPhraseStore.encData).toBeDefined();
+                done();
+            });
+
+
+    });
+
+    it("should produce different encrypted data for the same phrase and name", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+        tempPhraseStore.encryptPhrase("A special pass phrase with some Punctuation!?", "Jane Citizen")
+            .then(function (val) {
+                encDataHolder = tempPhraseStore.encData.ciphertext;
+                ivHolder = tempPhraseStore.encData.iv;
+                return true;
+            })
+            .then(function (val) {
+                return tempPhraseStore.encryptPhrase("A special pass phrase with some Punctuation!?", "Jane Citizen");
+            })
+            .then(function (val) {
+                expect(tempPhraseStore.encData.ciphertext).not.toEqual(encDataHolder);
+                expect(tempPhraseStore.encData.iv).not.toEqual(ivHolder);
+                done();
+            });
+    });
+
+    it("should successfully decrypt the phrase using the first three characters and name", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+        tempPhraseStore.encryptPhrase("aP2 with Some Special Stuff", "KruderAndDorfmeister")
+            .then(function (val) {
+
+                expect(tempPhraseStore.decryptPhrase("aP2", "KruderAndDorfmeister")).toBeResolvedWith("aP2 with Some Special Stuff", done);
+            });
+    });
+
+    it("should successfully decrypt a phrase with special characters using the first three characters and name", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+
+        tempPhraseStore.encryptPhrase("Ihëart årt and £$¢!", "HumptyDumpty")
+            .then(function (val) {
+                expect(tempPhraseStore.decryptPhrase("Ihë", "HumptyDumpty")).toBeResolvedWith("Ihëart årt and £$¢!", done);
+            });
+
+    });
+
+    it("should fail to decrypt the phrase using the first two characters and name", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+
+        tempPhraseStore.encryptPhrase("Here is a special [phrase]", "MrRobot")
+            .then(function (val) {
+                expect(tempPhraseStore.decryptPhrase("He", "MrRobot")).toBeRejected(done);
+            });
+    });
+
+    it("should remove encrypted data after failing to decrypt the phrase using the first two characters and name", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+
+        tempPhraseStore.encryptPhrase("Here is a special [phrase]", "MrRobot")
+            .then(function (val) {
+                return tempPhraseStore.decryptPhrase("He", "MrRobot");
+            })
+            .catch(function (err) {
+                expect(tempPhraseStore.encData).not.toBeDefined();
+                done();
+            });
+    });
+
+    it("should fail to decrypt the phrase using the wrong case for the first three characters and name and encrypted data should be removed", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+
+        tempPhraseStore.encryptPhrase("This is a pass phrase", "TylerDurden")
+            .then(function (val) {
+                expect(tempPhraseStore.decryptPhrase("tHI", "TylerDurden")).toBeRejected(done);
+            });
+    });
+
+    it("should remove encrypted data after failing to decrypt the phrase using the wrong case for the first three characters and name", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+
+        tempPhraseStore.encryptPhrase("This is a pass phrase", "TylerDurden")
+            .then(function (val) {
+                return tempPhraseStore.decryptPhrase("tHI", "TylerDurden");
+            })
+            .catch(function (err) {
+                expect(tempPhraseStore.encData).not.toBeDefined();
+                done();
+            });
+    });
+
+
+    //afterEach(JasminePromiseMatchers.uninstall);
 });

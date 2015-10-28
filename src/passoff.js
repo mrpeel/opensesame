@@ -1,15 +1,17 @@
-/** --------------------------------------------------------------------------------------------------------------
-  This web app uses the application cache - any change requires the passoff.appcache file to be modified.  
-    Modify the timestamp comment in the 2nd line to force browsers to refresh  
-  ----------------------------------------------------------------------------------------------------------------
+/** Passoff class encapsulating the functionality for generating a password.
+    Requires cryptofunctions.js which determies whether to use subtle crypto or cryptojs
+    and executes the appropriate functions.
 */
-/** Set up global types so JSHint doesn't trigger warnings that they are not defined */
 
 /*global CryptoJS, Promise, performance, console, Uint8Array */
 
+/* Functions defined in cryptofunctions.js */
+/* global PBKDF2, HMACSHA256, aesEncrypt, aesDecrypt, convertDerivedKeyToHex, convertWordArrayToHex, convertWordArrayToUint8Array, convertUint8ArrayToHex, convertHexToUint8Array, zeroVar, zeroIntArray */
+
 /** 
- * Passoff class encapsulating the functionality for generating a password.
- * Calls the CyrptoJS library for PBKDF2 to generate salted password and HMAC256 for generating seed
+ * 
+ * PassOff uses BKDF2 to generate salted password and HMAC256 to generate a seed.  The seed is then ued to generate a password based on
+    a chosen template.
  */
 var PassOff = function () {
     "use strict";
@@ -127,7 +129,7 @@ var PassOff = function () {
  * @param {Object} queryParams The request parameters.
  * @return {Promise} A promise.
  */
-PassOff.prototype.PBKDF2 = function (password, salt) {
+/*PassOff.prototype.PBKDF2 = function (password, salt) {
     "use strict";
 
     return new Promise(function (resolve, reject) {
@@ -139,7 +141,7 @@ PassOff.prototype.PBKDF2 = function (password, salt) {
         resolve(derivedKey);
     });
 
-};
+};*/
 
 /**
  * Wraps the CryptoJS HMAC256 function in a promise and returns signed data as a word array
@@ -147,7 +149,7 @@ PassOff.prototype.PBKDF2 = function (password, salt) {
  * @return {Promise} A promise.
  */
 
-PassOff.prototype.HMACSHA256 = function (plainText, key) {
+/*PassOff.prototype.HMACSHA256 = function (plainText, key) {
     "use strict";
 
     return new Promise(function (resolve, reject) {
@@ -156,7 +158,7 @@ PassOff.prototype.HMACSHA256 = function (plainText, key) {
         resolve(seed);
     });
 
-};
+};*/
 
 /**
  * Converts a word array into a Uint8Array to convert to use as a numeric array. 
@@ -164,7 +166,7 @@ PassOff.prototype.HMACSHA256 = function (plainText, key) {
  * @param {word array} wordArray .
  * @return {Uint8Array}.
  */
-PassOff.prototype.convertWordArrayToUint8Array = function (wordArray) {
+/*PassOff.prototype.convertWordArrayToUint8Array = function (wordArray) {
     "use strict";
 
     var len = wordArray.words.length,
@@ -181,7 +183,7 @@ PassOff.prototype.convertWordArrayToUint8Array = function (wordArray) {
     }
 
     return u8_array;
-};
+};*/
 
 /**
  * Resets all the values used for calculations
@@ -189,10 +191,10 @@ PassOff.prototype.convertWordArrayToUint8Array = function (wordArray) {
  * @return {None}.
  */
 
-PassOff.prototype.clearPassPhrase = function (wordArray) {
+PassOff.prototype.clearPassPhrase = function () {
     "use strict";
 
-    this.passPhrase = "00000000000000000000000000000000000000000000000000000000000000000000000000000";
+    this.passPhrase = zeroVar(this.passPhrase);
     this.passPhrase = "";
 };
 /**
@@ -294,18 +296,20 @@ PassOff.prototype.generatePassword = function (passwordType) {
             }
 
 
-            return passOffContext.PBKDF2(passOffContext.passPhrase, salt)
+
+            //parameters: password, salt, numIterations, keyLength
+            return PBKDF2(passOffContext.passPhrase, salt, 750, 128)
                 .then(function (key) {
                     //console.log("Derived key: " + key);
 
-                    return passOffContext.HMACSHA256(domainValue, key);
-                }).then(function (seed) {
-                    //console.log("HMAC result seed hex: " + seed);
-                    var seedArray = passOffContext.convertWordArrayToUint8Array(seed);
+                    return HMACSHA256(domainValue, key);
+                    /*}).then(function (seed) {
+                        //console.log("HMAC result seed hex: " + seed);
+                        var seedArray = passOffContext.convertWordArrayToUint8Array(seed);
 
-                    //console.log("HMAC result seed array: " + seedArray);
-                    //console.log(performance.now() - t0 + " ms");
-                    return seedArray;
+                        //console.log("HMAC result seed array: " + seedArray);
+                        //console.log(performance.now() - t0 + " ms");
+                        return seedArray;*/
                 }).then(function (seedArray) {
                     // Find the selected template array
                     var templateType = passOffContext.templates[passwordType];

@@ -44,12 +44,13 @@
         // If Promise is not supported, include the polyfill
         window.Promise || document.write("<script src=Promise.min.js><\/script>");
 
+        // If subtle crypto not supported, add cryptoJS functions
+        (window.crypto && window.crypto.subtle) || document.write("<script src=cryptojs.js><\/script>");
+
     </script>
 
     <script src="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
-    <script src="pbkdf2.js"></script>
-    <script src="hmac-sha256.js"></script>
-    <script src="opensesame.min.js"></script>
+    <script src="opensesame.js"></script>
 </body>
 
 </html>

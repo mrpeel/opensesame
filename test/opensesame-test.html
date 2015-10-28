@@ -25,19 +25,21 @@
 
     <script src="jasmine-es6-promise-matchers.min.js"></script>
 
+
     <!-- include source files here... -->
     <script>
         // If Promise is not supported, include the polyfill
-        // https://github.com/taylorhakes/promise-polyfill
         window.Promise || document.write("<script src=../Promise.min.js><\/script>");
 
+        //Add cryptoJS functions if subtle crypto not supported
+        (window.crypto && window.crypto.subtle) || document.write("<script src=cryptojs.js><\/script>");
+
     </script>
-    <script src="../pbkdf2.js"></script>
-    <script src="../hmac-sha256.js"></script>
     <script src="../opensesame.min.js"></script>
 
     <!-- include spec files here... -->
     <script src="opensesame-spec.min.js"></script>
+
 
 </body>
 

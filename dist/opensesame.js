@@ -1,15 +1,17 @@
-/** --------------------------------------------------------------------------------------------------------------
-  This web app uses the application cache - any change requires the passoff.appcache file to be modified.  
-    Modify the timestamp comment in the 2nd line to force browsers to refresh  
-  ----------------------------------------------------------------------------------------------------------------
+/** Passoff class encapsulating the functionality for generating a password.
+    Requires cryptofunctions.js which determies whether to use subtle crypto or cryptojs
+    and executes the appropriate functions.
 */
-/** Set up global types so JSHint doesn't trigger warnings that they are not defined */
 
 /*global CryptoJS, Promise, performance, console, Uint8Array */
 
+/* Functions defined in cryptofunctions.js */
+/* global PBKDF2, HMACSHA256, aesEncrypt, aesDecrypt, convertDerivedKeyToHex, convertWordArrayToHex, convertWordArrayToUint8Array, convertUint8ArrayToHex, convertHexToUint8Array, zeroVar, zeroIntArray */
+
 /** 
- * Passoff class encapsulating the functionality for generating a password.
- * Calls the CyrptoJS library for PBKDF2 to generate salted password and HMAC256 for generating seed
+ * 
+ * PassOff uses BKDF2 to generate salted password and HMAC256 to generate a seed.  The seed is then ued to generate a password based on
+    a chosen template.
  */
 var PassOff = function () {
     "use strict";
@@ -127,7 +129,7 @@ var PassOff = function () {
  * @param {Object} queryParams The request parameters.
  * @return {Promise} A promise.
  */
-PassOff.prototype.PBKDF2 = function (password, salt) {
+/*PassOff.prototype.PBKDF2 = function (password, salt) {
     "use strict";
 
     return new Promise(function (resolve, reject) {
@@ -139,7 +141,7 @@ PassOff.prototype.PBKDF2 = function (password, salt) {
         resolve(derivedKey);
     });
 
-};
+};*/
 
 /**
  * Wraps the CryptoJS HMAC256 function in a promise and returns signed data as a word array
@@ -147,7 +149,7 @@ PassOff.prototype.PBKDF2 = function (password, salt) {
  * @return {Promise} A promise.
  */
 
-PassOff.prototype.HMACSHA256 = function (plainText, key) {
+/*PassOff.prototype.HMACSHA256 = function (plainText, key) {
     "use strict";
 
     return new Promise(function (resolve, reject) {
@@ -156,7 +158,7 @@ PassOff.prototype.HMACSHA256 = function (plainText, key) {
         resolve(seed);
     });
 
-};
+};*/
 
 /**
  * Converts a word array into a Uint8Array to convert to use as a numeric array. 
@@ -164,7 +166,7 @@ PassOff.prototype.HMACSHA256 = function (plainText, key) {
  * @param {word array} wordArray .
  * @return {Uint8Array}.
  */
-PassOff.prototype.convertWordArrayToUint8Array = function (wordArray) {
+/*PassOff.prototype.convertWordArrayToUint8Array = function (wordArray) {
     "use strict";
 
     var len = wordArray.words.length,
@@ -181,7 +183,7 @@ PassOff.prototype.convertWordArrayToUint8Array = function (wordArray) {
     }
 
     return u8_array;
-};
+};*/
 
 /**
  * Resets all the values used for calculations
@@ -189,10 +191,10 @@ PassOff.prototype.convertWordArrayToUint8Array = function (wordArray) {
  * @return {None}.
  */
 
-PassOff.prototype.clearPassPhrase = function (wordArray) {
+PassOff.prototype.clearPassPhrase = function () {
     "use strict";
 
-    this.passPhrase = "00000000000000000000000000000000000000000000000000000000000000000000000000000";
+    this.passPhrase = zeroVar(this.passPhrase);
     this.passPhrase = "";
 };
 /**
@@ -294,18 +296,20 @@ PassOff.prototype.generatePassword = function (passwordType) {
             }
 
 
-            return passOffContext.PBKDF2(passOffContext.passPhrase, salt)
+
+            //parameters: password, salt, numIterations, keyLength
+            return PBKDF2(passOffContext.passPhrase, salt, 750, 128)
                 .then(function (key) {
                     //console.log("Derived key: " + key);
 
-                    return passOffContext.HMACSHA256(domainValue, key);
-                }).then(function (seed) {
-                    //console.log("HMAC result seed hex: " + seed);
-                    var seedArray = passOffContext.convertWordArrayToUint8Array(seed);
+                    return HMACSHA256(domainValue, key);
+                    /*}).then(function (seed) {
+                        //console.log("HMAC result seed hex: " + seed);
+                        var seedArray = passOffContext.convertWordArrayToUint8Array(seed);
 
-                    //console.log("HMAC result seed array: " + seedArray);
-                    //console.log(performance.now() - t0 + " ms");
-                    return seedArray;
+                        //console.log("HMAC result seed array: " + seedArray);
+                        //console.log(performance.now() - t0 + " ms");
+                        return seedArray;*/
                 }).then(function (seedArray) {
                     // Find the selected template array
                     var templateType = passOffContext.templates[passwordType];
@@ -357,7 +361,7 @@ PassOff.prototype.generatePassword = function (passwordType) {
   ----------------------------------------------------------------------------------------------------------------
 */
 
-/*global PassOff, document, window, console, navigator, isChromeExtension, extHasPassword, generateExtPassword */
+/*global PassOff, document, window, console, navigator, isChromeExtension, extHasPassword, generateExtPassword, zeroVar */
 
 //Variables for UI element
 var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, passwordCardHeader, copyPasswordDiv, loaderPassword, closePasswordButton, copyPasswordButton, bodyNode, clipboardVal, passwordToggle, headerKey, successToast, lastPassGenTimeStamp, successPrefix;
@@ -368,7 +372,7 @@ var passOff, passwordType, fullName, error, passChangeRequiredCount, lastPassPhr
 
 function clearPassword() {
     hideElement(passwordCard);
-    password.textContent = "00000000000000000000000000000000000000000000000000000000000000000000000000000";
+    password.textContent = zeroVar(password.textContent);
     password.textContent = "";
     setPasswordButton();
 }
@@ -388,7 +392,7 @@ function trimDomainName() {
 }
 
 function clearValues() {
-    passPhrase.value = "00000000000000000000000000000000000000000000000000000000000000000000000000000";
+    passPhrase.value = zeroVar(passPhrase.value);
     passPhrase.value = "";
     passChangeRequiredCount = 0;
 
@@ -545,7 +549,7 @@ function setPasswordButton() {
     }
 
     //Check if minimum values have been completed - all types need name and domain
-    if ((givenName.value.trim().length > 0 || familyName.value.trim().length > 0) && calculatedDomainName.length > 0 &&
+    if ((givenName.value.trim().length > 0 || familyName.value.trim().length > 0) && passPhrase.value.trim().length > 0 && calculatedDomainName.length > 0 &&
         //For an answer type, a question must also be set 
         (passwordType !== "answer" || securityQuestion.value.trim().length > 0)) {
         generatePasswordButton.disabled = false;
@@ -816,3 +820,448 @@ window.addEventListener("load", function () {
     givenName.focus();
 
 }, false);
+
+/*global CryptoJS, Promise, console, Uint8Array, window, TextEncoder, TextDecoder */
+
+/* Ensure functions are always adressable after minification / compilation */
+window['PBKDF2'] = PBKDF2;
+window['HMACSHA256'] = HMACSHA256;
+window['aesEncrypt'] = aesEncrypt;
+window['aesDecrypt'] = aesDecrypt;
+window['convertDerivedKeyToHex'] = convertDerivedKeyToHex;
+window['convertWordArrayToHex'] = convertWordArrayToHex;
+window['convertWordArrayToUint8Array'] = convertWordArrayToUint8Array;
+window['convertUint8ArrayToHex'] = convertUint8ArrayToHex;
+window['convertHexToUint8Array'] = convertHexToUint8Array;
+window['zeroVar'] = zeroVar;
+window['zeroIntArray'] = zeroIntArray;
+
+/**
+ * Executes the PBKDF2 function.  If crypto subtle is supported it is used.  If not,  the CryptoJS PBKDF2 function is wrapped
+ * in a promise.   Either way, it returns the derived key
+ * @param {password, salt, numIterations, keylength} the password to perform the function on, the salt to apply, the number of iterations to 
+ *     perform, and the length for the derived key
+ * @return {Promise} A promise which resolves to the derived key.
+ */
+
+
+function PBKDF2(password, salt, numIterations, keyLength) {
+    "use strict";
+
+    if (window.crypto && window.crypto.subtle) {
+        //use the subtle crypto functions
+        var cryptoTextEncoder = new TextEncoder("utf-8");
+
+        var saltBuffer = cryptoTextEncoder.encode(salt);
+        var passwordBuffer = cryptoTextEncoder.encode(password);
+
+        return window.crypto.subtle.importKey('raw', passwordBuffer, {
+            name: 'PBKDF2'
+        }, false, ['deriveBits']).then(function (key) {
+            return window.crypto.subtle.deriveBits({
+                name: 'PBKDF2',
+                iterations: numIterations,
+                salt: saltBuffer,
+                hash: 'SHA-1'
+            }, key, keyLength);
+        });
+
+    } else {
+        //use the CryptJS function
+
+        return new Promise(function (resolve, reject) {
+            var derivedKey = CryptoJS.PBKDF2(password, salt, {
+                iterations: numIterations,
+                keySize: keyLength / 32
+            });
+
+            resolve(derivedKey);
+        });
+    }
+
+}
+
+/**
+ * Executes the HMAC-SHA256 function.  If crypto subtle is supported it is used.  If not,  the CryptoJS HmacSHA256 function is wrapped
+ * in a promise, the converts the Word Array to a Uint8Array.  Returns the MAC as a Uint8Array.
+ * @param {plainText, key} The plaintext data to be signed and the key to use for the signing.
+ * @return {Promise} A promise which resolves a Uint8Array with the MAC.
+ */
+
+function HMACSHA256(plainText, key) {
+    "use strict";
+
+    if (window.crypto && window.crypto.subtle) {
+        //use the subtle crypto functions
+        return new Promise(function (resolve, reject) {
+
+            var cryptoTextEncoder = new TextEncoder("utf-8");
+            var plainTextBuffer = cryptoTextEncoder.encode(plainText);
+
+            window.crypto.subtle.importKey("raw", key, {
+                    name: "HMAC",
+                    hash: {
+                        name: "SHA-256"
+                    }
+                }, false /*not extractable*/ , ["sign"])
+                .then(function (importedKey) {
+
+                    return window.crypto.subtle.sign({
+                        name: "HMAC",
+                        hash: {
+                            name: "SHA-256"
+                        }
+                    }, importedKey, plainTextBuffer);
+                })
+                .then(function (mac) {
+                    var macArray = new Uint8Array(mac);
+
+                    resolve(macArray);
+                });
+        });
+
+    } else {
+        //use the CryptJS function
+        return new Promise(function (resolve, reject) {
+            var mac = CryptoJS.HmacSHA256(plainText, key);
+            var macArray = convertWordArrayToUint8Array(mac);
+            //Convert to uInt8Array
+            resolve(macArray);
+        });
+    }
+}
+
+/**
+ * Executes an AES encryption.  If crypto subtle is supported it is used.  If not,  the CryptoJS AES encryption function is wrapped in a promise.
+ * Returns the encrypted data.
+ * @param {plainText, key} The plaintext data to be encrypted and the encryption key as a hex string.
+ * @return {Promise} A promise which resolves to the encryted data.
+ */
+function aesEncrypt(plainText, key) {
+    "use strict";
+
+    if (window.crypto && window.crypto.subtle) {
+        //use the subtle crypto functions
+        return new Promise(function (resolve, reject) {
+            var cryptoTextEncoder = new TextEncoder("utf-8");
+            var plainTextBuffer = cryptoTextEncoder.encode(plainText);
+
+            //Key will be supplied in hex - so need to convert to Uint8Array
+            var aesKey = convertHexToUint8Array(key);
+
+            //Create random initialisation vector
+            var iv = window.crypto.getRandomValues(new Uint8Array(16));
+
+            window.crypto.subtle.importKey("raw", aesKey, {
+                    name: "AES-CBC",
+                    length: 128
+                }, false /*not extractable*/ , ["encrypt"])
+                .then(function (importedKey) {
+
+
+                    return window.crypto.subtle.encrypt({
+                        "name": "AES-CBC",
+                        iv: iv
+                    }, importedKey, plainTextBuffer);
+                })
+                .then(function (encryptedData) {
+                    var encryptedArray = new Uint8Array(encryptedData);
+
+                    resolve({
+                        iv: iv,
+                        ciphertext: encryptedArray
+                    }); //Return an object so the iv is contained with the ciphertext
+                });
+        });
+    } else {
+        //use the CryptJS function
+        return new Promise(function (resolve, reject) {
+            var encrypted = CryptoJS.AES.encrypt(plainText, key);
+            resolve(encrypted);
+        });
+    }
+
+}
+
+/**
+ * Executes an AES decryption.  If crypto subtle is supported it is used.  If not,  the CryptoJS AES decryption function is wrapped in a promise.
+ * Returns the decrypted data.
+ * @param {cipherText, key} The ciphertext data to be decrypted and the decryption key as a hex string.
+ * @return {Promise} A promise which resolves to the plain text data.
+ */
+function aesDecrypt(encyptedData, key) {
+    "use strict";
+
+
+    if (window.crypto && window.crypto.subtle) {
+        //use the subtle crypto functions
+        return new Promise(function (resolve, reject) {
+            //Key will be supplied in hex - so need to convert to Uint8Array
+            var cryptoTextEncoder = new TextEncoder("utf-8");
+            var cryptoTextDecoder = new TextDecoder("utf-8");
+            var aesKey = convertHexToUint8Array(key);
+
+            window.crypto.subtle.importKey("raw", aesKey, {
+                    name: "AES-CBC",
+                    length: 128
+                }, false /*not extractable*/ , ["decrypt"])
+                .then(function (importedKey) {
+
+                    return window.crypto.subtle.decrypt({
+                            name: "AES-CBC",
+                            iv: encyptedData.iv // Same IV as for encryption
+                        },
+                        importedKey,
+                        encyptedData.ciphertext
+                    );
+                })
+                .then(function (decryptedData) {
+                    var decryptedArray = new Uint8Array(decryptedData);
+                    var plainText = cryptoTextDecoder.decode(decryptedArray);
+
+                    resolve(plainText);
+                });
+        });
+
+    } else {
+        //use the CryptJS function
+        return new Promise(function (resolve, reject) {
+            var decrypted = CryptoJS.AES.decrypt(encyptedData, key);
+
+            //var decryptedArray = cryptoContext.convertWordArrayToUint8Array(decrypted);
+            //var plainText = cryptoContext.cryptoTextDecoder.decode(decryptedArray);
+
+            var plainText = CryptoJS.enc.Utf8.stringify(decrypted);
+            resolve(plainText);
+        });
+    }
+
+
+}
+
+/**
+ * Converts a derived key to a hex string.  Determines whether using subtle crypto of CryptoJS and uses appropriate function
+ * @param {wordArray / bufffer} derivedKey.
+ * @return {String}.
+ */
+function convertDerivedKeyToHex(derivedKey) {
+    "use strict";
+
+    if (window.crypto && window.crypto.subtle) {
+        return convertUint8ArrayToHex(new Uint8Array(derivedKey));
+
+    } else {
+        return convertUint8ArrayToHex(convertWordArrayToUint8Array(derivedKey));
+
+    }
+
+
+}
+
+/**
+ * Converts a word array into a Hex String by chaining together canversion to Uint8Array, then to hex 
+ * @param {word array} wordArray .
+ * @return {String}.
+ */
+function convertWordArrayToHex(wordArray) {
+    "use strict";
+
+    return convertUint8ArrayToHex(convertWordArrayToUint8Array(wordArray));
+
+}
+
+/**
+ * Converts a word array into a Uint8Array. 
+ * @param {word array} wordArray .
+ * @return {Uint8Array}.
+ */
+function convertWordArrayToUint8Array(wordArray) {
+    "use strict";
+
+    var words = wordArray.words;
+    var sigBytes = wordArray.sigBytes;
+
+    // Convert
+    var u8 = new Uint8Array(sigBytes);
+    for (var i = 0; i < sigBytes; i++) {
+        var byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+        u8[i] = byte;
+    }
+
+    return u8;
+
+}
+
+/**
+ * Converts a Uint8Array into a Uint8Array to a hex string. 
+ * @param {u8Array} Uint8Array.
+ * @return {String}.
+ */
+function convertUint8ArrayToHex(u8Array) {
+    var i;
+    var len;
+    var hex = '';
+    var c;
+
+    for (i = 0, len = u8Array.length; i < len; i += 1) {
+        c = u8Array[i].toString(16);
+        if (c.length < 2) {
+            c = '0' + c;
+        }
+        hex += c;
+    }
+
+    return hex;
+}
+
+
+/**
+ * Converts a Hex string into a Uint8Array. 
+ * @param {hex} String.
+ * @return {Uint8Array}.
+ */
+function convertHexToUint8Array(hex) {
+    var i;
+    var byteLen = hex.length / 2;
+    var arr;
+    var j = 0;
+
+    if (byteLen !== parseInt(byteLen, 10)) {
+        throw new Error("Invalid hex length '" + hex.length + "'");
+    }
+
+    arr = new Uint8Array(byteLen);
+
+    for (i = 0; i < byteLen; i += 1) {
+        arr[i] = parseInt(hex[j] + hex[j + 1], 16);
+        j += 2;
+    }
+
+    return arr;
+}
+
+/** Utility function to replace a string's value with all zeroes
+ */
+function zeroVar(varToZero) {
+    return Array(varToZero.length).join("0");
+
+}
+
+/** Utility function to replace an array's value with all zeroes
+ */
+function zeroIntArray(arrayToZero) {
+    var holdingVal = arrayToZero;
+    for (var aCounter = 0; aCounter < arrayToZero.length; aCounter++) {
+        holdingVal[aCounter] = 0;
+    }
+    return holdingVal;
+
+}
+
+/*global  console, CryptoJS, Uint8Array, Promise, performance, TextEncoder, TextDecoder, window, webcrypto, crypto, CryptoFunctions */
+/*global PBKDF2, convertDerivedKeyToHex, aesEncrypt, aesDecrypt, zeroVar, zeroIntArray */
+
+
+var TemporaryPhraseStore = function () {
+    this.ns = "cake.man.io";
+};
+
+
+TemporaryPhraseStore.prototype.encryptPhrase = function (passphrase, name) {
+    "use strict";
+
+    var aesKey;
+    var tempStoreContext = this;
+    return new Promise(function (resolve, reject) {
+
+        if (typeof passphrase === "string" && passphrase.length >= 3) {
+            var firstThreeChars = passphrase.substring(0, 3);
+
+
+            PBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
+                .then(function (key) {
+                    aesKey = convertDerivedKeyToHex(key);
+
+                    return PBKDF2(convertDerivedKeyToHex(key), name + firstThreeChars, 250, 128);
+                }).then(function (verificationHash) {
+                    tempStoreContext.threeCharHash = convertDerivedKeyToHex(verificationHash);
+
+                    return aesEncrypt(passphrase, aesKey);
+                }).then(function (encryptedData) {
+                    tempStoreContext.encData = encryptedData;
+                    resolve("Success");
+                }).catch(function (err) {
+                    reject(err);
+                });
+        } else {
+            reject("Pass phrase must be a sring at least three characters long");
+        }
+    });
+
+};
+
+
+
+TemporaryPhraseStore.prototype.decryptPhrase = function (firstThreeChars, name) {
+    "use strict";
+
+    var tempStoreContext = this;
+    var aesKey;
+
+    return new Promise(function (resolve, reject) {
+
+        if (typeof tempStoreContext.encData === "undefined") {
+            reject("No encrypted data found");
+
+        } else if (typeof firstThreeChars !== "string" || firstThreeChars.length !== 3) {
+            delete tempStoreContext.encData;
+            delete tempStoreContext.threeCharHash;
+
+            reject("First three characters parameter is not a 3 character string");
+
+        } else {
+
+
+            PBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
+                .then(function (key) {
+                    aesKey = convertDerivedKeyToHex(key);
+
+                    return PBKDF2(convertDerivedKeyToHex(key), name + firstThreeChars, 250, 128);
+                }).then(function (verificationHash) {
+                    if (tempStoreContext.threeCharHash === convertDerivedKeyToHex(verificationHash)) {
+
+                        aesDecrypt(tempStoreContext.encData, aesKey)
+                            .then(function (plainText) {
+                                resolve(plainText);
+                            });
+
+                    } else {
+                        zeroVar(tempStoreContext.threeCharHash);
+                        tempStoreContext.threeCharHash = "";
+
+                        if (typeof tempStoreContext.encData.iv === "string") {
+                            zeroVar(tempStoreContext.encData.iv);
+                            tempStoreContext.encData.iv = "";
+                        } else if (tempStoreContext.encData.iv.constructor.name === "Uint8Array") {
+                            zeroIntArray(tempStoreContext.encData.iv);
+                            tempStoreContext.encData.iv = [];
+                        }
+
+                        if (typeof tempStoreContext.encData.ciphertext === "string") {
+                            zeroVar(tempStoreContext.encData.ciphertext);
+                            tempStoreContext.encData.ciphertext = "";
+                        } else if (tempStoreContext.encData.ciphertext.constructor.name === "Uint8Array") {
+                            zeroIntArray(tempStoreContext.encData.ciphertext);
+                            tempStoreContext.encData.ciphertext = [];
+                        }
+
+                        delete tempStoreContext.encData;
+                        delete tempStoreContext.threeCharHash;
+
+                        reject("First three characters did not match");
+                    }
+
+                });
+        }
+    });
+};

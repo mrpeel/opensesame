@@ -65,13 +65,19 @@
 
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                             <input class="mdl-textfield__input passphrase" type="password" id="passphrase" />
-                            <label class="mdl-textfield__label required-field" for="passphrase">Pass phrase</label>
+                            <label class="mdl-textfield__label required-field" for="passphrase">Open Sesame Pass phrase</label>
                             <button id="show-password" class="show-password mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--grey-700 hidden" tabindex="-1">
                                 <i class="material-icons">visibility</i>
                             </button>
                         </div>
 
-
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width hidden">
+                            <input class="mdl-textfield__input passphrase" type="password" id="confirm-passphrase" maxlength="3" />
+                            <label class="mdl-textfield__label required-field" for="passphrase">Re-type the first three characters of your Pass phrase</label>
+                            <button id="clear-password" class="show-password mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--grey-700" tabindex="-1">
+                                <i class="material-icons">edit</i>
+                            </button>
+                        </div>
 
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                             <input class="mdl-textfield__input" type="text" id="domain" />
@@ -98,7 +104,7 @@
                     <div class="mdl-card__actions">
                         <div class="mdl-card__supporting-text">
                             <button id="generate-password" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">
-                                Generate Long Password
+                                Produce Long Password
                             </button>
                         </div>
                     </div>
@@ -157,8 +163,6 @@
 
 
     <script src="material.min.js"></script>
-    <script src="pbkdf2.js"></script>
-    <script src="hmac-sha256.js"></script>
     <script src="ext-opensesame.min.js"></script>
 </body>
 

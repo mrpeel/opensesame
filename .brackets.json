@@ -4,6 +4,7 @@
         "/Users/neilkloot/Dev/opensesame/dist/test/opensesame-spec.min.js",
         "/Users/neilkloot/Dev/opensesame/test/opensesame-spec.min.js",
         "/Users/neilkloot/Dev/opensesame/src/ext-background.js",
-        "/Users/neilkloot/Dev/opensesame/gulpfile.js"
+        "/Users/neilkloot/Dev/opensesame/gulpfile.js",
+        "/Users/neilkloot/Dev/opensesame/test/opensesame-spec.js"
     ]
 }

@@ -4,7 +4,7 @@
   ----------------------------------------------------------------------------------------------------------------
 */
 
-/*global PassOff, document, window, console, navigator, isChromeExtension, extHasPassword, generateExtPassword */
+/*global PassOff, document, window, console, navigator, isChromeExtension, extHasPassword, generateExtPassword, zeroVar */
 
 //Variables for UI element
 var givenName, familyName, passPhrase, domainName, securityQuestion, securityQuestionDiv, userName, userNameDiv, type, resultType, generatePasswordButton, password, passwordCard, passwordCardHeader, copyPasswordDiv, loaderPassword, closePasswordButton, copyPasswordButton, bodyNode, clipboardVal, passwordToggle, headerKey, successToast, lastPassGenTimeStamp, successPrefix;
@@ -15,7 +15,7 @@ var passOff, passwordType, fullName, error, passChangeRequiredCount, lastPassPhr
 
 function clearPassword() {
     hideElement(passwordCard);
-    password.textContent = "00000000000000000000000000000000000000000000000000000000000000000000000000000";
+    password.textContent = zeroVar(password.textContent);
     password.textContent = "";
     setPasswordButton();
 }
@@ -35,7 +35,7 @@ function trimDomainName() {
 }
 
 function clearValues() {
-    passPhrase.value = "00000000000000000000000000000000000000000000000000000000000000000000000000000";
+    passPhrase.value = zeroVar(passPhrase.value);
     passPhrase.value = "";
     passChangeRequiredCount = 0;
 
@@ -192,7 +192,7 @@ function setPasswordButton() {
     }
 
     //Check if minimum values have been completed - all types need name and domain
-    if ((givenName.value.trim().length > 0 || familyName.value.trim().length > 0) && calculatedDomainName.length > 0 &&
+    if ((givenName.value.trim().length > 0 || familyName.value.trim().length > 0) && passPhrase.value.trim().length > 0 && calculatedDomainName.length > 0 &&
         //For an answer type, a question must also be set 
         (passwordType !== "answer" || securityQuestion.value.trim().length > 0)) {
         generatePasswordButton.disabled = false;
