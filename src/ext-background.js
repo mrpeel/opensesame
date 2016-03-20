@@ -4,17 +4,19 @@ var extGivenName = "";
 var extFamilyName = "";
 var extPassPhrase = "";
 var extPasswordType = "";
+var extEncStore = {};
+var extEncHash = "";
 var pageHasPassword = false;
 var lastPassGenTimeStamp;
 
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.message === "set_password") {
+            /*Populate password into password field on the page - called by pop-up page */
             extGivenName = request.givenName;
             extFamilyName = request.familyName;
             extPassPhrase = request.passPhrase;
             extPasswordType = request.passwordType;
-            //console.log('Set password password type: ' + request.passwordType);
 
             if (pageHasPassword) {
                 chrome.tabs.executeScript(null, {
@@ -24,7 +26,39 @@ chrome.runtime.onMessage.addListener(
 
             //Automatically clear the stored pass phrase after elapsed time
             clearStoredPhrase();
+        } else if (request.message === "store_phrase") {
+            /*Store encrypted pass phrase values - called by pop-up page */
+            lastPassGenTimeStamp = Date.now();
+
+            extEncHash = request.threeCharHash;
+            extEncStore = request.phraseStore;
+
+        } else if (request.message === "clear_stored_phrase") {
+            /*Remove stored pass phrase values password - called by pop-up page */
+            lastPassGenTimeStamp = Date.now();
+
+            zeroVar(extEncHash);
+            extEncHash = "";
+
+            if (typeof extEncStore.iv === "string") {
+                zeroVar(extEncStore.iv);
+                extEncStore.iv = "";
+            } else if (extEncStore.iv.constructor.name === "Uint8Array") {
+                zeroIntArray(extEncStore.iv);
+                extEncStore.iv = [];
+            }
+
+            if (typeof extEncStore.ciphertext === "string") {
+                zeroVar(extEncStore.ciphertext);
+                extEncStore.ciphertext = "";
+            } else if (extEncStore.ciphertext.constructor.name === "Uint8Array") {
+                zeroIntArray(extEncStore.ciphertext);
+                extEncStore.ciphertext = [];
+            }
+
         } else if (request.message === "set_page_details") {
+            /*Called by content script when page loads */
+
             //Store page values
             var pageURL = trimDomainName(request.url);
 
@@ -49,7 +83,9 @@ chrome.runtime.onMessage.addListener(
                 "givenName": extGivenName,
                 "familyName": extFamilyName,
                 "passPhrase": extPassPhrase,
-                "passwordType": extPasswordType
+                "passwordType": extPasswordType,
+                "threeCharHash": extEncHash,
+                "phraseStore": extEncStore
             });
 
         }
@@ -63,14 +99,15 @@ function clearStoredPhrase() {
     lastPassGenTimeStamp = Date.now();
     thisPasswordTimeStamp = lastPassGenTimeStamp;
 
-    //Set function to clear passwords after 30 minutes if no other activity has occurred
+    //Set function to clear stored pass phrase after 5 minutes if no other activity has occurred
     window.setTimeout(function () {
         //Check of this was the last password generated (timestamp still matches)
         if (thisPasswordTimeStamp === lastPassGenTimeStamp) {
             //Too much time has elapsed without any password activity so clear the stored pass phrase
+            zeroVar(extPassPhrase);
             extPassPhrase = "";
         }
-    }, 1800000);
+    }, 300000);
 }
 
 function trimDomainName(domainURL) {
@@ -87,5 +124,23 @@ function trimDomainName(domainURL) {
     }
 
     return domainName;
+
+}
+
+/** Utility function to replace a string's value with all zeroes
+ */
+function zeroVar(varToZero) {
+    return Array(varToZero.length).join("0");
+
+}
+
+/** Utility function to replace an array's value with all zeroes
+ */
+function zeroIntArray(arrayToZero) {
+    var holdingVal = arrayToZero;
+    for (var aCounter = 0; aCounter < arrayToZero.length; aCounter++) {
+        holdingVal[aCounter] = 0;
+    }
+    return holdingVal;
 
 }

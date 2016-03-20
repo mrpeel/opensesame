@@ -18,7 +18,7 @@ body {
 }
 @font-face {
     font-family: 'Muli';
-    src: url('muli.woff2') format('woff2')
+    src: url('muli.woff2') format('woff2');
 }
 @font-face {
     font-family: 'Material Icons';
@@ -61,4 +61,3 @@ body {
     src: local('Roboto Medium'), local('Roboto-Medium'), url('roboto-v15-latin-ext_cyrillic_greek-ext_greek_cyrillic-ext_vietnamese_latin-500.woff2') format('woff2');
     /* Super Modern Browsers */
 }
-/

@@ -1,4 +1,4 @@
-/*global chrome, alert, console, document, givenName, familyName, passPhrase, password, domainName, passwordType, setType, setPassChangeRequired */
+/*global chrome, alert, console, document, givenName, familyName, passPhrase, password, domainName, passwordType, setType, temporaryPhraseStore, setPassPhraseScreenState, setPassPhrase */
 
 //Extra variable only present for Chrome Extension
 var isChromeExtension = true;
@@ -26,8 +26,8 @@ chrome.runtime.onMessage.addListener(
             domainName.value = request.url;
             givenName.value = request.givenName;
             familyName.value = request.familyName;
-            passPhrase.value = request.passPhrase;
             extHasPassword = request.hasPassword;
+
             //console.log('Populate fields password type: ' + request.passwordType);
             setType(request.passwordType);
         }
@@ -41,10 +41,21 @@ chrome.runtime.onMessage.addListener(
         if (familyName.value.length > 0) {
             setValuePopulated(familyName);
         }
-        if (passPhrase.value.length > 0) {
+        //Determine state of password, and set the appropriate values
+        if (request.passPhrase.length > 0) {
+            //Pass phrase is still being held
             setValuePopulated(passPhrase);
-            setPassChangeRequired();
+            setPassPhrase(request.passPhrase);
+            setPassPhraseScreenState("holding");
+        } else if (request.threeCharHash.length > 0 && typeof request.phraseStore.iv !== "undefined") {
+            //Pass phrase has been encrypted and requires confirmation of the first three characters
+            temporaryPhraseStore.storeValues(request.threeCharHash, request.phraseStore);
+            setPassPhraseScreenState("stored");
+        } else {
+            //Pass phrase is not stored at all and is in standard editing mode
+            setPassPhraseScreenState("editing");
         }
+
     }
 );
 
@@ -60,6 +71,27 @@ function generateExtPassword() {
     });
 
 }
+
+function storeExtPhrase() {
+
+    chrome.runtime.sendMessage({
+        "message": "store_phrase",
+        "threeCharHash": temporaryPhraseStore.threeCharHash,
+        "phraseStore": temporaryPhraseStore.encData
+    });
+
+}
+
+
+function clearExtPhrase() {
+
+    chrome.runtime.sendMessage({
+        "message": "clear_stored_phrase"
+    });
+
+}
+
+
 
 function setValuePopulated(pElement) {
 

@@ -6,28 +6,126 @@ var fileinclude = require('gulp-file-include');
 var rename = require('gulp-rename');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
-var sourcemaps = require('gulp-sourcemaps');
-var minifyCss = require('gulp-minify-css');
+var nano = require('gulp-cssnano');
 var connect = require('gulp-connect');
 var ghPages = require('gulp-gh-pages');
+var gutil = require('gulp-util');
+var debug = require('gulp-debug');
+var htmlmin = require('gulp-htmlmin');
 
 
 /* Use a dependency chain to build in the correct order - starting with the final task.
     Each task has the dependcy of the previous task listed
 */
-gulp.task('default', ['copytodistchromeext']);
+//gulp.task('default', ['copytodistchromeext']);
+gulp.task('default', ['serve']);
+
+/* Build the serviceworker js file for build directory. Updates the timestamp used in the cache name the current date/time.  
+ */
+gulp.task('buildserviceworker', function () {
+    gulp.src('src/sw.js')
+        .pipe(replace({
+            patterns: [
+                {
+                    match: 'timestamp',
+                    replacement: new Date().getTime()
+                    }
+                ]
+        }))
+        .pipe(replace({
+            patterns: [
+                {
+                    match: 'cssfile',
+                    replacement: 'opensesame.css'
+                    }
+                ]
+        }))
+        .pipe(replace({
+            patterns: [
+                {
+                    match: 'jsfile',
+                    replacement: 'opensesame.js'
+                    }
+                ]
+        }))
+
+    .pipe(gulp.dest('build/'));
+});
+
+
+/* Build the serviceworker js file for dist directory. Updates the timestamp used in the cache name the current date/time.  
+ */
+gulp.task('distserviceworker', ['buildserviceworker'], function () {
+    gulp.src('src/sw.js')
+        .pipe(replace({
+            patterns: [
+                {
+                    match: 'timestamp',
+                    replacement: new Date().getTime()
+                    }
+                ]
+        }))
+        .pipe(replace({
+            patterns: [
+                {
+                    match: 'cssfile',
+                    replacement: 'opensesame.min.css'
+                    }
+                ]
+        }))
+        .pipe(replace({
+            patterns: [
+                {
+                    match: 'jsfile',
+                    replacement: 'opensesame.min.js'
+                    }
+                ]
+        }))
+
+    .pipe(gulp.dest('dist/'));
+});
 
 /* Build the html for the stand alone website version of Open Sesame.
     Takes the container file and inserts the relevant @@include directives to build the complete page.
 */
-gulp.task('buildstandalonehtml', function () {
+gulp.task('buildstandalonehtml', ['distserviceworker'], function () {
     gulp.src(['src/standalone-container.html'])
         .pipe(fileinclude({
             prefix: '@@',
             basepath: '@file'
         }))
+        .pipe(replace({
+            patterns: [
+                {
+                    match: 'jsref',
+                    replacement: "opensesame.js"
+                }
+            ]
+        }))
+        .pipe(htmlmin({
+            collapseWhitespace: false
+        }))
         .pipe(rename('index.html'))
-        .pipe(gulp.dest('./build/'))
+        .pipe(gulp.dest('./build/'));
+
+
+    gulp.src(['src/standalone-container.html'])
+        .pipe(fileinclude({
+            prefix: '@@',
+            basepath: '@file'
+        }))
+        .pipe(replace({
+            patterns: [
+                {
+                    match: 'jsref',
+                    replacement: "opensesame.js"
+                }
+            ]
+        }))
+        .pipe(htmlmin({
+            collapseWhitespace: true
+        }))
+        .pipe(rename('index.html'))
         .pipe(gulp.dest('./dist/'));
 });
 
@@ -35,6 +133,7 @@ gulp.task('buildstandalonehtml', function () {
     Updates the timestamp comment with the current date/time.  This is required to force a re-load of
     the cached files.
 */
+/*
 gulp.task('appcachetimestamp', ['buildstandalonehtml'], function () {
     gulp.src('src/opensesame.appcache.base')
         .pipe(replace({
@@ -42,24 +141,22 @@ gulp.task('appcachetimestamp', ['buildstandalonehtml'], function () {
                 {
                     match: 'timestamp',
                     replacement: new Date().getTime()
-        }
-      ]
+                }
+            ]
         }))
         .pipe(rename('opensesame.appcache'))
         .pipe(gulp.dest('./build/'));
-});
+});*/
 
 /* Build the javascript for the stand alone website version of Open Sesame.
     Concatenates and minifies the files required to run as a stand-alone.
 */
-gulp.task('buildstandalonejs', ['appcachetimestamp'], function () {
+gulp.task('buildstandalonejs', ['buildstandalonehtml'], function () {
     gulp.src(['src/passoff.js', 'src/manager.js', 'src/cryptofunctions.js', 'src/temporaryphrasestore.js'])
-        .pipe(sourcemaps.init())
         .pipe(concat('opensesame.js'))
         .pipe(gulp.dest('./build/'))
         .pipe(rename('opensesame.min.js'))
-        .pipe(uglify())
-        .pipe(sourcemaps.write('./'))
+        .pipe(uglify().on('error', gutil.log))
         .pipe(gulp.dest('build/'));
 });
 
@@ -67,26 +164,36 @@ gulp.task('buildstandalonejs', ['appcachetimestamp'], function () {
  */
 gulp.task('minifycss', ['buildstandalonejs'], function () {
     gulp.src(['src/style.css'])
+        .pipe(rename('opensesame.css'))
+        .pipe(gulp.dest('./build/'))
         .pipe(rename('opensesame.min.css'))
-        .pipe(minifyCss())
+        .pipe(nano()).on('error', gutil.log)
         .pipe(gulp.dest('./build/'));
+});
+
+/* Copy the MDL files from source to build
+ */
+gulp.task('copymaterial', ['minifycss'], function () {
+    gulp.src(['lib/material.min.js', 'lib/material.min.css'])
+        .pipe(gulp.dest('./build/'))
+        .pipe(gulp.dest('./dist/'));
 });
 
 /* Copy all the required files for stand alone operation to the dist directory.
  */
-gulp.task('copytodist', ['minifycss'], function () {
-    gulp.src(['./build/*.png', './build/*.ico', './build/*.js', './build/*.css', './build/*.html', './build/*.appcache'])
-        .pipe(gulp.dest('./dist/'));
+gulp.task('copytodist', ['copymaterial'], function () {
+    gulp.src(['./build/*.png', './build/*.ico', './build/*.js', './build/*.css', './build/*.html'])
+        .pipe(debug())
+        .pipe(gulp.dest('./dist/'))
+        .pipe(connect.reload());
 });
 
 /* Minify the test spec file.
  */
 gulp.task('minifytestspec', ['copytodist'], function () {
     gulp.src(['test/opensesame-spec.js'])
-        .pipe(sourcemaps.init())
         .pipe(rename('opensesame-spec.min.js'))
-        .pipe(uglify())
-        .pipe(sourcemaps.write('./'))
+        .pipe(uglify().on('error', gutil.log))
         .pipe(gulp.dest('test/'));
 });
 
@@ -94,6 +201,7 @@ gulp.task('minifytestspec', ['copytodist'], function () {
  */
 gulp.task('copytodisttest', ['minifytestspec'], function () {
     gulp.src(['test/*.html', 'test/*.css', 'test/*.min.js', 'test/*.png'])
+        .pipe(debug())
         .pipe(gulp.dest('./dist/test/'));
 });
 
@@ -106,6 +214,14 @@ gulp.task('buildexthtml', ['copytodisttest'], function () {
             prefix: '@@',
             basepath: '@file'
         }))
+        .pipe(replace({
+            patterns: [
+                {
+                    match: 'jsref',
+                    replacement: "ext-opensesame.js"
+                }
+            ]
+        }))
         .pipe(rename('opensesame.html'))
         .pipe(gulp.dest('./chrome-ext/'));
 });
@@ -115,12 +231,11 @@ gulp.task('buildexthtml', ['copytodisttest'], function () {
 */
 gulp.task('buildextjs', ['buildexthtml'], function () {
     gulp.src(['src/passoff.js', 'src/manager.js', 'src/ext-popup.js', 'src/cryptofunctions.js'])
-        .pipe(sourcemaps.init())
+        .pipe(debug())
         .pipe(concat('ext-opensesame.js'))
         .pipe(gulp.dest('./chrome-ext/'))
         .pipe(rename('ext-opensesame.min.js'))
-        .pipe(uglify())
-        .pipe(sourcemaps.write('./'))
+        .pipe(uglify().on('error', gutil.log))
         .pipe(gulp.dest('./chrome-ext/'));
 });
 
@@ -129,15 +244,17 @@ gulp.task('buildextjs', ['buildexthtml'], function () {
 
 gulp.task('minifyextcss', ['buildextjs'], function () {
     gulp.src(['src/style.css', 'src/ext-style.css'])
+        .pipe(debug())
         .pipe(concat('ext-opensesame.min.css'))
-        .pipe(minifyCss())
+        .pipe(nano()).on('error', gutil.log)
         .pipe(gulp.dest('./chrome-ext/'));
 });
 
 /* Copy all the required files for chrome extension operation to the chrome-ext directory.
  */
 gulp.task('copytochromeext', ['minifyextcss'], function () {
-    gulp.src(['src/manifest.json', 'src/ext-background.js', 'src/ext-content.js', 'opensesame-38.png', 'src/material.min.js', 'src/material.min.css', 'src/cryptojs.js', 'fonts/*.woff2'])
+    gulp.src(['src/manifest.json', 'src/ext-background.js', 'src/ext-content.js', 'opensesame-38.png', 'lib/material.min.js', 'lib/material.min.css', 'src/cryptojs.js', 'fonts/*.woff2'])
+        .pipe(debug())
         .pipe(gulp.dest('./chrome-ext/'));
 });
 
@@ -145,14 +262,28 @@ gulp.task('copytochromeext', ['minifyextcss'], function () {
  */
 gulp.task('copytodistchromeext', ['copytochromeext'], function () {
     gulp.src(['src/*.json', 'src/ext-background.js', 'src/ext-content.js', 'chrome-ext/cryptojs.js', 'chrome-ext/*.png', 'chrome-ext/*.min.js', 'chrome-ext/*.min.css', 'chrome-ext/*.html', 'fonts/*.woff2'])
+        .pipe(debug())
         .pipe(gulp.dest('./dist/chrome-ext/'));
 
 });
 
 
+/* Watch for changes to html and then reload when updated
+ */
+gulp.task('html', ['copytodistchromeext'], function () {
+    gulp.src('./build/*.html')
+        .pipe(connect.reload());
+});
+
 /* Standard server task */
-gulp.task('serve', function () {
-    connect.server();
+gulp.task('serve', ['copytodistchromeext'], function () {
+    connect.server({
+        root: 'dist',
+        livereload: true
+    });
+
+    //Execute the html task anytime the source files change
+    gulp.watch('src/*.*', ['html']);
 });
 
 
@@ -164,7 +295,8 @@ gulp.task('deploy', function () {
 
 /* Special task to build the three CyrptoJS files used into a single file */
 gulp.task('buildcryptojs', function () {
-    gulp.src(['src/aes.js', 'src/pbkdf2.js', 'src/hmac-sha256.js'])
+    gulp.src(['lib/aes.js', 'lib/pbkdf2.js', 'lib/hmac-sha256.js'])
+        .pipe(debug())
         .pipe(concat('cryptojs.js'))
         .pipe(gulp.dest('./build/'));
 });

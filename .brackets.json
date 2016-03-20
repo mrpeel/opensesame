@@ -5,6 +5,8 @@
         "/Users/neilkloot/Dev/opensesame/test/opensesame-spec.min.js",
         "/Users/neilkloot/Dev/opensesame/src/ext-background.js",
         "/Users/neilkloot/Dev/opensesame/gulpfile.js",
-        "/Users/neilkloot/Dev/opensesame/test/opensesame-spec.js"
+        "/Users/neilkloot/Dev/opensesame/test/opensesame-spec.js",
+        "/Users/neilkloot/Dev/opensesame/test/test-spec.js",
+        "/Users/neilkloot/Dev/opensesame/dist/test/jasmine-es6-promise-matchers.min.js"
     ]
 }

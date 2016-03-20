@@ -1,12 +1,14 @@
 <!doctype html>
-<html lang=en manifest="opensesame.appcache">
+<html lang=en>
+<!-- manifest="opensesame.appcache">-->
 <!-- This web app uses the application cache - any change requires the passoff.appcache file to be modified.  
     Modify the timestamp comment in the 2nd line to force browsers to refresh  -->
 
 
 <head>
     <meta charset="utf-8">
-    <meta http-equiv=Content-Security-Policy content="default-src 'none'; style-src 'self' https://fonts.googleapis.com https://storage.googleapis.com; script-src 'self' 'unsafe-inline' https://storage.googleapis.com;font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self'">
+    <!--Reset to default-src 'none' -->
+    <meta http-equiv=Content-Security-Policy content="default-src *; style-src 'self' 127.0.0.1 https://fonts.googleapis.com https://storage.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:* 127.0.0.1:* https://storage.googleapis.com;font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self'">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Generate passwords on demand">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -33,7 +35,7 @@
     <link href='https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Muli&text=PassOpSasfYourPwdINAnweUmly' rel='stylesheet' type='text/css'>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.teal-pink.min.css" />
+    <link rel="stylesheet" href="material.min.css" />
     <link rel="stylesheet" href="opensesame.min.css">
 </head>
 
@@ -49,8 +51,14 @@
 
     </script>
 
-    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.4/material.min.js"></script>
-    <script src="opensesame.js"></script>
+    <script src="material.min.js"></script>
+    <script src="@@jsref"></script>
+    <script>
+        //Execute the servide worker prep
+        prepServiceWorker();
+
+    </script>
+
 </body>
 
 </html>

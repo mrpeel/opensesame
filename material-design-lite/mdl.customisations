@@ -1,0 +1,163 @@
+custom scss file - material-design-lite.scss
+---------------------------------------------
+
+
+/* Material Design Lite */
+
+// Variables and mixins
+@import "variables";
+@import "mixins";
+// Resets and dependencies
+@import "resets/resets";
+@import "typography/typography";
+// Components
+@import "palette/palette";
+@import "ripple/ripple";
+@import "animation/animation";
+//@import "badge/badge";
+@import "button/button";
+@import "card/card";
+@import "checkbox/checkbox";
+//@import "data-table/data-table";
+@import "dialog/dialog";
+//@import "footer/mega_footer";
+//@import "footer/mini_footer";
+@import "icon-toggle/icon-toggle";
+@import "menu/menu";
+//@import "progress/progress";
+@import "layout/layout";
+//@import "radio/radio";
+//@import "slider/slider";
+@import "snackbar/snackbar";
+//@import "spinner/spinner";
+//@import "switch/switch";
+//@import "tabs/tabs";
+@import "textfield/textfield";
+//@import "tooltip/tooltip";
+@import "shadow/shadow";
+@import "grid/grid";
+
+
+_variables.scss
+----------------
+
+/* ==========  Color & Themes  ========== */
+
+// Define whether individual color pallet items should have classes created.
+// Setting this to true will remove individual color classes for each color in the pallets.
+// To improve overall performance (assuming they aren't used) by:
+// * Saving server bandwidth sending the extra classes
+// * Save client computation against the classes
+// it is RECOMMENDED you set this to true.
+$trim-color-classes: true !default;
+// Use color primarily for emphasis. Choose colors that fit with
+// your brand and provide good contrast between visual components.
+$color-primary: $palette-teal-500 !default;
+$color-primary-dark: $palette-teal-700 !default;
+$color-accent: $palette-pink-A200 !default;
+// Our primary is dark, so use $color-dark-contrast for overlaid text.
+$color-primary-contrast: $color-dark-contrast !default;
+// Our accent is dark, so use $color-dark-contrast for overlaid text.
+$color-accent-contrast: $color-dark-contrast !default;
+// Replace all colors with placeholders if we're generating a template.
+
+
+extra entries in gulp file - gulpfile.babel.js
+-------------------------
+
+const OPEN_SESAME_SOURCES = [
+  // Component handler
+  'src/mdlComponentHandler.js',
+  // Polyfills/dependencies
+  'src/third_party/**/*.js',
+  // Base components
+  'src/button/button.js',
+  //'src/checkbox/checkbox.js',
+  'src/dialog/dialog.js',
+  'src/icon-toggle/icon-toggle.js',
+  'src/menu/menu.js',
+  'src/progress/progress.js',
+  //'src/radio/radio.js',
+  //'src/slider/slider.js',
+  //'src/snackbar/snackbar.js',
+  //'src/spinner/spinner.js',
+  //'src/switch/switch.js',
+  //'src/tabs/tabs.js',
+  'src/textfield/textfield.js',
+  //'src/tooltip/tooltip.js',
+  // Complex components (which reuse base components)
+  'src/layout/layout.js',
+  //'src/data-table/data-table.js',
+  // And finally, the ripples
+  'src/ripple/ripple.js'
+];
+
+// Compile and Automatically Prefix Stylesheets for Open Sesame
+gulp.task('styles-open-sesame', () => {
+    // For best performance, don't add Sass partials to `gulp.src`
+    return gulp.src('src/material-design-lite-open-sesame.scss')
+        // Generate Source Maps
+        .pipe($.sourcemaps.init())
+        .pipe($.sass({
+            precision: 10,
+            onError: console.error.bind(console, 'Sass error:')
+        }))
+        .pipe($.cssInlineImages({
+            webRoot: 'src'
+        }))
+        .pipe($.autoprefixer(AUTOPREFIXER_BROWSERS))
+        .pipe(gulp.dest('.tmp'))
+        // Concatenate Styles
+        .pipe($.concat('material.css'))
+        .pipe($.header(banner, {
+            pkg
+        }))
+        .pipe(gulp.dest('dist'))
+        // Minify Styles
+        .pipe($.if('*.css', $.csso()))
+        .pipe($.concat('material.min.css'))
+        .pipe($.header(banner, {
+            pkg
+        }))
+        .pipe($.sourcemaps.write('.'))
+        .pipe(gulp.dest('dist'))
+        .pipe($.size({
+            title: 'styles'
+        }));
+});
+
+// Concatenate And Minify JavaScript
+gulp.task('scripts-open-sesame', () => {
+    return gulp.src(OPEN_SESAME_SOURCES)
+        .pipe($.if(/mdlComponentHandler\.js/, $.util.noop(), uniffe()))
+        .pipe($.sourcemaps.init())
+        // Concatenate Scripts
+        .pipe($.concat('material.js'))
+        .pipe($.iife({
+            useStrict: true
+        }))
+        .pipe(gulp.dest('dist'))
+        // Minify Scripts
+        .pipe($.uglify({
+            sourceRoot: '.',
+            sourceMapIncludeSources: true
+        }))
+        .pipe($.header(banner, {
+            pkg
+        }))
+        .pipe($.concat('material.min.js'))
+        // Write Source Maps
+        .pipe($.sourcemaps.write('.'))
+        .pipe(gulp.dest('dist'))
+        .pipe($.size({
+            title: 'scripts'
+        }));
+});
+
+gulp.task('opensesame', ['clean'], cb => {
+    runSequence(
+    ['styles-open-sesame', 'styles-grid'], ['scripts-open-sesame'], ['mocha'],
+        cb);
+});
+
+

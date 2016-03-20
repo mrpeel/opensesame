@@ -1624,6 +1624,28 @@ describe("Test Open Sesame Temporary Phrase Store", function () {
             });
     });
 
+    it("should clear encrypted data and hash when the clearStore method is called", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+
+        tempPhraseStore.encryptPhrase("This is a pass phrase", "TylerDurden")
+            .then(function (val) {
+                tempPhraseStore.clearStore();
+                expect(tempPhraseStore.encData).not.toBeDefined();
+                done();
+            });
+    });
+
+    it("should allow encrypted data and hash to be passed in and a succsefull decryption to occur", function (done) {
+        var tempPhraseStore = new TemporaryPhraseStore();
+        var tempPhraseStore2 = new TemporaryPhraseStore();
+
+        tempPhraseStore.encryptPhrase("This is a pass phrase", "TylerDurden")
+            .then(function (val) {
+                tempPhraseStore2.storeValues(tempPhraseStore.threeCharHash, tempPhraseStore.encData);
+                expect(tempPhraseStore2.decryptPhrase("Thi", "TylerDurden")).toBeResolvedWith("This is a pass phrase", done);
+            });
+    });
+
 
     //afterEach(JasminePromiseMatchers.uninstall);
 });
