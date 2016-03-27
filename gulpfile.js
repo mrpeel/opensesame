@@ -179,10 +179,21 @@ gulp.task('copymaterial', ['minifycss'], function () {
         .pipe(gulp.dest('./dist/'));
 });
 
+/* Copy the favicon files
+ */
+gulp.task('copyfavicon', ['copymaterial'], function () {
+    gulp.src(['src/*.png', 'src/*.ico'])
+        .pipe(debug())
+        .pipe(gulp.dest('./build/'))
+        .pipe(gulp.dest('./dist/'));
+});
+
+
+
 /* Copy all the required files for stand alone operation to the dist directory.
  */
-gulp.task('copytodist', ['copymaterial'], function () {
-    gulp.src(['./build/*.png', './build/*.ico', './build/*.js', './build/*.css', './build/*.html'])
+gulp.task('copytodist', ['copyfavicon'], function () {
+    gulp.src(['./build/*.js', './build/*.css', './build/*.html'])
         .pipe(debug())
         .pipe(gulp.dest('./dist/'))
         .pipe(connect.reload());
@@ -224,13 +235,30 @@ gulp.task('buildexthtml', ['copytodisttest'], function () {
         }))
         .pipe(rename('opensesame.html'))
         .pipe(gulp.dest('./chrome-ext/'));
+
+    gulp.src(['src/ext-container.html'])
+        .pipe(fileinclude({
+            prefix: '@@',
+            basepath: '@file'
+        }))
+        .pipe(replace({
+            patterns: [
+                {
+                    match: 'jsref',
+                    replacement: "ext-opensesame.min.js"
+                }
+            ]
+        }))
+        .pipe(rename('opensesame.html'))
+        .pipe(gulp.dest('./dist/chrome-ext/'));
+
 });
 
 /* Build the javascript file for pop-up page for the chrome extension.
     Concatenates and minifies the files required to run as a stand-alone.
 */
 gulp.task('buildextjs', ['buildexthtml'], function () {
-    gulp.src(['src/passoff.js', 'src/manager.js', 'src/ext-popup.js', 'src/cryptofunctions.js'])
+    gulp.src(['src/temporaryphrasestore.js', 'src/passoff.js', 'src/manager.js', 'src/ext-popup.js', 'src/cryptofunctions.js'])
         .pipe(debug())
         .pipe(concat('ext-opensesame.js'))
         .pipe(gulp.dest('./chrome-ext/'))
@@ -250,10 +278,30 @@ gulp.task('minifyextcss', ['buildextjs'], function () {
         .pipe(gulp.dest('./chrome-ext/'));
 });
 
+/* Build manifest file
+ */
+gulp.task('buildmanifestfiles', ['minifyextcss'], function () {
+    var dateOffset = 4032271;
+    var dateCalc = parseInt(new Date().getTime() / 360000);
+
+    gulp.src('src/manifest.json')
+        .pipe(replace({
+            patterns: [
+                {
+                    match: 'timestamp',
+                    replacement: String(parseInt((dateCalc - dateOffset) / 1000)) + '.' + String((dateCalc - dateOffset) % 1000)
+                    }
+                ]
+        }))
+        .pipe(debug())
+        .pipe(gulp.dest('./chrome-ext/'))
+        .pipe(gulp.dest('./dist/chrome-ext/'));
+});
+
 /* Copy all the required files for chrome extension operation to the chrome-ext directory.
  */
-gulp.task('copytochromeext', ['minifyextcss'], function () {
-    gulp.src(['src/manifest.json', 'src/ext-background.js', 'src/ext-content.js', 'opensesame-38.png', 'lib/material.min.js', 'lib/material.min.css', 'src/cryptojs.js', 'fonts/*.woff2'])
+gulp.task('copytochromeext', ['buildmanifestfiles'], function () {
+    gulp.src(['src/ext-background.js', 'src/ext-content.js', 'src/opensesame-38.png', 'lib/material.min.js', 'lib/material.min.css', 'src/cryptojs.js', 'fonts/*.woff2'])
         .pipe(debug())
         .pipe(gulp.dest('./chrome-ext/'));
 });
@@ -261,7 +309,7 @@ gulp.task('copytochromeext', ['minifyextcss'], function () {
 /* Copy all the required files for chrome extension operation to the dist/chrome-ext directory.
  */
 gulp.task('copytodistchromeext', ['copytochromeext'], function () {
-    gulp.src(['src/*.json', 'src/ext-background.js', 'src/ext-content.js', 'chrome-ext/cryptojs.js', 'chrome-ext/*.png', 'chrome-ext/*.min.js', 'chrome-ext/*.min.css', 'chrome-ext/*.html', 'fonts/*.woff2'])
+    gulp.src(['src/ext-background.js', 'src/ext-content.js', 'chrome-ext/cryptojs.js', 'chrome-ext/*.png', 'chrome-ext/*.min.js', 'chrome-ext/*.min.css', 'fonts/*.woff2'])
         .pipe(debug())
         .pipe(gulp.dest('./dist/chrome-ext/'));
 

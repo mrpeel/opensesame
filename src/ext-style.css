@@ -1,5 +1,5 @@
 body {
-    width: 512px;
+    width: 414px;
 }
 .ext-pass {
     height: 510px;
@@ -12,9 +12,6 @@ body {
 }
 .ext-answer-generated {
     height: 714px;
-}
-.mdl-layout__container {
-    width: 512px;
 }
 @font-face {
     font-family: 'Muli';

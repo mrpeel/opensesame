@@ -510,6 +510,7 @@ function setPassPhraseScreenState(passState) {
         //Hide the pass phrase
         // Showing the dialog
         showElement("confirm-dialog");
+        document.getElementById("header-key").scrollIntoView();
         document.getElementById("confirm-passphrase").focus();
 
     } else if (passState === "failed") {
