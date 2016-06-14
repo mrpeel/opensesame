@@ -1,14 +1,10 @@
 <!doctype html>
 <html lang="en">
-<!-- manifest="opensesame.appcache">-->
-<!-- This web app uses the application cache - any change requires the passoff.appcache file to be modified.  
-    Modify the timestamp comment in the 2nd line to force browsers to refresh  -->
-
 
 <head>
     <meta charset="utf-8">
     <!--Reset to default-src 'none' -->
-    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 127.0.0.1 https://fonts.googleapis.com https://storage.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:* 127.0.0.1:* https://storage.googleapis.com;font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 127.0.0.1 https://fonts.googleapis.com https://code.getmdl.io; script-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:* 127.0.0.1:* https://code.getmdl.io;font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self'">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Generate passwords on demand">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -35,7 +31,8 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Muli&text=PassOpSasfYourPwdINAnweUmly" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="material.min.css">
+    <!--link rel="stylesheet" href="material.min.css" /-->
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.indigo-blue.min.css">
     <link rel="stylesheet" href="opensesame.min.css">
 </head>
 
@@ -199,18 +196,18 @@
                     </div>
                 </div>
 
-                <div class="mdl-cell mdl-cell--1-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+                <!--div class="mdl-cell mdl-cell--1-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div-->
 
-                <div id="password-card" class="mdl-card mdl-cell mdl-cell--middle mdl-cell--6-col mdl-shadow--2dp hidden">
-                    <div class="password-header">
+                <div id="password-card" class="mdl-card mdl-cell mdl-cell--middle mdl-cell--6-col mdl-cell--3-offset-desktop mdl-cell--1-offset-tablet mdl-shadow--2dp hidden">
+                    <div class="password-header mdl-color--accent">
                         <!--<div class="header-circle mdl-color--teal-600">
                             <i class="material-icons circle-icon">lock_open</i>
                         </div>-->
-                        <h5><span id="password-card-header"><!--class="mdl-color-text--accent">-->Password</span></h5>
+                        <h5><span id="password-card-header" class="mdl-color-text--white">Password</span></h5>
                     </div>
 
                     <button class="close-button-top-right mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="close-password">
-                        <i class="material-icons">close</i>
+                        <i class="material-icons mdl-color-text--white">close</i>
                     </button>
                     <div class="mdl-layout__content mdl-card__supporting-text">
                         <div id="load-bar-ball" class="loader-four-balls hidden">
@@ -259,7 +256,7 @@
 
     </script>
 
-    <script src="material.min.js"></script>
+    <script defer="defer" src="material.min.js"></script>
     <script src="opensesame.js"></script>
     <script>
         //Execute the servide worker prep
