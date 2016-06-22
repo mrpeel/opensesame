@@ -136,8 +136,8 @@ gulp.task('appcachetimestamp', ['buildstandalonehtml'], function () {
     Concatenates and minifies the files required to run as a stand-alone.
 */
 gulp.task('buildstandalonejs', ['buildstandalonehtml'], function() {
-  gulp.src(['src/passoff.js', 'src/manager.js', 'src/cryptofunctions.js',
-      'src/temporaryphrasestore.js'
+  gulp.src(['src/simple_assert.js', 'src/passoff.js', 'src/manager.js',
+      'src/cryptofunctions.js', 'src/temporaryphrasestore.js'
     ])
     .pipe(concat('opensesame.js'))
     .pipe(gulp.dest('./build/'))
@@ -240,8 +240,9 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
     Concatenates and minifies the files required to run as a stand-alone.
 */
 gulp.task('buildextjs', ['buildexthtml'], function() {
-  gulp.src(['src/temporaryphrasestore.js', 'src/passoff.js',
-      'src/manager.js', 'src/ext-popup.js', 'src/cryptofunctions.js'
+  gulp.src(['src/simple_assert.js', 'src/temporaryphrasestore.js',
+      'src/passoff.js', 'src/manager.js', 'src/ext-popup.js',
+      'src/cryptofunctions.js'
     ])
     .pipe(debug())
     .pipe(concat('ext-opensesame.js'))

@@ -1,143 +1,204 @@
+/*global console*/
+
+/**
+ * Simple assertions - checks global variables to decide whether to run and if it runs whether to throw an error or log a console message
+
+ */
+
+var ASSERT_ENABLED = true;
+var ASSERT_ERROR = true;
+var ASSERT_VERBOSE = true;
+
+function assert(condition, message) {
+  if (ASSERT_ENABLED && !condition) {
+
+    if (ASSERT_ERROR) {
+      throw new Error('Assertion failed' + typeof message === "undefined" ? '' :
+        message);
+    } else {
+      console.log('Assertion failed');
+      console.log(typeof message === "undefined" ? '' : message);
+    }
+  } else if (ASSERT_VERBOSE && condition) {
+    console.log(typeof message === "undefined" ? '' : message);
+  }
+}
+
 /*global  console, CryptoJS, Uint8Array, Promise, performance, TextEncoder, TextDecoder, window, webcrypto, crypto, CryptoFunctions */
 /*global PBKDF2, convertDerivedKeyToHex, aesEncrypt, aesDecrypt, zeroVar, zeroIntArray */
+/*global ASSERT_ENABLED, ASSERT_ERROR, assert */
 
 
-var TemporaryPhraseStore = function () {
-    this.ns = "cake.man.io";
+var TemporaryPhraseStore = function() {
+  this.ns = "cake.man.io";
 };
 
-/* Encrypts the pass phrase using the name as a salt.  Runs a PBKDF2 500 times on the firsth three characters of the passphrase to generate a key.  
+/* Encrypts the pass phrase using the name as a salt.  Runs a PBKDF2 500 times on the firsth three characters of the passphrase to generate a key.
  *     Then runs PBKDF2 250 times on the key to generate a hash to store for comparison later.
  *     The key is used to encrypt the data using AES and the result is stored.
  * @param {passphrase, name} strings.
- * @return {promise} A promise which will be resolved with eoither "Success" or rejected with an error.     
+ * @return {promise} A promise which will be resolved with eoither "Success" or rejected with an error.
  */
-TemporaryPhraseStore.prototype.encryptPhrase = function (passphrase, name) {
-    "use strict";
+TemporaryPhraseStore.prototype.encryptPhrase = function(passphrase, name) {
+  "use strict";
 
-    var aesKey;
-    var tempStoreContext = this;
-    return new Promise(function (resolve, reject) {
+  assert(passphrase !== "",
+    'TemporaryPhraseStore.prototype.encryptPhrase passphrase: ' +
+    passPhrase);
+  assert(name !== "", 'TemporaryPhraseStore.prototype.encryptPhrase name: ' +
+    name);
 
-        if (typeof passphrase === "string" && passphrase.length >= 3) {
-            var firstThreeChars = passphrase.substring(0, 3);
+
+  var aesKey;
+  var tempStoreContext = this;
+  return new Promise(function(resolve, reject) {
+
+    if (typeof passphrase === "string" && passphrase.length >= 3) {
+      var firstThreeChars = passphrase.substring(0, 3);
 
 
-            PBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
-                .then(function (key) {
-                    aesKey = convertDerivedKeyToHex(key);
+      PBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
+        .then(function(key) {
+          aesKey = convertDerivedKeyToHex(key);
 
-                    return PBKDF2(convertDerivedKeyToHex(key), name + firstThreeChars, 250, 128);
-                }).then(function (verificationHash) {
-                    tempStoreContext.threeCharHash = convertDerivedKeyToHex(verificationHash);
+          return PBKDF2(convertDerivedKeyToHex(key), name +
+            firstThreeChars, 250, 128);
+        }).then(function(verificationHash) {
+          tempStoreContext.threeCharHash = convertDerivedKeyToHex(
+            verificationHash);
 
-                    return aesEncrypt(passphrase, aesKey);
-                }).then(function (encryptedData) {
-                    tempStoreContext.encData = encryptedData;
-                    resolve("Success");
-                }).catch(function (err) {
-                    reject(err);
-                });
-        } else {
-            reject("Pass phrase must be a sring at least three characters long");
-        }
-    });
+          return aesEncrypt(passphrase, aesKey);
+        }).then(function(encryptedData) {
+          tempStoreContext.encData = encryptedData;
+          resolve("Success");
+        }).catch(function(err) {
+          reject(err);
+        });
+    } else {
+      reject("Pass phrase must be a sring at least three characters long");
+    }
+  });
 
 };
 
 /* Descrypts the pass phrase using the first three chars and name.  Runs a PBKDF2 500 times on the firsth three characters of the passphrase
- * to generate a key.  Then runs PBKDF2 250 times on the key to generate a hash.  The generated hash is compared to the stored hash.  If they 
+ * to generate a key.  Then runs PBKDF2 250 times on the key to generate a hash.  The generated hash is compared to the stored hash.  If they
  * match, the key used to decrypt the pass phrase using AES.  If not, the encrypted data and has are cleared.
  * @param {firstThreeChars, name} strings.
- * @return {promise} A promise which will be resolved with the pass phrasee or rejected with an error.     
+ * @return {promise} A promise which will be resolved with the pass phrasee or rejected with an error.
  */
-TemporaryPhraseStore.prototype.decryptPhrase = function (firstThreeChars, name) {
-    "use strict";
+TemporaryPhraseStore.prototype.decryptPhrase = function(firstThreeChars, name) {
+"use strict";
 
-    var tempStoreContext = this;
-    var aesKey;
+assert(firstThreeChars !== "",
+  'TemporaryPhraseStore.prototype.decryptPhrase firstThreeChars: ' +
+  firstThreeChars);
+assert(name !== "", 'TemporaryPhraseStore.prototype.decryptPhrase name: ' +
+  name);
 
-    return new Promise(function (resolve, reject) {
+var tempStoreContext = this;
+var aesKey;
 
-        if (typeof tempStoreContext.encData === "undefined") {
-            reject("No encrypted data found");
+return new Promise(function(resolve, reject) {
 
-        } else if (typeof firstThreeChars !== "string" || firstThreeChars.length !== 3) {
-            tempStoreContext.clearStore();
+    if (typeof tempStoreContext.encData === "undefined") {
+      reject("No encrypted data found");
 
-            reject("First three characters parameter is not a 3 character string");
+    } else if (typeof firstThreeChars !== "string" || firstThreeChars.length !==
+      3) {
+      tempStoreContext.clearStore();
 
-        } else {
+      reject(
+        "First three characters parameter is not a 3 character string");
+
+    } else {
 
 
-            PBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
-                .then(function (key) {
-                    aesKey = convertDerivedKeyToHex(key);
+      PBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
+        .then(function(key) {
+          aesKey = convertDerivedKeyToHex(key);
+          //console.log('Key: ' + aesKey);
 
-                    return PBKDF2(convertDerivedKeyToHex(key), name + firstThreeChars, 250, 128);
-                }).then(function (verificationHash) {
-                    if (tempStoreContext.threeCharHash === convertDerivedKeyToHex(verificationHash)) {
+          return PBKDF2(convertDerivedKeyToHex(key), name +
+            firstThreeChars, 250, 128);
+        }).then(function(verificationHash) {
 
-                        aesDecrypt(tempStoreContext.encData, aesKey)
-                            .then(function (plainText) {
-                                resolve(plainText);
-                            });
+          //console.log('Stored hash: ' + tempStoreContext.threeCharHash);
+          //console.log('Verification hash: ' + convertDerivedKeyToHex(
+          verificationHash));
 
-                    } else {
-                        tempStoreContext.clearStore();
-                        reject("First three characters did not match");
-                    }
+      if (tempStoreContext.threeCharHash === convertDerivedKeyToHex(
+          verificationHash)) {
 
-                });
-        }
+        //console.log('Encrypted data');
+        //console.log(tempStoreContext.encData);
+
+        aesDecrypt(tempStoreContext.encData, aesKey)
+          .then(function(plainText) {
+            resolve(plainText);
+          });
+
+      } else {
+        tempStoreContext.clearStore();
+        reject("First three characters did not match");
+      }
+
     });
+}
+});
 };
 
 /* Clears any stored data for the hash and encrypted pass phrase
  * @param {none}
  * @return {none}
  */
-TemporaryPhraseStore.prototype.clearStore = function () {
-    "use strict";
+TemporaryPhraseStore.prototype.clearStore = function() {
+  "use strict";
 
-    if (typeof this.threeCharHash !== "undefined") {
-        zeroVar(this.threeCharHash);
-        delete this.threeCharHash;
+  if (typeof this.threeCharHash !== "undefined") {
+    zeroVar(this.threeCharHash);
+    delete this.threeCharHash;
+  }
+
+  if (typeof this.encData !== "undefined") {
+
+    if (typeof this.encData.iv === "string") {
+      zeroVar(this.encData.iv);
+      this.encData.iv = "";
+    } else if (this.encData.iv.constructor.name === "Uint8Array") {
+      zeroIntArray(this.encData.iv);
+      this.encData.iv = [];
     }
 
-    if (typeof this.encData !== "undefined") {
-
-        if (typeof this.encData.iv === "string") {
-            zeroVar(this.encData.iv);
-            this.encData.iv = "";
-        } else if (this.encData.iv.constructor.name === "Uint8Array") {
-            zeroIntArray(this.encData.iv);
-            this.encData.iv = [];
-        }
-
-        if (typeof this.encData.ciphertext === "string") {
-            zeroVar(this.encData.ciphertext);
-            this.encData.ciphertext = "";
-        } else if (this.encData.ciphertext.constructor.name === "Uint8Array") {
-            zeroIntArray(this.encData.ciphertext);
-            this.encData.ciphertext = [];
-        }
-
-        delete this.encData;
+    if (typeof this.encData.ciphertext === "string") {
+      zeroVar(this.encData.ciphertext);
+      this.encData.ciphertext = "";
+    } else if (this.encData.ciphertext.constructor.name === "Uint8Array") {
+      zeroIntArray(this.encData.ciphertext);
+      this.encData.ciphertext = [];
     }
+
+    delete this.encData;
+  }
 
 };
 
-/* Allows values to be stored which were created separately.  This functionality is required for the chrome extension which stores and returns values. 
+/* Allows values to be stored which were created separately.  This functionality is required for the chrome extension which stores and returns values.
  * @param {threeCharHash, encData} String, Uint8Array
  * @return {none}
  */
-TemporaryPhraseStore.prototype.storeValues = function (threeCharHash, encData) {
-    "use strict";
+TemporaryPhraseStore.prototype.storeValues = function(threeCharHash, encData) {
+  "use strict";
 
+  assert(threeCharHash !== "",
+    'TemporaryPhraseStore.prototype.storeValues threeCharHash: ' +
+    threeCharHash);
+  assert(encData !== "",
+    'TemporaryPhraseStore.prototype.storeValues encData: ' +
+    encData);
 
-    this.threeCharHash = threeCharHash;
-    this.encData = encData;
+  this.threeCharHash = threeCharHash;
+  this.encData = encData;
 
 };
 
@@ -504,7 +565,9 @@ PassOff.prototype.generatePassword = function (passwordType) {
   ----------------------------------------------------------------------------------------------------------------
 */
 
-/*global PassOff, document, window, console, navigator, extHasPassword, generateExtPassword, clearExtPhrase, storeExtPhrase, storeExtVals, zeroVar, zeroIntArray, TemporaryPhraseStore */
+/*global PassOff, document, window, console, navigator, extHasPassword,
+generateExtPassword, clearExtPhrase, storeExtPhrase, storeExtVals, zeroVar, zeroIntArray, TemporaryPhraseStore,
+ASSERT_ENABLED, ASSERT_ERROR */
 
 //Global variables for UI elements
 var passPhrase;
@@ -1072,8 +1135,14 @@ function setPassPhraseScreenState(passState) {
     //Hide the pass phrase
     // Showing the dialog
     showElement("confirm-dialog");
-    document.getElementById("header-key").scrollIntoView();
-    document.getElementById("confirm-passphrase").focus();
+
+    //USe setTimeout to allow time for screen updates before prerforming next action
+    document.setTimeout(function() {
+      document.getElementById("header-key").scrollIntoView();
+    });
+    document.setTimeout(function() {
+      document.getElementById("confirm-passphrase").focus();
+    });
 
   } else if (passState === "failed") {
     //An attempt to confirm the first three characters of the pass phrase failed.
@@ -1094,6 +1163,7 @@ function setPassPhraseScreenState(passState) {
 /* Checks when three characters have been typed and then calls the confirmation decryption*/
 function checkConfirmation() {
   var confirmPassPhrase = document.getElementById("confirm-passphrase");
+  fullName = givenName.value.trim() + familyName.value.trim();
 
   if (confirmPassPhrase.value.length === 3) {
     confirmThreeChars(confirmPassPhrase.value, fullName);
@@ -1105,6 +1175,10 @@ function checkConfirmation() {
 
 /* Attempts to decrypt pass phrase using the first three characters*/
 function confirmThreeChars(threeChars, Name) {
+
+  //console.log('Three chars: ' + threeChars);
+  //console.log('Name: ' + Name);
+
   //Attempt decryption - if succesfull set passphrase value
   temporaryPhraseStore.decryptPhrase(threeChars, Name)
     .then(function(plainText) {
@@ -1431,7 +1505,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    if (request.message == "populate_fields") {
+    if (request.message === "populate_fields") {
       domainName.value = request.url || "";
       givenName.value = request.givenName || "";
       familyName.value = request.familyName || "";
@@ -1452,18 +1526,50 @@ chrome.runtime.onMessage.addListener(
         setValuePopulated(familyName);
       }
       //Determine state of password, and set the appropriate values
-      if (typeof request.threeCharHash !== "undefined" && request.threeCharHash
-        .length > 0 && typeof request.phraseStore.iv !==
-        "undefined") {
+      /*if (request.passPhrase.length > 0) {
+          //Pass phrase is still being held
+          setValuePopulated(passPhrase);
+          setPassPhrase(request.passPhrase);
+          setPassPhraseScreenState("holding");
+      } else */
+      if (request.threeCharHash && request.threeCharHash.length > 0 &&
+        request.phraseStore &&
+        request.phraseStore.iv) {
         //Pass phrase has been encrypted and requires confirmation of the first three characters
-        temporaryPhraseStore.storeValues(request.threeCharHash, request.phraseStore);
+        var eIV, eCiphertext;
+        //Uint8 values get lost in translation.  Values will need to be converted back tio Uint8Array
+        if (!(request.phraseStore.iv instanceof Uint8Array)) {
+          var iv = Object.keys(request.phraseStore.iv).map(function(key) {
+            return request.phraseStore.iv[key]
+          });
+          eIV = Uint8Array.from(iv);
+        } else {
+          eIV = request.phraseStore.iv;
+        }
+
+        if (!(request.phraseStore.ciphertext instanceof Uint8Array)) {
+          var ciphertext = Object.keys(request.phraseStore.ciphertext).map(
+            function(key) {
+              return request.phraseStore.ciphertext[key]
+            });
+          eCiphertext = Uint8Array.from(ciphertext);
+        } else {
+          eCiphertext = request.phraseStore.ciphertext;
+        }
+
+
+        temporaryPhraseStore.storeValues(request.threeCharHash, {
+          iv: eIV,
+          ciphertext: eCiphertext
+        });
+
+        setValuePopulated(passPhrase);
         setPassPhraseScreenState("stored");
       } else {
         //Pass phrase is not stored at all and is in standard editing mode
         setPassPhraseScreenState("editing");
       }
     }
-
   }
 );
 
@@ -1497,6 +1603,7 @@ function storeExtVals() {
     "phraseStore": temporaryPhraseStore.encData || {}
   });
 
+
 }
 
 function storeExtPhrase() {
@@ -1527,6 +1634,7 @@ function setValuePopulated(pElement) {
 }
 
 /*global CryptoJS, Promise, console, Uint8Array, window, TextEncoder, TextDecoder */
+/*global ASSERT_ENABLED, ASSERT_ERROR, assert */
 
 /* Ensure functions are always adressable after minification / compilation */
 window['PBKDF2'] = PBKDF2;
@@ -1544,45 +1652,59 @@ window['zeroIntArray'] = zeroIntArray;
 /**
  * Executes the PBKDF2 function.  If crypto subtle is supported it is used.  If not,  the CryptoJS PBKDF2 function is wrapped
  * in a promise.   Either way, it returns the derived key
- * @param {password, salt, numIterations, keylength} the password to perform the function on, the salt to apply, the number of iterations to 
+ * @param {password, salt, numIterations, keylength} the password to perform the function on, the salt to apply, the number of iterations to
  *     perform, and the length for the derived key
  * @return {Promise} A promise which resolves to the derived key.
  */
 
 
 function PBKDF2(password, salt, numIterations, keyLength) {
-    "use strict";
+  "use strict";
 
-    if (window.crypto && window.crypto.subtle) {
-        //use the subtle crypto functions
-        var cryptoTextEncoder = new TextEncoder("utf-8");
+  assert(password !== "",
+    'PBKDF2 password: ' +
+    password);
+  assert(salt !== "",
+    'PBKDF2 salt: ' +
+    salt);
+  assert(typeof numIterations === "number",
+    'PBKDF2 numIterations: ' +
+    numIterations);
+  assert(typeof keyLength === "number",
+    'PBKDF2 keyLength: ' +
+    keyLength);
 
-        var saltBuffer = cryptoTextEncoder.encode(salt);
-        var passwordBuffer = cryptoTextEncoder.encode(password);
 
-        return window.crypto.subtle.importKey('raw', passwordBuffer, {
-            name: 'PBKDF2'
-        }, false, ['deriveBits']).then(function (key) {
-            return window.crypto.subtle.deriveBits({
-                name: 'PBKDF2',
-                iterations: numIterations,
-                salt: saltBuffer,
-                hash: 'SHA-1'
-            }, key, keyLength);
-        });
+  if (window.crypto && window.crypto.subtle) {
+    //use the subtle crypto functions
+    var cryptoTextEncoder = new TextEncoder("utf-8");
 
-    } else {
-        //use the CryptJS function
+    var saltBuffer = cryptoTextEncoder.encode(salt);
+    var passwordBuffer = cryptoTextEncoder.encode(password);
 
-        return new Promise(function (resolve, reject) {
-            var derivedKey = CryptoJS.PBKDF2(password, salt, {
-                iterations: numIterations,
-                keySize: keyLength / 32
-            });
+    return window.crypto.subtle.importKey('raw', passwordBuffer, {
+      name: 'PBKDF2'
+    }, false, ['deriveBits']).then(function(key) {
+      return window.crypto.subtle.deriveBits({
+        name: 'PBKDF2',
+        iterations: numIterations,
+        salt: saltBuffer,
+        hash: 'SHA-1'
+      }, key, keyLength);
+    });
 
-            resolve(derivedKey);
-        });
-    }
+  } else {
+    //use the CryptJS function
+
+    return new Promise(function(resolve, reject) {
+      var derivedKey = CryptoJS.PBKDF2(password, salt, {
+        iterations: numIterations,
+        keySize: keyLength / 32
+      });
+
+      resolve(derivedKey);
+    });
+  }
 
 }
 
@@ -1594,46 +1716,46 @@ function PBKDF2(password, salt, numIterations, keyLength) {
  */
 
 function HMACSHA256(plainText, key) {
-    "use strict";
+  "use strict";
 
-    if (window.crypto && window.crypto.subtle) {
-        //use the subtle crypto functions
-        return new Promise(function (resolve, reject) {
+  if (window.crypto && window.crypto.subtle) {
+    //use the subtle crypto functions
+    return new Promise(function(resolve, reject) {
 
-            var cryptoTextEncoder = new TextEncoder("utf-8");
-            var plainTextBuffer = cryptoTextEncoder.encode(plainText);
+      var cryptoTextEncoder = new TextEncoder("utf-8");
+      var plainTextBuffer = cryptoTextEncoder.encode(plainText);
 
-            window.crypto.subtle.importKey("raw", key, {
-                    name: "HMAC",
-                    hash: {
-                        name: "SHA-256"
-                    }
-                }, false /*not extractable*/ , ["sign"])
-                .then(function (importedKey) {
+      window.crypto.subtle.importKey("raw", key, {
+          name: "HMAC",
+          hash: {
+            name: "SHA-256"
+          }
+        }, false /*not extractable*/ , ["sign"])
+        .then(function(importedKey) {
 
-                    return window.crypto.subtle.sign({
-                        name: "HMAC",
-                        hash: {
-                            name: "SHA-256"
-                        }
-                    }, importedKey, plainTextBuffer);
-                })
-                .then(function (mac) {
-                    var macArray = new Uint8Array(mac);
+          return window.crypto.subtle.sign({
+            name: "HMAC",
+            hash: {
+              name: "SHA-256"
+            }
+          }, importedKey, plainTextBuffer);
+        })
+        .then(function(mac) {
+          var macArray = new Uint8Array(mac);
 
-                    resolve(macArray);
-                });
+          resolve(macArray);
         });
+    });
 
-    } else {
-        //use the CryptJS function
-        return new Promise(function (resolve, reject) {
-            var mac = CryptoJS.HmacSHA256(plainText, key);
-            var macArray = convertWordArrayToUint8Array(mac);
-            //Convert to uInt8Array
-            resolve(macArray);
-        });
-    }
+  } else {
+    //use the CryptJS function
+    return new Promise(function(resolve, reject) {
+      var mac = CryptoJS.HmacSHA256(plainText, key);
+      var macArray = convertWordArrayToUint8Array(mac);
+      //Convert to uInt8Array
+      resolve(macArray);
+    });
+  }
 }
 
 /**
@@ -1643,48 +1765,50 @@ function HMACSHA256(plainText, key) {
  * @return {Promise} A promise which resolves to the encryted data.
  */
 function aesEncrypt(plainText, key) {
-    "use strict";
+  "use strict";
 
-    if (window.crypto && window.crypto.subtle) {
-        //use the subtle crypto functions
-        return new Promise(function (resolve, reject) {
-            var cryptoTextEncoder = new TextEncoder("utf-8");
-            var plainTextBuffer = cryptoTextEncoder.encode(plainText);
+  // ###[TODO] Why is the encrypted array not storing items as a UInt8Array when using the extension? #####
 
-            //Key will be supplied in hex - so need to convert to Uint8Array
-            var aesKey = convertHexToUint8Array(key);
+  if (window.crypto && window.crypto.subtle) {
+    //use the subtle crypto functions
+    return new Promise(function(resolve, reject) {
+      var cryptoTextEncoder = new TextEncoder("utf-8");
+      var plainTextBuffer = cryptoTextEncoder.encode(plainText);
 
-            //Create random initialisation vector
-            var iv = window.crypto.getRandomValues(new Uint8Array(16));
+      //Key will be supplied in hex - so need to convert to Uint8Array
+      var aesKey = convertHexToUint8Array(key);
 
-            window.crypto.subtle.importKey("raw", aesKey, {
-                    name: "AES-CBC",
-                    length: 128
-                }, false /*not extractable*/ , ["encrypt"])
-                .then(function (importedKey) {
+      //Create random initialisation vector
+      var iv = window.crypto.getRandomValues(new Uint8Array(16));
+
+      window.crypto.subtle.importKey("raw", aesKey, {
+          name: "AES-CBC",
+          length: 128
+        }, false /*not extractable*/ , ["encrypt"])
+        .then(function(importedKey) {
 
 
-                    return window.crypto.subtle.encrypt({
-                        "name": "AES-CBC",
-                        iv: iv
-                    }, importedKey, plainTextBuffer);
-                })
-                .then(function (encryptedData) {
-                    var encryptedArray = new Uint8Array(encryptedData);
+          return window.crypto.subtle.encrypt({
+            "name": "AES-CBC",
+            iv: iv
+          }, importedKey, plainTextBuffer);
+        })
+        .then(function(encryptedData) {
+          var encryptedArray = new Uint8Array(encryptedData);
 
-                    resolve({
-                        iv: iv,
-                        ciphertext: encryptedArray
-                    }); //Return an object so the iv is contained with the ciphertext
-                });
+          resolve({
+            iv: iv,
+            ciphertext: encryptedArray
+          }); //Return an object so the iv is contained with the ciphertext
         });
-    } else {
-        //use the CryptJS function
-        return new Promise(function (resolve, reject) {
-            var encrypted = CryptoJS.AES.encrypt(plainText, key);
-            resolve(encrypted);
-        });
-    }
+    });
+  } else {
+    //use the CryptJS function
+    return new Promise(function(resolve, reject) {
+      var encrypted = CryptoJS.AES.encrypt(plainText, key);
+      resolve(encrypted);
+    });
+  }
 
 }
 
@@ -1695,51 +1819,51 @@ function aesEncrypt(plainText, key) {
  * @return {Promise} A promise which resolves to the plain text data.
  */
 function aesDecrypt(encyptedData, key) {
-    "use strict";
+  "use strict";
 
 
-    if (window.crypto && window.crypto.subtle) {
-        //use the subtle crypto functions
-        return new Promise(function (resolve, reject) {
-            //Key will be supplied in hex - so need to convert to Uint8Array
-            var cryptoTextEncoder = new TextEncoder("utf-8");
-            var cryptoTextDecoder = new TextDecoder("utf-8");
-            var aesKey = convertHexToUint8Array(key);
+  if (window.crypto && window.crypto.subtle) {
+    //use the subtle crypto functions
+    return new Promise(function(resolve, reject) {
+      //Key will be supplied in hex - so need to convert to Uint8Array
+      var cryptoTextEncoder = new TextEncoder("utf-8");
+      var cryptoTextDecoder = new TextDecoder("utf-8");
+      var aesKey = convertHexToUint8Array(key);
 
-            window.crypto.subtle.importKey("raw", aesKey, {
-                    name: "AES-CBC",
-                    length: 128
-                }, false /*not extractable*/ , ["decrypt"])
-                .then(function (importedKey) {
+      window.crypto.subtle.importKey("raw", aesKey, {
+          name: "AES-CBC",
+          length: 128
+        }, false /*not extractable*/ , ["decrypt"])
+        .then(function(importedKey) {
 
-                    return window.crypto.subtle.decrypt({
-                            name: "AES-CBC",
-                            iv: encyptedData.iv // Same IV as for encryption
-                        },
-                        importedKey,
-                        encyptedData.ciphertext
-                    );
-                })
-                .then(function (decryptedData) {
-                    var decryptedArray = new Uint8Array(decryptedData);
-                    var plainText = cryptoTextDecoder.decode(decryptedArray);
+          return window.crypto.subtle.decrypt({
+              name: "AES-CBC",
+              iv: encyptedData.iv // Same IV as for encryption
+            },
+            importedKey,
+            encyptedData.ciphertext
+          );
+        })
+        .then(function(decryptedData) {
+          var decryptedArray = new Uint8Array(decryptedData);
+          var plainText = cryptoTextDecoder.decode(decryptedArray);
 
-                    resolve(plainText);
-                });
+          resolve(plainText);
         });
+    });
 
-    } else {
-        //use the CryptJS function
-        return new Promise(function (resolve, reject) {
-            var decrypted = CryptoJS.AES.decrypt(encyptedData, key);
+  } else {
+    //use the CryptJS function
+    return new Promise(function(resolve, reject) {
+      var decrypted = CryptoJS.AES.decrypt(encyptedData, key);
 
-            //var decryptedArray = cryptoContext.convertWordArrayToUint8Array(decrypted);
-            //var plainText = cryptoContext.cryptoTextDecoder.decode(decryptedArray);
+      //var decryptedArray = cryptoContext.convertWordArrayToUint8Array(decrypted);
+      //var plainText = cryptoContext.cryptoTextDecoder.decode(decryptedArray);
 
-            var plainText = CryptoJS.enc.Utf8.stringify(decrypted);
-            resolve(plainText);
-        });
-    }
+      var plainText = CryptoJS.enc.Utf8.stringify(decrypted);
+      resolve(plainText);
+    });
+  }
 
 
 }
@@ -1750,115 +1874,115 @@ function aesDecrypt(encyptedData, key) {
  * @return {String}.
  */
 function convertDerivedKeyToHex(derivedKey) {
-    "use strict";
+  "use strict";
 
-    if (window.crypto && window.crypto.subtle) {
-        return convertUint8ArrayToHex(new Uint8Array(derivedKey));
+  if (window.crypto && window.crypto.subtle) {
+    return convertUint8ArrayToHex(new Uint8Array(derivedKey));
 
-    } else {
-        return convertUint8ArrayToHex(convertWordArrayToUint8Array(derivedKey));
+  } else {
+    return convertUint8ArrayToHex(convertWordArrayToUint8Array(derivedKey));
 
-    }
+  }
 
 
 }
 
 /**
- * Converts a word array into a Hex String by chaining together canversion to Uint8Array, then to hex 
+ * Converts a word array into a Hex String by chaining together canversion to Uint8Array, then to hex
  * @param {word array} wordArray .
  * @return {String}.
  */
 function convertWordArrayToHex(wordArray) {
-    "use strict";
+  "use strict";
 
-    return convertUint8ArrayToHex(convertWordArrayToUint8Array(wordArray));
+  return convertUint8ArrayToHex(convertWordArrayToUint8Array(wordArray));
 
 }
 
 /**
- * Converts a word array into a Uint8Array. 
+ * Converts a word array into a Uint8Array.
  * @param {word array} wordArray .
  * @return {Uint8Array}.
  */
 function convertWordArrayToUint8Array(wordArray) {
-    "use strict";
+  "use strict";
 
-    var words = wordArray.words;
-    var sigBytes = wordArray.sigBytes;
+  var words = wordArray.words;
+  var sigBytes = wordArray.sigBytes;
 
-    // Convert
-    var u8 = new Uint8Array(sigBytes);
-    for (var i = 0; i < sigBytes; i++) {
-        var byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
-        u8[i] = byte;
-    }
+  // Convert
+  var u8 = new Uint8Array(sigBytes);
+  for (var i = 0; i < sigBytes; i++) {
+    var byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+    u8[i] = byte;
+  }
 
-    return u8;
+  return u8;
 
 }
 
 /**
- * Converts a Uint8Array into a Uint8Array to a hex string. 
+ * Converts a Uint8Array into a Uint8Array to a hex string.
  * @param {u8Array} Uint8Array.
  * @return {String}.
  */
 function convertUint8ArrayToHex(u8Array) {
-    var i;
-    var len;
-    var hex = '';
-    var c;
+  var i;
+  var len;
+  var hex = '';
+  var c;
 
-    for (i = 0, len = u8Array.length; i < len; i += 1) {
-        c = u8Array[i].toString(16);
-        if (c.length < 2) {
-            c = '0' + c;
-        }
-        hex += c;
+  for (i = 0, len = u8Array.length; i < len; i += 1) {
+    c = u8Array[i].toString(16);
+    if (c.length < 2) {
+      c = '0' + c;
     }
+    hex += c;
+  }
 
-    return hex;
+  return hex;
 }
 
 
 /**
- * Converts a Hex string into a Uint8Array. 
+ * Converts a Hex string into a Uint8Array.
  * @param {hex} String.
  * @return {Uint8Array}.
  */
 function convertHexToUint8Array(hex) {
-    var i;
-    var byteLen = hex.length / 2;
-    var arr;
-    var j = 0;
+  var i;
+  var byteLen = hex.length / 2;
+  var arr;
+  var j = 0;
 
-    if (byteLen !== parseInt(byteLen, 10)) {
-        throw new Error("Invalid hex length '" + hex.length + "'");
-    }
+  if (byteLen !== parseInt(byteLen, 10)) {
+    throw new Error("Invalid hex length '" + hex.length + "'");
+  }
 
-    arr = new Uint8Array(byteLen);
+  arr = new Uint8Array(byteLen);
 
-    for (i = 0; i < byteLen; i += 1) {
-        arr[i] = parseInt(hex[j] + hex[j + 1], 16);
-        j += 2;
-    }
+  for (i = 0; i < byteLen; i += 1) {
+    arr[i] = parseInt(hex[j] + hex[j + 1], 16);
+    j += 2;
+  }
 
-    return arr;
+  return arr;
 }
 
 /** Utility function to replace a string's value with all zeroes
  */
 function zeroVar(varToZero) {
-    return Array(varToZero.length).join("0");
+  return Array(varToZero.length).join("0");
 
 }
 
 /** Utility function to replace an array's value with all zeroes
  */
 function zeroIntArray(arrayToZero) {
-    var holdingVal = arrayToZero;
-    for (var aCounter = 0; aCounter < arrayToZero.length; aCounter++) {
-        holdingVal[aCounter] = 0;
-    }
-    return holdingVal;
+  var holdingVal = arrayToZero;
+  for (var aCounter = 0; aCounter < arrayToZero.length; aCounter++) {
+    holdingVal[aCounter] = 0;
+  }
+  return holdingVal;
 
 }

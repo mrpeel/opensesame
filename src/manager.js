@@ -4,7 +4,9 @@
   ----------------------------------------------------------------------------------------------------------------
 */
 
-/*global PassOff, document, window, console, navigator, extHasPassword, generateExtPassword, clearExtPhrase, storeExtPhrase, storeExtVals, zeroVar, zeroIntArray, TemporaryPhraseStore */
+/*global PassOff, document, window, console, navigator, extHasPassword,
+generateExtPassword, clearExtPhrase, storeExtPhrase, storeExtVals, zeroVar, zeroIntArray, TemporaryPhraseStore,
+ASSERT_ENABLED, ASSERT_ERROR */
 
 //Global variables for UI elements
 var passPhrase;
@@ -572,8 +574,14 @@ function setPassPhraseScreenState(passState) {
     //Hide the pass phrase
     // Showing the dialog
     showElement("confirm-dialog");
-    document.getElementById("header-key").scrollIntoView();
-    document.getElementById("confirm-passphrase").focus();
+
+    //USe setTimeout to allow time for screen updates before prerforming next action
+    document.setTimeout(function() {
+      document.getElementById("header-key").scrollIntoView();
+    });
+    document.setTimeout(function() {
+      document.getElementById("confirm-passphrase").focus();
+    });
 
   } else if (passState === "failed") {
     //An attempt to confirm the first three characters of the pass phrase failed.
@@ -594,6 +602,7 @@ function setPassPhraseScreenState(passState) {
 /* Checks when three characters have been typed and then calls the confirmation decryption*/
 function checkConfirmation() {
   var confirmPassPhrase = document.getElementById("confirm-passphrase");
+  fullName = givenName.value.trim() + familyName.value.trim();
 
   if (confirmPassPhrase.value.length === 3) {
     confirmThreeChars(confirmPassPhrase.value, fullName);
@@ -605,6 +614,10 @@ function checkConfirmation() {
 
 /* Attempts to decrypt pass phrase using the first three characters*/
 function confirmThreeChars(threeChars, Name) {
+
+  //console.log('Three chars: ' + threeChars);
+  //console.log('Name: ' + Name);
+
   //Attempt decryption - if succesfull set passphrase value
   temporaryPhraseStore.decryptPhrase(threeChars, Name)
     .then(function(plainText) {

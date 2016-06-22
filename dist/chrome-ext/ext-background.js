@@ -12,8 +12,12 @@ var lastPassGenTimeStamp;
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
+    //console.log(request.message);
+    //console.log(request);
+
     if (request.message === "set_password") {
       /*Populate password into password field on the page - called by pop-up page */
+      //console.log('Executing set password');
       extGivenName = request.givenName;
       extFamilyName = request.familyName;
       extPasswordType = request.passwordType;
@@ -29,20 +33,29 @@ chrome.runtime.onMessage.addListener(
             request.password + "';  }  catch(e)  { console.log(e);  }"
         });
       }
+      return;
 
     } else if (request.message === "store_phrase") {
       /*Store encrypted pass phrase values - called by pop-up page */
+      //console.log('Executing store phrase');
+
       lastPassGenTimeStamp = Date.now();
 
       extEncHash = request.threeCharHash;
       extEncStore = request.phraseStore;
+      return;
 
     } else if (request.message === "clear_stored_phrase") {
       /*Remove stored pass phrase values password - called by pop-up page */
+      //console.log('Executing clear stored phrase');
 
       clearStoredPhrase();
+      return;
+
     } else if (request.message === "set_values") {
       //Call sets whatever values are present
+      //console.log('Executing set values');
+
       extGivenName = request.givenName || "";
       extFamilyName = request.familyName || "";
       extPasswordType = request.passwordType || "";
@@ -50,10 +63,11 @@ chrome.runtime.onMessage.addListener(
       extSecurityQuestion = request.securityQuestion || "";
       extEncHash = request.threeCharHash || "";
       extEncStore = request.phraseStore || {};
+      return;
 
     } else if (request.message === "set_page_details") {
       /*Called by content script when page loads */
-
+      //console.log('Executing set page details');
       //Store page values
       var pageURL = trimDomainName(request.url);
 
@@ -86,7 +100,7 @@ chrome.runtime.onMessage.addListener(
 
       //After values have been supplied, clear the stored phrase and hash
       clearStoredPhrase();
-
+      return;
     }
   }
 );
@@ -121,7 +135,7 @@ function clearStoredPhrase() {
     if (typeof extEncStore.iv === "string") {
       zeroVar(extEncStore.iv);
       extEncStore.iv = "";
-    } else if (extEncStore.iv.constructor.name === "Uint8Array") {
+    } else {
       zeroIntArray(extEncStore.iv);
       extEncStore.iv = [];
     }
@@ -131,7 +145,7 @@ function clearStoredPhrase() {
     if (typeof extEncStore.ciphertext === "string") {
       zeroVar(extEncStore.ciphertext);
       extEncStore.ciphertext = "";
-    } else if (extEncStore.ciphertext.constructor.name === "Uint8Array") {
+    } else {
       zeroIntArray(extEncStore.ciphertext);
       extEncStore.ciphertext = [];
     }

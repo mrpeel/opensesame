@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    if (request.message == "populate_fields") {
+    if (request.message === "populate_fields") {
       domainName.value = request.url || "";
       givenName.value = request.givenName || "";
       familyName.value = request.familyName || "";
@@ -43,18 +43,50 @@ chrome.runtime.onMessage.addListener(
         setValuePopulated(familyName);
       }
       //Determine state of password, and set the appropriate values
-      if (typeof request.threeCharHash !== "undefined" && request.threeCharHash
-        .length > 0 && typeof request.phraseStore.iv !==
-        "undefined") {
+      /*if (request.passPhrase.length > 0) {
+          //Pass phrase is still being held
+          setValuePopulated(passPhrase);
+          setPassPhrase(request.passPhrase);
+          setPassPhraseScreenState("holding");
+      } else */
+      if (request.threeCharHash && request.threeCharHash.length > 0 &&
+        request.phraseStore &&
+        request.phraseStore.iv) {
         //Pass phrase has been encrypted and requires confirmation of the first three characters
-        temporaryPhraseStore.storeValues(request.threeCharHash, request.phraseStore);
+        var eIV, eCiphertext;
+        //Uint8 values get lost in translation.  Values will need to be converted back tio Uint8Array
+        if (!(request.phraseStore.iv instanceof Uint8Array)) {
+          var iv = Object.keys(request.phraseStore.iv).map(function(key) {
+            return request.phraseStore.iv[key]
+          });
+          eIV = Uint8Array.from(iv);
+        } else {
+          eIV = request.phraseStore.iv;
+        }
+
+        if (!(request.phraseStore.ciphertext instanceof Uint8Array)) {
+          var ciphertext = Object.keys(request.phraseStore.ciphertext).map(
+            function(key) {
+              return request.phraseStore.ciphertext[key]
+            });
+          eCiphertext = Uint8Array.from(ciphertext);
+        } else {
+          eCiphertext = request.phraseStore.ciphertext;
+        }
+
+
+        temporaryPhraseStore.storeValues(request.threeCharHash, {
+          iv: eIV,
+          ciphertext: eCiphertext
+        });
+
+        setValuePopulated(passPhrase);
         setPassPhraseScreenState("stored");
       } else {
         //Pass phrase is not stored at all and is in standard editing mode
         setPassPhraseScreenState("editing");
       }
     }
-
   }
 );
 
@@ -87,6 +119,7 @@ function storeExtVals() {
     "threeCharHash": temporaryPhraseStore.threeCharHash || "",
     "phraseStore": temporaryPhraseStore.encData || {}
   });
+
 
 }
 
