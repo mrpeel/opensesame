@@ -775,7 +775,7 @@ function passPhraseTimedClear() {
       clearPassPhrase();
       setPassPhraseScreenState("stored");
     }
-  }, 10000);
+  }, 300000);
 
 }
 
@@ -870,6 +870,9 @@ function generatePassword() {
 
         setPassPhraseScreenState("holding");
 
+        //Clear the generated password after 30 seconds on the screen
+        window.setTimeout(clearPassword, 18000);
+
       })
       .catch(function(err) {
         error.textContent = err.message;
@@ -961,10 +964,10 @@ function setPassPhraseScreenState(passState) {
     //USe setTimeout to allow time for screen updates before prerforming next action
     document.setTimeout(function() {
       document.getElementById("header-key").scrollIntoView();
-    });
+    }, 0);
     document.setTimeout(function() {
       document.getElementById("confirm-passphrase").focus();
-    });
+    }, 0);
 
   } else if (passState === "failed") {
     //An attempt to confirm the first three characters of the pass phrase failed.
@@ -1295,7 +1298,7 @@ function setPassChangeRequired() {
       //Too much time has elapsed without any password activity so clear all the values
       clearPassPhrase();
     }
-  }, 1800000);
+  }, 180000);
 }
 
 function changePassPhrase() {
@@ -1721,18 +1724,18 @@ TemporaryPhraseStore.prototype.encryptPhrase = function(passphrase, name) {
  * @return {promise} A promise which will be resolved with the pass phrasee or rejected with an error.
  */
 TemporaryPhraseStore.prototype.decryptPhrase = function(firstThreeChars, name) {
-"use strict";
+  "use strict";
 
-assert(firstThreeChars !== "",
-  'TemporaryPhraseStore.prototype.decryptPhrase firstThreeChars: ' +
-  firstThreeChars);
-assert(name !== "", 'TemporaryPhraseStore.prototype.decryptPhrase name: ' +
-  name);
+  assert(firstThreeChars !== "",
+    'TemporaryPhraseStore.prototype.decryptPhrase firstThreeChars: ' +
+    firstThreeChars);
+  assert(name !== "", 'TemporaryPhraseStore.prototype.decryptPhrase name: ' +
+    name);
 
-var tempStoreContext = this;
-var aesKey;
+  var tempStoreContext = this;
+  var aesKey;
 
-return new Promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
 
     if (typeof tempStoreContext.encData === "undefined") {
       reject("No encrypted data found");
@@ -1758,27 +1761,27 @@ return new Promise(function(resolve, reject) {
 
           //console.log('Stored hash: ' + tempStoreContext.threeCharHash);
           //console.log('Verification hash: ' + convertDerivedKeyToHex(
-          verificationHash));
+          //verificationHash));
 
-      if (tempStoreContext.threeCharHash === convertDerivedKeyToHex(
-          verificationHash)) {
+          if (tempStoreContext.threeCharHash === convertDerivedKeyToHex(
+              verificationHash)) {
 
-        //console.log('Encrypted data');
-        //console.log(tempStoreContext.encData);
+            //console.log('Encrypted data');
+            //console.log(tempStoreContext.encData);
 
-        aesDecrypt(tempStoreContext.encData, aesKey)
-          .then(function(plainText) {
-            resolve(plainText);
-          });
+            aesDecrypt(tempStoreContext.encData, aesKey)
+              .then(function(plainText) {
+                resolve(plainText);
+              });
 
-      } else {
-        tempStoreContext.clearStore();
-        reject("First three characters did not match");
-      }
+          } else {
+            tempStoreContext.clearStore();
+            reject("First three characters did not match");
+          }
 
-    });
-}
-});
+        });
+    }
+  });
 };
 
 /* Clears any stored data for the hash and encrypted pass phrase

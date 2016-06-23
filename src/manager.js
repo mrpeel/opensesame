@@ -392,7 +392,7 @@ function passPhraseTimedClear() {
       clearPassPhrase();
       setPassPhraseScreenState("stored");
     }
-  }, 10000);
+  }, 300000);
 
 }
 
@@ -487,6 +487,9 @@ function generatePassword() {
 
         setPassPhraseScreenState("holding");
 
+        //Clear the generated password after 30 seconds on the screen
+        window.setTimeout(clearPassword, 30000);
+
       })
       .catch(function(err) {
         error.textContent = err.message;
@@ -578,10 +581,10 @@ function setPassPhraseScreenState(passState) {
     //USe setTimeout to allow time for screen updates before prerforming next action
     document.setTimeout(function() {
       document.getElementById("header-key").scrollIntoView();
-    });
+    }, 0);
     document.setTimeout(function() {
       document.getElementById("confirm-passphrase").focus();
-    });
+    }, 0);
 
   } else if (passState === "failed") {
     //An attempt to confirm the first three characters of the pass phrase failed.
@@ -912,7 +915,7 @@ function setPassChangeRequired() {
       //Too much time has elapsed without any password activity so clear all the values
       clearPassPhrase();
     }
-  }, 1800000);
+  }, 180000);
 }
 
 function changePassPhrase() {

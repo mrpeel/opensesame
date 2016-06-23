@@ -62,18 +62,18 @@ TemporaryPhraseStore.prototype.encryptPhrase = function(passphrase, name) {
  * @return {promise} A promise which will be resolved with the pass phrasee or rejected with an error.
  */
 TemporaryPhraseStore.prototype.decryptPhrase = function(firstThreeChars, name) {
-"use strict";
+  "use strict";
 
-assert(firstThreeChars !== "",
-  'TemporaryPhraseStore.prototype.decryptPhrase firstThreeChars: ' +
-  firstThreeChars);
-assert(name !== "", 'TemporaryPhraseStore.prototype.decryptPhrase name: ' +
-  name);
+  assert(firstThreeChars !== "",
+    'TemporaryPhraseStore.prototype.decryptPhrase firstThreeChars: ' +
+    firstThreeChars);
+  assert(name !== "", 'TemporaryPhraseStore.prototype.decryptPhrase name: ' +
+    name);
 
-var tempStoreContext = this;
-var aesKey;
+  var tempStoreContext = this;
+  var aesKey;
 
-return new Promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
 
     if (typeof tempStoreContext.encData === "undefined") {
       reject("No encrypted data found");
@@ -99,27 +99,27 @@ return new Promise(function(resolve, reject) {
 
           //console.log('Stored hash: ' + tempStoreContext.threeCharHash);
           //console.log('Verification hash: ' + convertDerivedKeyToHex(
-          verificationHash));
+          //verificationHash));
 
-      if (tempStoreContext.threeCharHash === convertDerivedKeyToHex(
-          verificationHash)) {
+          if (tempStoreContext.threeCharHash === convertDerivedKeyToHex(
+              verificationHash)) {
 
-        //console.log('Encrypted data');
-        //console.log(tempStoreContext.encData);
+            //console.log('Encrypted data');
+            //console.log(tempStoreContext.encData);
 
-        aesDecrypt(tempStoreContext.encData, aesKey)
-          .then(function(plainText) {
-            resolve(plainText);
-          });
+            aesDecrypt(tempStoreContext.encData, aesKey)
+              .then(function(plainText) {
+                resolve(plainText);
+              });
 
-      } else {
-        tempStoreContext.clearStore();
-        reject("First three characters did not match");
-      }
+          } else {
+            tempStoreContext.clearStore();
+            reject("First three characters did not match");
+          }
 
-    });
-}
-});
+        });
+    }
+  });
 };
 
 /* Clears any stored data for the hash and encrypted pass phrase
