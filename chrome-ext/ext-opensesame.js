@@ -769,10 +769,10 @@ window.addEventListener("load", function() {
     openCloseOptions, false);
 
   /* Set up password type click events */
-  document.getElementById("password-type").addEventListener("click",
+  /*document.getElementById("password-selected").addEventListener("click",
     function() {
       document.getElementById("password-options").click();
-    });
+    });*/
 
   //Loop through different values within password type drop down and add one listener for each value
   for (var lCounter = 0; lCounter < type.children.length; lCounter++) {
@@ -838,7 +838,7 @@ function userNameUpdate() {
     userText = ", " + userText;
   }
 
-  optsSummary.innerText = passwordDescription + userText;
+  optsSummary.innerText = 'Options: ' + passwordDescription + userText;
 }
 
 function checkRequired(currentElement) {
@@ -883,6 +883,7 @@ function openCloseOptions() {
   if (optionsVisible) {
     optsDiv.classList.remove("hidden");
     optsIcon.innerHTML = "keyboard_arrow_up";
+    bodyNode.classList.add("ext-pass-generated");
   } else {
     optsDiv.classList.add("hidden");
     optsIcon.innerHTML = "keyboard_arrow_down";
@@ -1301,6 +1302,7 @@ function setType(passwordSelection) {
   copyPasswordButton.textContent = "Copy Password";
   successPrefix = "Password";
   passwordCardHeader.textContent = "Password";
+  generatePasswordButton.textContent = "Produce password";
   showElement("user-name-div");
   hideElement("security-question-div");
   passwordType = passwordSelection;
@@ -1309,7 +1311,7 @@ function setType(passwordSelection) {
 
   switch (passwordSelection) {
     case "login":
-      generatePasswordButton.textContent = "User name";
+      generatePasswordButton.textContent = "Produce user name";
       passwordDescription = "User name";
       copyPasswordButton.textContent = "Copy User name";
       successPrefix = "User name";
@@ -1318,34 +1320,29 @@ function setType(passwordSelection) {
       hideElement("user-name-div");
       break;
     case "maximum-password":
-      generatePasswordButton.textContent = "Produce Maximum Password";
       passwordDescription = "Maximum password";
       passwordLabel.innerText = "Maximum password (20 characters)";
       break;
     case "long-password":
-      generatePasswordButton.textContent = "Produce Long Password";
       passwordDescription = "Long password";
       passwordLabel.innerText = "Long password (14 characters)";
       break;
     case "medium-password":
-      generatePasswordButton.textContent = "Produce Medium Password";
       passwordDescription = "Medium password";
       passwordLabel.innerText = "Medium password (8 characters)";
       break;
     case "basic-password":
-      generatePasswordButton.textContent = "Produce Basic Password";
       passwordDescription = "Basic password";
       passwordLabel.innerText =
-        "Basic password (8 chars - letters and numbers)";
+        "Basic password (8 letters / numbers)";
       break;
     case "short-password":
-      generatePasswordButton.textContent = "Produce Short Password";
       passwordDescription = "Short password";
       passwordLabel.innerText =
-        "Short password (4 chars - letters and numbers)";
+        "Short password (4 letters / numbers)";
       break;
     case "pin":
-      generatePasswordButton.textContent = "Produce Four Digit PIN";
+      generatePasswordButton.textContent = "Produce PIN";
       passwordDescription = "Four digit PIN";
       copyPasswordButton.textContent = "Copy PIN";
       successPrefix = "PIN";
@@ -1353,7 +1350,7 @@ function setType(passwordSelection) {
       passwordLabel.innerText = "Four digit PIN";
       break;
     case "pin-6":
-      generatePasswordButton.textContent = "Produce Six Digit PIN";
+      generatePasswordButton.textContent = "Produce PIN";
       passwordDescription = "Six digit PIN";
       copyPasswordButton.textContent = "Copy PIN";
       successPrefix = "PIN";
@@ -1361,7 +1358,7 @@ function setType(passwordSelection) {
       passwordLabel.innerText = "Six digit PIN";
       break;
     case "answer":
-      generatePasswordButton.textContent = "Produce Security Answer";
+      generatePasswordButton.textContent = "Produce security answer";
       passwordDescription = "Security answer";
       copyPasswordButton.textContent = "Copy Security Answer";
       successPrefix = "Answer";

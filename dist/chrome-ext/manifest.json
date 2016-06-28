@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Open Sesame Password Management",
-  "version": "0.5.42.495",
+  "version": "0.5.43.31",
   "permissions": [
     "activeTab"
   ],
