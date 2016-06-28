@@ -705,6 +705,7 @@ function openCloseOptions() {
   if (optionsVisible) {
     optsDiv.classList.remove("hidden");
     optsIcon.innerHTML = "keyboard_arrow_up";
+    bodyNode.classList.add("ext-pass-generated");
   } else {
     optsDiv.classList.add("hidden");
     optsIcon.innerHTML = "keyboard_arrow_down";
