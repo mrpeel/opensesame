@@ -8,10 +8,8 @@
     <title>&nbsp;&nbsp;Open Sesame</title>
 
 
-    <!--<link href='https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en' rel='stylesheet' type='text/css'>-->
-    <!--<link href='https://fonts.googleapis.com/css?family=Muli&text=PassOpSasfYourPwdINAnweUmly' rel='stylesheet' type='text/css'>-->
-    <!--<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
     <link rel="stylesheet" href="material.min.css" />
+    <!--link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.indigo-blue.min.css" /-->
     <link rel="stylesheet" href="ext-opensesame.min.css">
 </head>
 
@@ -21,16 +19,45 @@
         <div class="page-content mdl-color--grey-100 overflow-x-visible">
 
             <section class="section--center mdl-grid password-grid overflow-x-visible">
-                <div class="mdl-card mdl-cell mdl-cell--6-col mdl-shadow--2dp overflow-x-visible primary-card">
+                <div class="mdl-card mdl-cell mdl-cell--6-col mdl-cell--3-offset-desktop mdl-cell--1-offset-tablet mdl-shadow--2dp overflow-x-visible primary-card">
 
-                    <div class="mdl-color--primary mdl-color-text--white overflow-x-visible">
-                        <div class="header-circle mdl-color--teal-600">
-                            <button id="header-key" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon circle-icon-tall">
-                                <i class="material-icons circle-icon-tall">phonelink_lock</i>
+                    <!--Passphrase char confirmation dialog-->
+                    <div id="confirm-dialog" class="overlay hidden">
+
+                        <div class="dialog">
+                            <div class="dialog-header mdl-color-text--primary">Confirm Pass Phrase</div>
+
+                            <button class="close-button-top-right mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent" id="close-password-confirm">
+
+                                <i class="material-icons">close</i>
                             </button>
+
+                            <span>Your pass phrase was moved to encrypted storage. Re-type the first three characters to retrieve it.</span>
+                            <p></p>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+
+                                <input class="mdl-textfield__input passphrase" type="password" id="confirm-passphrase" autofocus maxlength="3" />
+                                <label class="mdl-textfield__label required-field" for="passphrase">First three characters of pass phrase</label>
+                            </div>
+
+
+                            <div class="mdl-dialog__actions">
+                                <button id="clear-close-dialog" type="button" class="mdl-button mdl-color-text--accent button-bottom-right">Clear Pass Phrase</button>
+                            </div>
                         </div>
-                        <h4>Open Sesame</h4>
-                        <div class="header-upper-right">
+                    </div>
+
+                    <div class="mdl-color--accent text--white card-header">
+                        <!--div class="mdl-color--blue-700 text--white card-header"-->
+
+                        <!--<div class="header-circle mdl-color--teal-600">
+                            <!--<button id="header-key" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon circle-icon-tall">
+                                <i class="material-icons circle-icon-tall">
+</i>
+                            </button>
+                        </div>-->
+                        <h4 class="header-text" id="header-key">Open Sesame</h4>
+                        <!--<div class="header-upper-right">
                             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--white icon-uper-right" id="password-options">
                                 <i class="material-icons">more_vert</i>
                             </button>
@@ -46,36 +73,48 @@
                                 <li id="login" class="mdl-menu__item">User name</li>
                                 <li id="answer" class="mdl-menu__item">Security Answer</li>
                             </ul>
-                        </div>
+                        </div>-->
                     </div>
-
 
                     <div class="mdl-layout__content mdl-card__supporting-text overflow-x-visible">
 
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                             <input class="mdl-textfield__input" type="text" id="given-name" />
-                            <label class="mdl-textfield__label required-field" for="given-name">Given name</label>
+                            <label class="mdl-textfield__label required-field" for="given-name">Given name *</label>
+                            <span class="mdl-textfield__error">Given name is required</span>
                         </div>
 
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                             <input class="mdl-textfield__input" type="text" id="family-name" />
-                            <label class="mdl-textfield__label required-field" for="family-name">Family name</label>
+                            <label class="mdl-textfield__label required-field" for="family-name">Family name *</label>
+                            <span class="mdl-textfield__error">Family name is required</span>
+                        </div>
+
+                        <div id="failure-toast" class="toast main-card hidden">
+                            The entered characters don't match your pass phrase. Pass phrase cleared.
                         </div>
 
 
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                            <input class="mdl-textfield__input passphrase" type="password" id="passphrase" />
-                            <label class="mdl-textfield__label required-field" for="passphrase">Pass phrase</label>
-                            <button id="show-password" class="show-password mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--grey-700 hidden" tabindex="-1">
+                        <div id="passphrase-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+                            <!--<div class="text-with-button">-->
+                            <input class="mdl-textfield__input passphrase flex-field" type="password" id="passphrase" />
+
+                            <button id="show-passphrase" class="show-password mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent hidden" tabindex="-1">
                                 <i class="material-icons">visibility</i>
                             </button>
+                            <button id="clear-passphrase" class="show-password mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--grey-700 hidden" tabindex="-1">
+                                <i class="material-icons">edit</i>
+                            </button>
+                            <!--</div>-->
+                            <label id="passphrase-label" class="mdl-textfield__label required-field" for="passphrase">Open Sesame Pass phrase *</label>
+                            <span class="mdl-textfield__error">Open Sesame Pass Phrase is required</span>
                         </div>
-
 
 
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                             <input class="mdl-textfield__input" type="text" id="domain" />
-                            <label class="mdl-textfield__label required-field" for="domain">Web site</label>
+                            <label class="mdl-textfield__label required-field" for="domain">Web site *</label>
+                            <span class="mdl-textfield__error">Web site is required</span>
                         </div>
 
                         <div id="security-question-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label  textfield-full-width hidden">
@@ -83,9 +122,41 @@
                             <label class="mdl-textfield__label required-field" for="security-question">Security question</label>
                         </div>
 
-                        <div id="user-name-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                            <input class="mdl-textfield__input" type="text" id="user-name" />
-                            <label class="mdl-textfield__label" for="user-name">Website user name (optional)</label>
+                        <div id="options" class="row-flex hover-link options-open-close">
+                            <div id="options-summary" class="flex-element">Options: Long password</div>
+
+                            <i id="options-icon" class="material-icons right-align">keyboard_arrow_down</i>
+
+                        </div>
+
+                        <div id="extra-options-div" class="extra-options hidden">
+                            <div id="password-type-div">
+                                <div id="password-type" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
+                                    <div id="password-selected" class="hover-link top-pad">Long password (14 characters)</div>
+                                    <label class="mdl-textfield__label" for="password-selected">Password type</label>
+
+                                    <!--button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent right-align drop-down" id="password-options">
+                                        <i class="material-icons">more_vert</i>
+                                    </button-->
+                                </div>
+
+                                <ul id="type" class="mdl-menu mdl-js-menu mdl-menu--top-left" for="password-selected">
+                                    <li id="maximum-password" class="mdl-menu__item">Maximum password (20 characters)</li>
+                                    <li id="long-password" class="mdl-menu__item">Long password (14 characters)</li>
+                                    <li id="medium-password" class="mdl-menu__item">Medium password (8 characters)</li>
+                                    <li id="basic-password" class="mdl-menu__item">Basic password (8 letters / numbers)</li>
+                                    <li id="short-password" class="mdl-menu__item">Short password (4 letters / numbers)</li>
+                                    <li id="pin" class="mdl-menu__item">Four digit PIN</li>
+                                    <li id="pin-6" class="mdl-menu__item">Six digit PIN</li>
+                                    <li id="login" class="mdl-menu__item">User name</li>
+                                    <li id="answer" class="mdl-menu__item">Security answer</li>
+                                </ul>
+                            </div>
+
+                            <div id="user-name-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+                                <input class="mdl-textfield__input" type="text" id="user-name" />
+                                <label class="mdl-textfield__label" for="user-name">Generate password for user name</label>
+                            </div>
                         </div>
 
                         <!--<p id="extra-vertical-space" class="hidden"></p>-->
@@ -97,25 +168,30 @@
 
                     <div class="mdl-card__actions">
                         <div class="mdl-card__supporting-text">
-                            <button id="generate-password" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">
-                                Generate Long Password
+                            <button id="generate-password" class="main-button mdl-button--colored mdl-button--accent mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                                Produce Long Password
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="mdl-cell mdl-cell--1-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+                <!--div class="mdl-cell mdl-cell--1-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div-->
 
-                <div id="password-card" class="mdl-card mdl-cell mdl-cell--middle mdl-cell--6-col mdl-shadow--2dp hidden">
-                    <div class="mdl-color--primary mdl-color-text--white">
-                        <div class="header-circle mdl-color--teal-600">
+                <div id="password-card" class="mdl-card mdl-cell mdl-cell--middle mdl-cell--6-col mdl-cell--3-offset-desktop mdl-cell--1-offset-tablet mdl-shadow--2dp hidden">
+                    <div class="password-header mdl-color--accent">
+
+
+                        <!--<div class="header-circle mdl-color--teal-600">
                             <i class="material-icons circle-icon">lock_open</i>
-                        </div>
-                        <h4><span id="password-card-header">Password</span></h4>
+                        </div>-->
+                        <h5><span id="password-card-header" class="mdl-color-text--white">Password</span></h5>
+
                     </div>
 
-                    <button class="close-button-top-right mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--white" id="close-password">
-                        <i class="material-icons">close</i>
+                    <button class="close-button-top-right mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="close-password">
+                        <i class="material-icons mdl-color-text--white">close</i>
+
+
                     </button>
                     <div class="mdl-layout__content mdl-card__supporting-text">
                         <div id="load-bar-ball" class="loader-four-balls hidden">
@@ -125,12 +201,12 @@
                             <div class="load-ball"></div>
                         </div>
                         <!--<div id="load-bar-password" class="loader hidden"></div>-->
-                        <div class="mdl-text-color--teal-700 extra-vertical-padding">
-                            <span class="password"></span>
+                        <div class="password-div">
+                            <span id="password" class="password"></span>
                         </div>
-                        <div><code class=error><noscript>You must have JavaScript enabled for this page to work.</noscript></code></div>
-                        <div id="copy-password-div" class="mdl-card__actions hidden">
-                            <button id="copy-password" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect fade-in">
+                        <div><code id="error" class="error"><noscript>You must have JavaScript enabled for this page to work.</noscript></code></div>
+                        <div id="copy-password-div" class="mdl-card__actions hidden move-left">
+                            <button id="copy-password" class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect fade-in">
                                 Copy Password
                             </button>
                         </div>
@@ -142,23 +218,21 @@
 
                 </div>
 
+                <div id="update-message" class="update-message hidden">
+                    <div class="update-message-text"><span>Open Sesame is about to update ...</span><span id="count-down-value" class="update-countdown-value"></span></div>
+                </div>
 
 
             </section>
 
         </div>
 
-
-
-
     </main>
 </div>
 
 
 
-    <script src="material.min.js"></script>
-    <script src="pbkdf2.js"></script>
-    <script src="hmac-sha256.js"></script>
+    <script defer src="material.min.js"></script>
     <script src="ext-opensesame.min.js"></script>
 </body>
 

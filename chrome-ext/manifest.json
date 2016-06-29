@@ -1,24 +1,23 @@
 {
-    "manifest_version": 2,
-    "name": "Open Sesame Password Management",
-    "version": "0.2.3",
-    "permissions": [
-            "activeTab"
+  "manifest_version": 2,
+  "name": "Open Sesame Password Management",
+  "version": "0.5.43.278",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [{
+    "matches": [
+      "<all_urls>"
     ],
-    "content_scripts": [
-        {
-            "matches": [
-                    "<all_urls>"
-                        ],
-            "js": ["ext-content.js"]
-        }
-    ],
-    "browser_action": {
-        "default_title": "Log in using the Open Sesame password manager",
-        "default_icon": "opensesame-38.png",
-        "default_popup": "opensesame.html"
-    },
-    "background": {
-        "scripts": ["ext-background.js"]
-    }
+    "js": ["ext-content.js"]
+  }],
+  "browser_action": {
+    "default_title": "Log in using the Open Sesame password manager",
+    "default_icon": "opensesame-38.png",
+    "default_popup": "opensesame.html"
+  },
+  "background": {
+    "scripts": ["ext-background.js"],
+    "persistent": true
+  }
 }
