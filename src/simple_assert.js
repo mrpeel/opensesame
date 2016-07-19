@@ -6,8 +6,8 @@
  */
 
 var ASSERT_ENABLED = true;
-var ASSERT_ERROR = true;
-var ASSERT_VERBOSE = true;
+var ASSERT_ERROR = false;
+var ASSERT_VERBOSE = false;
 
 function assert(condition, message) {
   if (ASSERT_ENABLED && !condition) {
