@@ -32,6 +32,7 @@ Open Sesame generates the following types of passwords:
 Open sesame uses PBKDF2 and HMAC256 crypto functions.  'window.crypto.subtle' it used when it is supported by the browser, otherwise CryptoJS is loaded.  
 
 The steps to generate a password are:
+
 1. Use PBKDF2 on the Pass phrase with full name (First name + Family Name) as the salt to generate a key
 2. Join User name, Domain name and Security question together and use the key to generate a seed array using HMAC256
 3. Use the seed to select a template of the correct type
