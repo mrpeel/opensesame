@@ -42,6 +42,12 @@ chrome.runtime.onMessage.addListener(
       if (familyName.value.length > 0) {
         setValuePopulated(familyName);
       }
+      if (securityQuestion.value.length > 0) {
+        setValuePopulated(securityQuestion);
+      }
+      if (userName.value.length > 0) {
+        setValuePopulated(userName);
+      }
       //Determine state of password, and set the appropriate values
       /*if (request.passPhrase.length > 0) {
           //Pass phrase is still being held
@@ -57,7 +63,7 @@ chrome.runtime.onMessage.addListener(
         //Uint8 values get lost in translation.  Values will need to be converted back tio Uint8Array
         if (!(request.phraseStore.iv instanceof Uint8Array)) {
           var iv = Object.keys(request.phraseStore.iv).map(function(key) {
-            return request.phraseStore.iv[key]
+            return request.phraseStore.iv[key];
           });
           eIV = Uint8Array.from(iv);
         } else {
@@ -67,7 +73,7 @@ chrome.runtime.onMessage.addListener(
         if (!(request.phraseStore.ciphertext instanceof Uint8Array)) {
           var ciphertext = Object.keys(request.phraseStore.ciphertext).map(
             function(key) {
-              return request.phraseStore.ciphertext[key]
+              return request.phraseStore.ciphertext[key];
             });
           eCiphertext = Uint8Array.from(ciphertext);
         } else {

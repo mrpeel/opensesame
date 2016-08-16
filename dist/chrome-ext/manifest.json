@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Open Sesame Password Manager",
   "short_name": "Open Sesame",
-  "version": "0.9.46.493",
+  "version": "0.9.54.791",
   "permissions": [
     "activeTab"
   ],
