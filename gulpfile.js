@@ -1,95 +1,167 @@
-/*global require */
+/* global require */
 
-var gulp = require('gulp');
-var replace = require('gulp-replace-task');
-var fileinclude = require('gulp-file-include');
-var rename = require('gulp-rename');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var nano = require('gulp-cssnano');
-var connect = require('gulp-connect');
-var ghPages = require('gulp-gh-pages');
-var gutil = require('gulp-util');
-var debug = require('gulp-debug');
-var htmlmin = require('gulp-htmlmin');
+let gulp = require('gulp');
+let replace = require('gulp-replace-task');
+let fileinclude = require('gulp-file-include');
+let rename = require('gulp-rename');
+let concat = require('gulp-concat');
+let uglify = require('gulp-uglify');
+let nano = require('gulp-cssnano');
+let connect = require('gulp-connect');
+let ghPages = require('gulp-gh-pages');
+let gutil = require('gulp-util');
+let debug = require('gulp-debug');
+let htmlmin = require('gulp-htmlmin');
 
 
-/* Use a dependency chain to build in the correct order - starting with the final task.
-    Each task has the dependcy of the previous task listed
+/* Use a dependency chain to build in the correct order - starting with the
+  final task.
+  Each task has the dependcy of the previous task listed
 */
-//gulp.task('default', ['copytodistchromeext']);
-gulp.task('default', ['serve']);
+gulp.task('default', ['watch']);
 
-/* Build the serviceworker js file for build directory. Updates the timestamp used in the cache name the current date/time.
+/* Build the serviceworker js file for build directory. Updates the timestamp
+ * used in the cache name the current date/time.
  */
 gulp.task('buildserviceworker', function() {
   gulp.src('src/sw.js')
     .pipe(replace({
       patterns: [{
         match: 'timestamp',
-        replacement: new Date().getTime()
-      }]
+        replacement: new Date().getTime(),
+      }],
     }))
     .pipe(replace({
       patterns: [{
         match: 'cssfile',
-        replacement: 'opensesame.css'
-      }]
+        replacement: 'opensesame.css',
+      }],
     }))
     .pipe(replace({
       patterns: [{
-        match: 'jsfile',
-        replacement: 'opensesame.js'
-      }]
+        match: 'assert-jsref',
+        replacement: 'simple_assert.js',
+      }],
     }))
-
-  .pipe(gulp.dest('build/'));
+    .pipe(replace({
+      patterns: [{
+        match: 'opensesame-jsref',
+        replacement: 'opensesame.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'manager-jsref',
+        replacement: 'manager.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'crypto-jsref',
+        replacement: 'cryptfunctions.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'phrasestore-jsref',
+        replacement: 'temporaryphrasestore.js',
+      }],
+    }))
+    .pipe(gulp.dest('build/'));
 });
 
 
-/* Build the serviceworker js file for dist directory. Updates the timestamp used in the cache name the current date/time.
- */
+/* Build the serviceworker js file for dist directory. Updates the timestamp
+*  used in the cache name the current date/time.
+*/
 gulp.task('distserviceworker', ['buildserviceworker'], function() {
   gulp.src('src/sw.js')
     .pipe(replace({
       patterns: [{
         match: 'timestamp',
-        replacement: new Date().getTime()
-      }]
+        replacement: new Date().getTime(),
+      }],
     }))
     .pipe(replace({
       patterns: [{
         match: 'cssfile',
-        replacement: 'opensesame.min.css'
-      }]
+        replacement: 'opensesame.min.css',
+      }],
     }))
     .pipe(replace({
       patterns: [{
-        match: 'jsfile',
-        replacement: 'opensesame.min.js'
-      }]
+        match: 'assert-jsref',
+        replacement: 'simple_assert.min.js',
+      }],
     }))
-
-  .pipe(gulp.dest('dist/'));
+    .pipe(replace({
+      patterns: [{
+        match: 'opensesame-jsref',
+        replacement: 'opensesame.min.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'manager-jsref',
+        replacement: 'manager.min.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'crypto-jsref',
+        replacement: 'cryptfunctions.min.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'phrasestore-jsref',
+        replacement: 'temporaryphrasestore.min.js',
+      }],
+    })).pipe(gulp.dest('dist/'));
 });
 
 /* Build the html for the stand alone website version of Open Sesame.
-    Takes the container file and inserts the relevant @@include directives to build the complete page.
+ *  Takes the container file and inserts the relevant @@include directives
+ *  to build the complete page.
 */
 gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
   gulp.src(['src/standalone-container.html'])
     .pipe(fileinclude({
       prefix: '@@',
-      basepath: '@file'
+      basepath: '@file',
     }))
     .pipe(replace({
       patterns: [{
-        match: 'jsref',
-        replacement: "opensesame.js"
-      }]
+        match: 'assert-jsref',
+        replacement: 'simple_assert.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'opensesame-jsref',
+        replacement: 'opensesame.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'manager-jsref',
+        replacement: 'manager.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'crypto-jsref',
+        replacement: 'cryptfunctions.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'phrasestore-jsref',
+        replacement: 'temporaryphrasestore.js',
+      }],
     }))
     .pipe(htmlmin({
-      collapseWhitespace: false
+      collapseWhitespace: false,
     }))
     .pipe(rename('index.html'))
     .pipe(gulp.dest('./build/'));
@@ -98,57 +170,110 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
   gulp.src(['src/standalone-container.html'])
     .pipe(fileinclude({
       prefix: '@@',
-      basepath: '@file'
+      basepath: '@file',
     }))
     .pipe(replace({
       patterns: [{
-        match: 'jsref',
-        replacement: "opensesame.js"
-      }]
+        match: 'assert-jsref',
+        replacement: 'simple_assert.min.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'opensesame-jsref',
+        replacement: 'opensesame.min.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'manager-jsref',
+        replacement: 'manager.min.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'crypto-jsref',
+        replacement: 'cryptfunctions.min.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'phrasestore-jsref',
+        replacement: 'temporaryphrasestore.min.js',
+      }],
     }))
     .pipe(htmlmin({
-      collapseWhitespace: true
+      collapseWhitespace: true,
     }))
     .pipe(rename('index.html'))
     .pipe(gulp.dest('./dist/'));
 });
 
-/* Build the appcache file for the stand alone website version of Open Sesame.
-    Updates the timestamp comment with the current date/time.  This is required to force a re-load of
-    the cached files.
+/* Minify the javascript for the stand alone website and extension versions
+* version of Open Sesame.
 */
-/*
-gulp.task('appcachetimestamp', ['buildstandalonehtml'], function () {
-    gulp.src('src/opensesame.appcache.base')
-        .pipe(replace({
-            patterns: [
-                {
-                    match: 'timestamp',
-                    replacement: new Date().getTime()
-                }
-            ]
-        }))
-        .pipe(rename('opensesame.appcache'))
-        .pipe(gulp.dest('./build/'));
-});*/
-
-/* Build the javascript for the stand alone website version of Open Sesame.
-    Concatenates and minifies the files required to run as a stand-alone.
-*/
-gulp.task('buildstandalonejs', ['buildstandalonehtml'], function() {
+gulp.task('copybuildjs', ['buildstandalonehtml'], function() {
   gulp.src(['src/simple_assert.js', 'src/passoff.js', 'src/manager.js',
-      'src/cryptofunctions.js', 'src/temporaryphrasestore.js'
-    ])
-    .pipe(concat('opensesame.js'))
+    'src/cryptofunctions.js', 'src/temporaryphrasestore.js',
+  ])
     .pipe(gulp.dest('./build/'))
-    .pipe(rename('opensesame.min.js'))
-    .pipe(uglify().on('error', gutil.log))
-    .pipe(gulp.dest('build/'));
+    .pipe(gulp.dest('./chrome-ext/'));
+
+  gulp.src(['ext-popup.js'])
+    .pipe(gulp.dest('./chrome-ext/'));
 });
 
-/* Minify the CSS used for Open Sesame (same is used for stand alone and chrome extension).
+
+/* Minify the javascript for the stand alone website and extension versions
+* version of Open Sesame.
+*/
+gulp.task('minifyjs', ['copybuildjs'], function() {
+  gulp.src(['src/simple_assert.js'])
+    .pipe(rename('simple_assert.min.js'))
+    .pipe(uglify().on('error', gutil.log))
+    .pipe(gulp.dest('./dist/'))
+    .pipe(gulp.dest('./dist/chrome-ext/'));
+
+  gulp.src(['src/opensesame.js'])
+    .pipe(rename('opensesame.min.js'))
+    .pipe(uglify().on('error', gutil.log))
+    .pipe(gulp.dest('./dist/'))
+    .pipe(gulp.dest('./dist/chrome-ext/'));
+
+  gulp.src(['src/manager.js'])
+    .pipe(rename('manager.min.js'))
+    .pipe(uglify().on('error', gutil.log))
+    .pipe(gulp.dest('./dist/'))
+    .pipe(gulp.dest('./dist/chrome-ext/'));
+
+  gulp.src(['src/cryptofunctions.js'])
+    .pipe(rename('cryptofunctions.min.js'))
+    .pipe(uglify().on('error', gutil.log))
+    .pipe(gulp.dest('./dist/'))
+    .pipe(gulp.dest('./dist/chrome-ext/'));
+
+  gulp.src(['src/temporaryphrasestore.js'])
+    .pipe(rename('temporaryphrasestore.min.js'))
+    .pipe(uglify().on('error', gutil.log))
+    .pipe(gulp.dest('./dist/'))
+    .pipe(gulp.dest('./dist/chrome-ext/'));
+
+  gulp.src(['src/cryptofunctions.js'])
+    .pipe(rename('cryptofunctions.min.js'))
+    .pipe(uglify().on('error', gutil.log))
+    .pipe(gulp.dest('./dist/'))
+    .pipe(gulp.dest('./dist/chrome-ext/'));
+
+  gulp.src(['ext-popup.js'])
+    .pipe(rename('ext-popup.min.js'))
+    .pipe(uglify().on('error', gutil.log))
+    .pipe(gulp.dest('./dist/chrome-ext/'));
+});
+
+/* Minify the CSS used for Open Sesame (same is used for stand alone and
+ * chrome extension).
  */
-gulp.task('minifycss', ['buildstandalonejs'], function() {
+gulp.task('minifycss', ['minifyjs'], function() {
   gulp.src(['src/style.css'])
     .pipe(rename('opensesame.css'))
     .pipe(gulp.dest('./build/'))
@@ -175,11 +300,10 @@ gulp.task('copyfavicon', ['copymaterial'], function() {
 });
 
 
-
 /* Copy all the required files for stand alone operation to the dist directory.
  */
 gulp.task('copytodist', ['copyfavicon'], function() {
-  gulp.src(['./build/*.js', './build/*.css', './build/*.html'])
+  gulp.src(['./build/*.css', './build/*.html'])
     .pipe(debug())
     .pipe(gulp.dest('./dist/'))
     .pipe(connect.reload());
@@ -203,19 +327,20 @@ gulp.task('copytodisttest', ['minifytestspec'], function() {
 });
 
 /* Build the html for the chrome extension version of Open Sesame.
-    Takes the container file and inserts the relevant @@include directives to build the complete page.
+ * Takes the container file and inserts the relevant @@include directives to
+ * build the complete page.
 */
 gulp.task('buildexthtml', ['copytodisttest'], function() {
   gulp.src(['src/ext-container.html'])
     .pipe(fileinclude({
       prefix: '@@',
-      basepath: '@file'
+      basepath: '@file',
     }))
     .pipe(replace({
       patterns: [{
         match: 'jsref',
-        replacement: "ext-opensesame.js"
-      }]
+        replacement: 'ext-opensesame.js',
+      }],
     }))
     .pipe(rename('opensesame.html'))
     .pipe(gulp.dest('./chrome-ext/'));
@@ -223,17 +348,16 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
   gulp.src(['src/ext-container.html'])
     .pipe(fileinclude({
       prefix: '@@',
-      basepath: '@file'
+      basepath: '@file',
     }))
     .pipe(replace({
       patterns: [{
         match: 'jsref',
-        replacement: "ext-opensesame.min.js"
-      }]
+        replacement: 'ext-opensesame.min.js',
+      }],
     }))
     .pipe(rename('opensesame.html'))
     .pipe(gulp.dest('./dist/chrome-ext/'));
-
 });
 
 /* Build the javascript file for pop-up page for the chrome extension.
@@ -241,9 +365,9 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
 */
 gulp.task('buildextjs', ['buildexthtml'], function() {
   gulp.src(['src/simple_assert.js', 'src/temporaryphrasestore.js',
-      'src/passoff.js', 'src/manager.js', 'src/ext-popup.js',
-      'src/cryptofunctions.js'
-    ])
+    'src/passoff.js', 'src/manager.js', 'src/ext-popup.js',
+    'src/cryptofunctions.js',
+  ])
     .pipe(debug())
     .pipe(concat('ext-opensesame.js'))
     .pipe(gulp.dest('./chrome-ext/'))
@@ -253,7 +377,8 @@ gulp.task('buildextjs', ['buildexthtml'], function() {
     .pipe(gulp.dest('./dist/chrome-ext/'));
 });
 
-/* Concatenate the main css and specialised chrome extension css and minifies it.
+/* Concatenate the main css and specialised chrome extension css and minifies
+ *  it.
  */
 
 gulp.task('minifyextcss', ['buildextjs'], function() {
@@ -268,43 +393,50 @@ gulp.task('minifyextcss', ['buildextjs'], function() {
 /* Build manifest file
  */
 gulp.task('buildmanifestfiles', ['minifyextcss'], function() {
-  var dateOffset = 4032271;
-  var dateCalc = parseInt(new Date().getTime() / 360000);
+  let dateOffset = 4032271;
+  let dateCalc = parseInt(new Date().getTime() / 360000);
 
   gulp.src('src/manifest.json')
     .pipe(replace({
       patterns: [{
         match: 'timestamp',
         replacement: String(parseInt((dateCalc - dateOffset) / 1000)) +
-          '.' + String((dateCalc - dateOffset) % 1000)
-      }]
+          '.' + String((dateCalc - dateOffset) % 1000),
+      }],
     }))
     .pipe(debug())
     .pipe(gulp.dest('./chrome-ext/'))
     .pipe(gulp.dest('./dist/chrome-ext/'));
 });
 
-/* Copy all the required files for chrome extension operation to the chrome-ext directory.
+/* Copy all the required files for chrome extension operation to the
+ *  chrome-ext directory.
  */
 gulp.task('copytochromeext', ['buildmanifestfiles'], function() {
   gulp.src(['src/ext-background.js', 'src/ext-content.js',
-      'src/opensesame-38.png', 'lib/material.min.js',
-      'lib/material.min.css', 'src/cryptojs.js', 'fonts/*.woff2'
-    ])
+    'src/opensesame-38.png', 'lib/material.min.js',
+    'lib/material.min.css', 'src/cryptojs.js', 'fonts/*.woff2',
+  ])
     .pipe(debug())
     .pipe(gulp.dest('./chrome-ext/'));
 });
 
-/* Copy all the required files for chrome extension operation to the dist/chrome-ext directory.
+/* Copy all the required files for chrome extension operation to the
+ *  dist/chrome-ext directory.
  */
 gulp.task('copytodistchromeext', ['copytochromeext'], function() {
   gulp.src(['src/ext-background.js', 'src/ext-content.js',
-      'chrome-ext/cryptojs.js', 'chrome-ext/*.png', 'lib/material.min.js',
-      'lib/material.min.css', 'fonts/*.woff2'
-    ])
+    'chrome-ext/cryptojs.js', 'chrome-ext/*.png', 'lib/material.min.js',
+    'lib/material.min.css', 'fonts/*.woff2',
+  ])
     .pipe(debug())
     .pipe(gulp.dest('./dist/chrome-ext/'));
+});
 
+
+gulp.task('watch', ['copytodistchromeext'], function() {
+  // Execute the html task anytime the source files change
+  gulp.watch('src/*.*', ['html']);
 });
 
 
@@ -319,10 +451,10 @@ gulp.task('html', ['copytodistchromeext'], function() {
 gulp.task('serve', ['copytodistchromeext'], function() {
   connect.server({
     root: 'dist',
-    livereload: true
+    livereload: true,
   });
 
-  //Execute the html task anytime the source files change
+  // Execute the html task anytime the source files change
   gulp.watch('src/*.*', ['html']);
 });
 

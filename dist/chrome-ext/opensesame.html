@@ -78,17 +78,17 @@
 
                     <div class="mdl-layout__content mdl-card__supporting-text overflow-x-visible">
 
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                            <input class="mdl-textfield__input" type="text" id="given-name" />
-                            <label class="mdl-textfield__label required-field" for="given-name">Given name *</label>
-                            <span class="mdl-textfield__error">Given name is required</span>
-                        </div>
+                      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+                          <input class="mdl-textfield__input" type="text" id="domain" />
+                          <label class="mdl-textfield__label required-field" for="domain">Web site *</label>
+                          <span class="mdl-textfield__error">Web site is required</span>
+                      </div>
 
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                            <input class="mdl-textfield__input" type="text" id="family-name" />
-                            <label class="mdl-textfield__label required-field" for="family-name">Family name *</label>
-                            <span class="mdl-textfield__error">Family name is required</span>
-                        </div>
+                      <div id="user-name-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+                          <input class="mdl-textfield__input" type="text" id="user-name" />
+                          <label class="mdl-textfield__label" for="user-name">User name *</label>
+                          <span class="mdl-textfield__error">User name is required</span>
+                      </div>
 
                         <div id="failure-toast" class="toast main-card hidden">
                             The entered characters don't match your pass phrase. Pass phrase cleared.
@@ -111,11 +111,6 @@
                         </div>
 
 
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                            <input class="mdl-textfield__input" type="text" id="domain" />
-                            <label class="mdl-textfield__label required-field" for="domain">Web site *</label>
-                            <span class="mdl-textfield__error">Web site is required</span>
-                        </div>
 
                         <div id="security-question-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label  textfield-full-width hidden">
                             <input class="mdl-textfield__input" type="text" id="security-question" />
@@ -148,15 +143,10 @@
                                     <li id="short-password" class="mdl-menu__item">Short password (4 letters / numbers)</li>
                                     <li id="pin" class="mdl-menu__item">Four digit PIN</li>
                                     <li id="pin-6" class="mdl-menu__item">Six digit PIN</li>
-                                    <li id="login" class="mdl-menu__item">User name</li>
                                     <li id="answer" class="mdl-menu__item">Security answer</li>
                                 </ul>
                             </div>
 
-                            <div id="user-name-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                                <input class="mdl-textfield__input" type="text" id="user-name" />
-                                <label class="mdl-textfield__label" for="user-name">Generate password for user name</label>
-                            </div>
                         </div>
 
                         <!--<p id="extra-vertical-space" class="hidden"></p>-->
@@ -233,7 +223,13 @@
 
 
     <script defer src="material.min.js"></script>
-    <script src="ext-opensesame.min.js"></script>
+    <script src="@@assert-jsref"></script>
+    <script src="@@opensesame-jsref"></script>
+    <script src="@@manager-jsref"></script>
+    <script src="@@crypto-jsref"></script>
+    <script src="@@phrasestore-jsref"></script>
+    <script src="@@ext-popup-jsref"></script>
+
 </body>
 
 </html>

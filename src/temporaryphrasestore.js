@@ -1,35 +1,42 @@
-/*global  console, CryptoJS, Uint8Array, Promise, performance, TextEncoder, TextDecoder, window, webcrypto, crypto, CryptoFunctions */
-/*global PBKDF2, convertDerivedKeyToHex, aesEncrypt, aesDecrypt, zeroVar, zeroIntArray */
-/*global ASSERT_ENABLED, ASSERT_ERROR, assert */
+/* global Uint8Array, Promise  */
+/* global PBKDF2, convertDerivedKeyToHex, aesEncrypt, aesDecrypt, zeroVar,
+zeroIntArray */
+/* global assert */
 
 
-var TemporaryPhraseStore = function() {
-  this.ns = "cake.man.io";
+/**
+* constructor
+*/
+let TemporaryPhraseStore = function() {
+  this.ns = 'cake.man.io';
 };
 
-/* Encrypts the pass phrase using the name as a salt.  Runs a PBKDF2 500 times on the firsth three characters of the passphrase to generate a key.
- *     Then runs PBKDF2 250 times on the key to generate a hash to store for comparison later.
- *     The key is used to encrypt the data using AES and the result is stored.
- * @param {passphrase, name} strings.
- * @return {promise} A promise which will be resolved with eoither "Success" or rejected with an error.
+/**
+* Encrypts the pass phrase using the name as a salt.  Runs a PBKDF2 500 times
+* on the firsth three characters of the passphrase to generate a key.
+*     Then runs PBKDF2 250 times on the key to generate a hash to store for
+*     comparison later.
+*     The key is used to encrypt the data using AES and the result is stored.
+* @param {String} passphrase
+* @param {String} name
+* @return {promise} A promise which will be resolved with eoither 'Success' or
+*  rejected with an error.
  */
 TemporaryPhraseStore.prototype.encryptPhrase = function(passphrase, name) {
-  "use strict";
+  'use strict';
 
-  assert(passphrase !== "",
+  assert(passphrase !== '',
     'TemporaryPhraseStore.prototype.encryptPhrase passphrase: ' +
     passPhrase);
-  assert(name !== "", 'TemporaryPhraseStore.prototype.encryptPhrase name: ' +
-    name);
+  assert(name !== '',
+    'TemporaryPhraseStore.prototype.encryptPhrase userName: ' + name);
 
 
-  var aesKey;
-  var tempStoreContext = this;
+  let aesKey;
+  let tempStoreContext = this;
   return new Promise(function(resolve, reject) {
-
-    if (typeof passphrase === "string" && passphrase.length >= 3) {
-      var firstThreeChars = passphrase.substring(0, 3);
-
+    if (typeof passphrase === 'string' && passphrase.length >= 3) {
+      let firstThreeChars = passphrase.substring(0, 3);
 
       PBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
         .then(function(key) {
@@ -38,86 +45,82 @@ TemporaryPhraseStore.prototype.encryptPhrase = function(passphrase, name) {
           return PBKDF2(convertDerivedKeyToHex(key), name +
             firstThreeChars, 250, 128);
         }).then(function(verificationHash) {
-          tempStoreContext.threeCharHash = convertDerivedKeyToHex(
-            verificationHash);
+        tempStoreContext.threeCharHash = convertDerivedKeyToHex(
+          verificationHash);
 
-          return aesEncrypt(passphrase, aesKey);
-        }).then(function(encryptedData) {
-          tempStoreContext.encData = encryptedData;
-          resolve("Success");
-        }).catch(function(err) {
-          reject(err);
-        });
+        return aesEncrypt(passphrase, aesKey);
+      }).then(function(encryptedData) {
+        tempStoreContext.encData = encryptedData;
+        resolve('Success');
+      }).catch(function(err) {
+        reject(err);
+      });
     } else {
-      reject("Pass phrase must be a sring at least three characters long");
+      reject('Pass phrase must be a sring at least three characters long');
     }
   });
-
 };
 
-/* Descrypts the pass phrase using the first three chars and name.  Runs a PBKDF2 500 times on the firsth three characters of the passphrase
- * to generate a key.  Then runs PBKDF2 250 times on the key to generate a hash.  The generated hash is compared to the stored hash.  If they
- * match, the key used to decrypt the pass phrase using AES.  If not, the encrypted data and has are cleared.
- * @param {firstThreeChars, name} strings.
- * @return {promise} A promise which will be resolved with the pass phrasee or rejected with an error.
- */
+/**
+*  Descrypts the pass phrase using the first three chars and name.  Runs a
+*   PBKDF2 500 times on the firsth three characters of the passphrase
+* to generate a key.  Then runs PBKDF2 250 times on the key to generate a
+* hash.  The generated hash is compared to the stored hash.  If they
+* match, the key used to decrypt the pass phrase using AES.  If not, the
+* encrypted data and has are cleared.
+* @param {String} firstThreeChars
+* @param {String} name
+* @return {promise} A promise which will be resolved with the pass phrasee or
+*  rejected with an error.
+*/
 TemporaryPhraseStore.prototype.decryptPhrase = function(firstThreeChars, name) {
-  "use strict";
+  'use strict';
 
-  assert(firstThreeChars !== "",
+  assert(firstThreeChars !== '',
     'TemporaryPhraseStore.prototype.decryptPhrase firstThreeChars: ' +
     firstThreeChars);
-  assert(name !== "", 'TemporaryPhraseStore.prototype.decryptPhrase name: ' +
+  assert(name !== '', 'TemporaryPhraseStore.prototype.decryptPhrase name: ' +
     name);
 
-  var tempStoreContext = this;
-  var aesKey;
+  let tempStoreContext = this;
+  let aesKey;
 
   return new Promise(function(resolve, reject) {
-
-    if (typeof tempStoreContext.encData === "undefined") {
-      reject("No encrypted data found");
-
-    } else if (typeof firstThreeChars !== "string" || firstThreeChars.length !==
+    if (typeof tempStoreContext.encData === 'undefined') {
+      reject('No encrypted data found');
+    } else if (typeof firstThreeChars !== 'string' || firstThreeChars.length !==
       3) {
       tempStoreContext.clearStore();
 
       reject(
-        "First three characters parameter is not a 3 character string");
-
+        'First three characters parameter is not a 3 character string');
     } else {
-
-
       PBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
         .then(function(key) {
           aesKey = convertDerivedKeyToHex(key);
-          //console.log('Key: ' + aesKey);
+          // console.log('Key: ' + aesKey);
 
           return PBKDF2(convertDerivedKeyToHex(key), name +
             firstThreeChars, 250, 128);
         }).then(function(verificationHash) {
+        // console.log('Stored hash: ' + tempStoreContext.threeCharHash);
+        // console.log('Verification hash: ' + convertDerivedKeyToHex(
+        // verificationHash));
 
-          //console.log('Stored hash: ' + tempStoreContext.threeCharHash);
-          //console.log('Verification hash: ' + convertDerivedKeyToHex(
-          //verificationHash));
+        if (tempStoreContext.threeCharHash === convertDerivedKeyToHex(
+            verificationHash)) {
+          // console.log('Encrypted data');
+          // console.log(tempStoreContext.encData);
 
-          if (tempStoreContext.threeCharHash === convertDerivedKeyToHex(
-              verificationHash)) {
-
-            //console.log('Encrypted data');
-            //console.log(tempStoreContext.encData);
-
-            aesDecrypt(tempStoreContext.encData, aesKey)
-              .then(function(plainText) {
-                resolve(plainText);
-              });
-
-          } else {
-            tempStoreContext.clearStore();
-            reject("First three characters did not match");
-          }
-
-        });
+          aesDecrypt(tempStoreContext.encData, aesKey)
+            .then(function(plainText) {
+              resolve(plainText);
+            });
+        } else {
+          tempStoreContext.clearStore();
+          reject('First three characters did not match');
+        }
+      });
     }
   });
 };
@@ -127,51 +130,51 @@ TemporaryPhraseStore.prototype.decryptPhrase = function(firstThreeChars, name) {
  * @return {none}
  */
 TemporaryPhraseStore.prototype.clearStore = function() {
-  "use strict";
+  'use strict';
 
-  if (typeof this.threeCharHash !== "undefined") {
+  if (typeof this.threeCharHash !== 'undefined') {
     zeroVar(this.threeCharHash);
     delete this.threeCharHash;
   }
 
-  if (typeof this.encData !== "undefined") {
-
-    if (typeof this.encData.iv === "string") {
+  if (typeof this.encData !== 'undefined') {
+    if (typeof this.encData.iv === 'string') {
       zeroVar(this.encData.iv);
-      this.encData.iv = "";
-    } else if (this.encData.iv.constructor.name === "Uint8Array") {
+      this.encData.iv = '';
+    } else if (this.encData.iv.constructor.name === 'Uint8Array') {
       zeroIntArray(this.encData.iv);
       this.encData.iv = [];
     }
 
-    if (typeof this.encData.ciphertext === "string") {
+    if (typeof this.encData.ciphertext === 'string') {
       zeroVar(this.encData.ciphertext);
-      this.encData.ciphertext = "";
-    } else if (this.encData.ciphertext.constructor.name === "Uint8Array") {
+      this.encData.ciphertext = '';
+    } else if (this.encData.ciphertext.constructor.name === 'Uint8Array') {
       zeroIntArray(this.encData.ciphertext);
       this.encData.ciphertext = [];
     }
 
     delete this.encData;
   }
-
 };
 
-/* Allows values to be stored which were created separately.  This functionality is required for the chrome extension which stores and returns values.
- * @param {threeCharHash, encData} String, Uint8Array
- * @return {none}
- */
+/**
+* Allows values to be stored which were created separately.  This
+*  functionality is required for the chrome extension which stores and returns
+*  values
+* @param {String} threeCharHash
+* @param {Uint8Array} encData
+*/
 TemporaryPhraseStore.prototype.storeValues = function(threeCharHash, encData) {
-  "use strict";
+  'use strict';
 
-  assert(threeCharHash !== "",
+  assert(threeCharHash !== '',
     'TemporaryPhraseStore.prototype.storeValues threeCharHash: ' +
     threeCharHash);
-  assert(encData !== "",
+  assert(encData !== '',
     'TemporaryPhraseStore.prototype.storeValues encData: ' +
     encData);
 
   this.threeCharHash = threeCharHash;
   this.encData = encData;
-
 };
