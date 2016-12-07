@@ -11,29 +11,28 @@
     <title>&nbsp;&nbsp;Open Sesame</title>
 
     <meta name="application-name" content="&nbsp;&nbsp;Open Sesame">
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="images/favicon.ico">
 
     <!-- Add to homescreen for Chrome on Android -->
     <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" sizes="192x192" href="favicon-192.png">
+    <link rel="icon" sizes="192x192" href="images/favicon-192.png">
 
     <!-- Add to homescreen for Safari on iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="white">
     <meta name="apple-mobile-web-app-title" content="Open Sesame">
-    <link rel="apple-touch-icon-precomposed" href="favicon-152.png">
+    <link rel="apple-touch-icon-precomposed" href="images/favicon-152.png">
 
     <!-- Tile icon for Win8 (144x144 + tile color) -->
-    <meta name="msapplication-TileImage" content="favicon-144.png">
+    <meta name="msapplication-TileImage" content="images/favicon-144.png">
     <meta name="msapplication-TileColor" content="#FBFBFB">
 
 
     <link href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Muli&text=PassOpSasfYourPwdINAnweUmly" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="material.min.css">
-    <!--link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.indigo-blue.min.css" /-->
-    <link rel="stylesheet" href="opensesame.min.css">
+    <link rel="stylesheet" href="lib/material.min.css">
+    <link rel="stylesheet" href="css/opensesame.min.css">
 </head>
 
 <body class="mdl-color--grey-200 mdl-base overflow-x-visible">
@@ -252,14 +251,12 @@
         (window.crypto && window.crypto.subtle) || document.write("<script src=cryptojs.js><\/script>");
 
     </script>
-
-    <!--script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script-->
-    <script defer="defer" src="material.min.js"></script>
-    <script src="@@assert-jsref"></script>
-    <script src="@@opensesame-jsref"></script>
-    <script src="@@manager-jsref"></script>
-    <script src="@@crypto-jsref"></script>
-    <script src="@@phrasestore-jsref"></script>
+    <script defer="defer" src="lib/material.min.js"></script>
+    <script src="scripts/@@assert-jsref"></script>
+    <script src="scripts/@@opensesame-jsref"></script>
+    <script src="scripts/@@manager-jsref"></script>
+    <script src="scripts/@@crypto-jsref"></script>
+    <script src="scripts/@@phrasestore-jsref"></script>
     <script>
         //Execute the servide worker prep
         prepServiceWorker();

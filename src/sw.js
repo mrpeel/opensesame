@@ -2,15 +2,15 @@
 
 let staticCacheName = 'open-sesame-v@@timestamp';
 let preCache = [
-  'material.min.css',
-  'material.min.js',
-  '@@cssfile',
-  '@@assert-jsref',
-  '@@opensesame-jsref',
-  '@@manager-jsref',
-  '@@crypto-jsref',
-  '@@phrasestore-jsref',
-  'favicon.ico',
+  'lib/material.min.css',
+  'lib/material.min.js',
+  'css/@@cssfile',
+  'scripts/@@assert-jsref',
+  'scripts/@@opensesame-jsref',
+  'scripts/@@manager-jsref',
+  'scripts/@@crypto-jsref',
+  'scripts/@@phrasestore-jsref',
+  'images/favicon.ico',
 ];
 let opaqueCacheOnRequest = [
   'https://fonts.gstatic.com',

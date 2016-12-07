@@ -1,16 +1,16 @@
 /* global self, caches, Promise, fetch */
 
-let staticCacheName = 'open-sesame-v1481018381422';
+let staticCacheName = 'open-sesame-v1481139236027';
 let preCache = [
-  'material.min.css',
-  'material.min.js',
-  'opensesame.css',
-  '@@assert-jsref',
-  '@@opensesame-jsref',
-  '@@manager-jsref',
-  '@@crypto-jsref',
-  '@@phrasestore-jsref',
-  'favicon.ico',
+  'lib/material.min.css',
+  'lib/material.min.js',
+  'css/opensesame.css',
+  'scripts/@@assert-jsref',
+  'scripts/@@opensesame-jsref',
+  'scripts/@@manager-jsref',
+  'scripts/@@crypto-jsref',
+  'scripts/@@phrasestore-jsref',
+  'images/favicon.ico',
 ];
 let opaqueCacheOnRequest = [
   'https://fonts.gstatic.com',

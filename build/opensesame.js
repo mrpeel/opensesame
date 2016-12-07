@@ -2,9 +2,9 @@
 
 /* exported assert */
 
-let ASSERT_ENABLED = true;
-let ASSERT_ERROR = false;
-let ASSERT_VERBOSE = false;
+const ASSERT_ENABLED = true;
+const ASSERT_ERROR = false;
+const ASSERT_VERBOSE = false;
 
 /**
  * Simple assertions - checks global variables to decide whether to run and
