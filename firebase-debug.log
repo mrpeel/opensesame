@@ -1,0 +1,28 @@
+[debug] ----------------------------------------------------------------------
+[debug] Command:      /usr/local/bin/node /usr/local/bin/firebase serve
+[debug] CLI Version:  3.0.8
+[debug] Platform:     darwin
+[debug] Node Version: v7.2.0
+[debug] Time:         Tue Dec 13 2016 06:08:49 GMT+1100 (AEDT)
+[debug] ----------------------------------------------------------------------
+[debug] 
+[info] Starting Firebase development server...
+[info] 
+[info] Project Directory: /Users/neilkloot/Dev/opensesame
+[info] Public Directory: dist
+[info] 
+[info] Server listening at: http://localhost:5000
+[debug] ----------------------------------------------------------------------
+[debug] Command:      /usr/local/bin/node /usr/local/bin/firebase serve
+[debug] CLI Version:  3.0.8
+[debug] Platform:     darwin
+[debug] Node Version: v7.2.0
+[debug] Time:         Wed Dec 14 2016 19:38:06 GMT+1100 (AEDT)
+[debug] ----------------------------------------------------------------------
+[debug] 
+[info] Starting Firebase development server...
+[info] 
+[info] Project Directory: /Users/neilkloot/Dev/opensesame
+[info] Public Directory: dist
+[info] 
+[info] Server listening at: http://localhost:5000

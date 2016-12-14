@@ -259,14 +259,14 @@ OpenSesame.prototype.generatePassword = function(userName, passPhrase,
             // Check if this character must be a space (for security answers)
             if (spaces.indexOf[s] >= 0) {
               // This position is a defined space
-              password = +' ';
+              password = password + ' ';
             } else {
               // Select character from character set
-              password = +charSet[seedArray[s + 1] % charSet.length];
+              password = password + charSet[seedArray[s] % charSet.length];
             }
           }
           // Re-set the seed array value
-          seedArray[seedCounter] = 0;
+          seedArray[s] = 0;
         }
 
         // Clear pass phrase values

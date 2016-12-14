@@ -69,7 +69,7 @@ gulp.task('buildserviceworker', ['clean'], function() {
     .pipe(replace({
       patterns: [{
         match: 'crypto-jsref',
-        replacement: 'cryptfunctions.js',
+        replacement: 'cryptofunctions.js',
       }],
     }))
     .pipe(replace({
@@ -120,7 +120,7 @@ gulp.task('distserviceworker', ['buildserviceworker'], function() {
     .pipe(replace({
       patterns: [{
         match: 'crypto-jsref',
-        replacement: 'cryptfunctions.min.js',
+        replacement: 'cryptofunctions.min.js',
       }],
     }))
     .pipe(replace({
@@ -162,7 +162,7 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
     .pipe(replace({
       patterns: [{
         match: 'crypto-jsref',
-        replacement: 'cryptfunctions.js',
+        replacement: 'cryptofunctions.js',
       }],
     }))
     .pipe(replace({
@@ -204,7 +204,7 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
     .pipe(replace({
       patterns: [{
         match: 'crypto-jsref',
-        replacement: 'cryptfunctions.min.js',
+        replacement: 'cryptofunctions.min.js',
       }],
     }))
     .pipe(replace({
@@ -242,44 +242,58 @@ gulp.task('copybuildjs', ['buildstandalonehtml'], function() {
 gulp.task('minifyjs', ['copybuildjs'], function() {
   gulp.src(['src/simple_assert.js'])
     .pipe(rename('simple_assert.min.js'))
-    .pipe(uglify().on('error', gutil.log))
+    .pipe(uglify({
+      mangle: false,
+    }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
 
   gulp.src(['src/opensesame.js'])
     .pipe(rename('opensesame.min.js'))
-    .pipe(uglify().on('error', gutil.log))
+    .pipe(uglify({
+      mangle: false,
+    }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
 
   gulp.src(['src/manager.js'])
     .pipe(rename('manager.min.js'))
-    .pipe(uglify().on('error', gutil.log))
+    .pipe(uglify({
+      mangle: false,
+    }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
 
   gulp.src(['src/cryptofunctions.js'])
     .pipe(rename('cryptofunctions.min.js'))
-    .pipe(uglify().on('error', gutil.log))
+    .pipe(uglify({
+      mangle: false,
+    }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
 
   gulp.src(['src/temporaryphrasestore.js'])
     .pipe(rename('temporaryphrasestore.min.js'))
-    .pipe(uglify().on('error', gutil.log))
+    .pipe(uglify({
+      mangle: false,
+    }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
 
   gulp.src(['src/cryptofunctions.js'])
     .pipe(rename('cryptofunctions.min.js'))
-    .pipe(uglify().on('error', gutil.log))
-    .pipe(gulp.dest('./dist/scripts/scripts/'))
+    .pipe(uglify({
+      mangle: false,
+    }).on('error', gutil.log))
+    .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
 
   // Extra js file used in the chrome extension only
   gulp.src(['ext-popup.js'])
     .pipe(rename('ext-popup.min.js'))
-    .pipe(uglify().on('error', gutil.log))
+    .pipe(uglify({
+      mangle: false,
+    }).on('error', gutil.log))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
 });
 
@@ -380,7 +394,7 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
     .pipe(replace({
       patterns: [{
         match: 'crypto-jsref',
-        replacement: 'cryptfunctions.js',
+        replacement: 'cryptofunctions.js',
       }],
     }))
     .pipe(replace({
@@ -425,7 +439,7 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
     .pipe(replace({
       patterns: [{
         match: 'crypto-jsref',
-        replacement: 'cryptfunctions.min.js',
+        replacement: 'cryptofunctions.min.js',
       }],
     }))
     .pipe(replace({
@@ -505,19 +519,20 @@ gulp.task('copytochromeext', ['buildmanifestfiles'], function() {
 
 
 gulp.task('watch', ['copytochromeext'], function() {
-  // Execute the copytodistchromeext task anytime the source files change
-  gulp.watch('src/*.*', ['copytodistchromeext']);
+  gulp.watch('src/*.*', ['copytochromeext']);
 });
 
 
 /* Watch for changes to html and then reload when updated
  */
+/*
 gulp.task('html', ['copytodistchromeext'], function() {
   gulp.src('./build/*.html')
     .pipe(connect.reload());
-});
+});*/
 
 /* Standard server task */
+/*
 gulp.task('serve', ['copytodistchromeext'], function() {
   connect.server({
     root: 'dist',
@@ -526,7 +541,7 @@ gulp.task('serve', ['copytodistchromeext'], function() {
 
   // Execute the html task anytime the source files change
   gulp.watch('src/*.*', ['html']);
-});
+}); */
 
 
 /* Task to deploy the built app to the github pages branch */

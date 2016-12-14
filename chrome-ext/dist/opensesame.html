@@ -1,41 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang=en>
 
 <head>
     <meta charset="utf-8">
-    <!--Reset to default-src 'none' -->
-    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 127.0.0.1 https://fonts.googleapis.com https://code.getmdl.io; script-src 'self' 'unsafe-inline' 'unsafe-eval' localhost:* 127.0.0.1:* https://code.getmdl.io;font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com;img-src 'self'">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Generate passwords on demand">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>&nbsp;&nbsp;Open Sesame</title>
 
-    <meta name="application-name" content="&nbsp;&nbsp;Open Sesame">
-    <link rel="icon" href="images/favicon.ico">
 
-    <!-- Add to homescreen for Chrome on Android -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" sizes="192x192" href="images/favicon-192.png">
-
-    <!-- Add to homescreen for Safari on iOS -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="white">
-    <meta name="apple-mobile-web-app-title" content="Open Sesame">
-    <link rel="apple-touch-icon-precomposed" href="images/favicon-152.png">
-
-    <!-- Tile icon for Win8 (144x144 + tile color) -->
-    <meta name="msapplication-TileImage" content="images/favicon-144.png">
-    <meta name="msapplication-TileColor" content="#FBFBFB">
-
-
-    <link href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Muli&text=PassOpSasfYourPwdINAnweUmly" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="lib/material.min.css">
-    <link rel="stylesheet" href="css/opensesame.min.css">
+    <link rel="stylesheet" href="lib/material.min.css" />
+    <link rel="stylesheet" href="css/ext-opensesame.min.css">
 </head>
 
-<body class="mdl-color--grey-200 mdl-base overflow-x-visible">
+<body class="mdl-color--grey-200 mdl-base overflow-x-visible ext-pass">
     <div class="mdl-layout mdl-js-layout overflow-x-visible">
     <main class="mdl-layout__content overflow-x-visible">
         <div class="page-content mdl-color--grey-100 overflow-x-visible">
@@ -58,7 +35,7 @@
                             <p></p>
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
 
-                                <input class="mdl-textfield__input passphrase" type="password" id="confirm-passphrase" autofocus maxlength="3">
+                                <input class="mdl-textfield__input passphrase" type="password" id="confirm-passphrase" autofocus maxlength="3" />
                                 <label class="mdl-textfield__label required-field" for="passphrase">First three characters of pass phrase</label>
                             </div>
 
@@ -101,13 +78,13 @@
                     <div class="mdl-layout__content mdl-card__supporting-text overflow-x-visible">
 
                       <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                          <input class="mdl-textfield__input" type="text" id="domain">
+                          <input class="mdl-textfield__input" type="text" id="domain" />
                           <label class="mdl-textfield__label required-field" for="domain">Web site *</label>
                           <span class="mdl-textfield__error">Web site is required</span>
                       </div>
 
                       <div id="user-name-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                          <input class="mdl-textfield__input" type="text" id="user-name">
+                          <input class="mdl-textfield__input" type="text" id="user-name" />
                           <label class="mdl-textfield__label" for="user-name">User name *</label>
                           <span class="mdl-textfield__error">User name is required</span>
                       </div>
@@ -119,7 +96,7 @@
 
                         <div id="passphrase-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                             <!--<div class="text-with-button">-->
-                            <input class="mdl-textfield__input passphrase flex-field" type="password" id="passphrase">
+                            <input class="mdl-textfield__input passphrase flex-field" type="password" id="passphrase" />
 
                             <button id="show-passphrase" class="show-password mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent hidden" tabindex="-1">
                                 <i class="material-icons">visibility</i>
@@ -134,8 +111,8 @@
 
 
 
-                        <div id="security-question-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width hidden">
-                            <input class="mdl-textfield__input" type="text" id="security-question">
+                        <div id="security-question-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label  textfield-full-width hidden">
+                            <input class="mdl-textfield__input" type="text" id="security-question" />
                             <label class="mdl-textfield__label required-field" for="security-question">Security question</label>
                         </div>
 
@@ -174,7 +151,7 @@
                         <!--<p id="extra-vertical-space" class="hidden"></p>-->
 
 
-                        <input id="clipboard-value" class="clipboard-field" type="textarea" tabindex="-1">
+                        <input id="clipboard-value" class="clipboard-field" type="textarea" tabindex="-1" />
 
                     </div>
 
@@ -243,25 +220,14 @@
 </div>
 
 
-    <script>
-        // If Promise is not supported, include the polyfill
-        window.Promise || document.write("<script src=Promise.min.js><\/script>");
 
-        // If subtle crypto not supported, add cryptoJS functions
-        (window.crypto && window.crypto.subtle) || document.write("<script src=cryptojs.js><\/script>");
-
-    </script>
-    <script defer="defer" src="lib/material.min.js"></script>
-    <script src="scripts/simple_assert.js"></script>
-    <script src="scripts/opensesame.js"></script>
-    <script src="scripts/manager.js"></script>
-    <script src="scripts/cryptofunctions.js"></script>
-    <script src="scripts/temporaryphrasestore.js"></script>
-    <script>
-        //Execute the servide worker prep
-        prepServiceWorker();
-
-    </script>
+    <script defer src="lib/material.min.js"></script>
+    <script src="scripts/simple_assert.min.js"></script>
+    <script src="scripts/opensesame.min.js"></script>
+    <script src="scripts/manager.min.js"></script>
+    <script src="scripts/cryptofunctions.min.js"></script>
+    <script src="scripts/temporaryphrasestore.min.js"></script>
+    <script src="scripts/@@ext-popup-jsref"></script>
 
 </body>
 
