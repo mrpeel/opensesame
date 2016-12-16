@@ -1,4 +1,4 @@
-/* global chrome, document, givenName, familyName, passPhrase, password,
+/* global chrome, document, passPhrase, password,
   domainName, passwordType, setType, temporaryPhraseStore,
   setPassPhraseScreenState, userName, securityQuestion, */
 
@@ -27,31 +27,14 @@ document.addEventListener('DOMContentLoaded', function() {
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.message === 'populate_fields') {
-      domainName.value = request.url || '';
-      givenName.value = request.givenName || '';
-      familyName.value = request.familyName || '';
-      userName.value = request.userName || '';
-      securityQuestion.value = request.securityQuestion || '';
+      populateValue(domainName, request.url || '');
+      populateValue(userName, request.userName || '');
+      populateValue(securityQuestion, request.securityQuestion || '');
       extHasPassword = request.hasPassword;
 
       // console.log('Populate fields password type: ' + request.passwordType);
       setType(request.passwordType);
 
-      if (domainName.value.length > 0) {
-        setValuePopulated(domainName);
-      }
-      if (givenName.value.length > 0) {
-        setValuePopulated(givenName);
-      }
-      if (familyName.value.length > 0) {
-        setValuePopulated(familyName);
-      }
-      if (securityQuestion.value.length > 0) {
-        setValuePopulated(securityQuestion);
-      }
-      if (userName.value.length > 0) {
-        setValuePopulated(userName);
-      }
       // Determine state of password, and set the appropriate values
       if (request.threeCharHash && request.threeCharHash.length > 0 &&
         request.phraseStore &&
@@ -80,7 +63,6 @@ chrome.runtime.onMessage.addListener(
         } else {
           eCiphertext = request.phraseStore.ciphertext;
         }
-
 
         temporaryPhraseStore.storeValues(request.threeCharHash, {
           iv: eIV,
@@ -154,7 +136,11 @@ function clearExtPhrase() {
 * function sets the is-dirty class to ensure that labels are rendered
 * correctly above the inpt fields
 * @param {String} pElement - the name if the element being populated
+* @param {String} pValue - the value for the element
 */
-function setValuePopulated(pElement) {
-  pElement.parentElement.classList.add('is-dirty');
+function populateValue(pElement, pValue) {
+  pElement.value = pValue;
+  if (pValue.length > 0) {
+    pElement.parentElement.classList.add('is-dirty');
+  }
 }

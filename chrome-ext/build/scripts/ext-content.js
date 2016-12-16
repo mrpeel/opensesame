@@ -31,7 +31,7 @@ chrome.runtime.onMessage.addListener(
         'message': 'set_page_details',
         'url': document.URL,
         'hasPassword': hasPassword,
-        'hasUser': hasUserName,
+        'hasUserName': hasUserName,
       });
     }
   }

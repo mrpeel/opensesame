@@ -22,55 +22,65 @@ let OpenSesame = function() {
   this.answerNS = 'cake.man.opensesame.answer';
 
   //  The values which will be populated for creating the password
-  /* this.passPhrase = '';
-  this.domainName = '';
-  this.userName = '';
-  this.securityQuestion = '';
-  this.version = 0; */
-
+  this.lowerChars = 'abcdefghijklmnopqrstuvwxyz';
+  this.upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  this.numberChars = '0123456789';
+  this.symbolChars = '!@#$%^&*()';
 
   //  The templates that passwords may be created from
   //  The characters map to MPW.passchars
   this.passwordTypes = {
     'maximum-password': {
-      'charSet': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' +
-        '0123456789!@#$%^&*()',
+      'charSet': this.upperChars + this.lowerChars + this.numberChars +
+        this.symbolChars,
       'length': 20,
+      'needsUpper': true,
+      'needsLower': true,
+      'needsNumber': true,
+      'needsSymbol': true,
     },
     'long-password': {
-      'charSet': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' +
-        '0123456789!@#$%^&*()',
+      'charSet': this.upperChars + this.lowerChars + this.numberChars +
+        this.symbolChars,
       'length': 14,
+      'needsUpper': true,
+      'needsLower': true,
+      'needsNumber': true,
+      'needsSymbol': true,
     },
     'medium-password': {
-      'charSet': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' +
-        '0123456789!@#$%^&*()',
+      'charSet': this.upperChars + this.lowerChars + this.numberChars +
+        this.symbolChars,
       'length': 8,
+      'needsUpper': true,
+      'needsLower': true,
+      'needsNumber': true,
+      'needsSymbol': true,
     },
     'basic-password': {
-      'charSet': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' +
-        '0123456789',
+      'charSet': this.upperChars + this.lowerChars + this.numberChars,
       'length': 8,
+      'needsUpper': true,
+      'needsLower': true,
+      'needsNumber': true,
     },
     'short-password': {
-      'charSet': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' +
-        '0123456789!@#$%^&*()',
+      'charSet': this.upperChars + this.lowerChars + this.numberChars,
       'length': 4,
+      'needsUpper': true,
+      'needsLower': true,
+      'needsNumber': true,
     },
     'pin': {
-      'charSet': '0123456789',
+      'charSet': this.numberChars,
       'length': 4,
     },
     'pin-6': {
-      'charSet': '0123456789',
+      'charSet': this.numberChars,
       'length': 6,
     },
-    'login': {
-      'charSet': 'abcdefghijklmnopqrstuvwxyz0123456789',
-      'length': 9,
-    },
     'answer': {
-      'charSet': 'abcdefghijklmnopqrstuvwxyz',
+      'charSet': this.lowerChars,
       'length': 16,
       /* Spaces will split the generated answer into chunks which look like
          word by making specific characters spaces */
@@ -218,7 +228,8 @@ OpenSesame.prototype.generatePassword = function(userName, passPhrase,
       if (passwordType === 'answer') {
         /* Strip out any punctuation or multiple spaces and convert to
           lower case */
-        securityQuestionValue = securityQuestionValue.replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()?'']/g, '')
+        securityQuestionValue = securityQuestionValue
+          .replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()?'']/g, '')
           .replace(/  +/g, ' ')
           .trim()
           .toLowerCase();
@@ -235,36 +246,72 @@ OpenSesame.prototype.generatePassword = function(userName, passPhrase,
         }).then(function(seedArray) {
         //  Set up passowrd length and any spaces for generated value
         let passLength = openSesame.passwordTypes[passwordType].length;
+        let passAdjLength = passLength - 1;
         let spaces = openSesame.passwordTypes[passwordType].spaces || [];
         let charSet = openSesame.passwordTypes[passwordType].charSet;
         let password = '';
+        // Variables to check for password complexity
+        let needsUpper = openSesame.passwordTypes[passwordType].needsUpper ||
+          false;
+        let needsLower = openSesame.passwordTypes[passwordType].needsLower ||
+          false;
+        let needsNumber = openSesame.passwordTypes[passwordType].needsNumber ||
+          false;
+        let needsSymbol = openSesame.passwordTypes[passwordType].needsSymbol ||
+          false;
 
-        //  Split the template string
-        /* let password = template.split('').map(function(c, i) {
-          //  Use the available passchars to map the template string
-          //  to characters (e.g. c -> bcdfghjklmnpqrstvwxyz)
-          let chars = openSesame.passchars[c];
-
-          //  Select the character using seed[i + 1]
-          return chars[seedArray[i + 1] % chars.length];
-        }).join(''); /* Re-join as password */
-        // console.log('Generated password: ' + password);
-        // console.log(performance.now() - t0 + ' ms');
-        // console.log('All done');*/
+        /* Determine the character number to start checking for minimum
+          password complexity */
+        let upperCheck = seedArray[0] % passAdjLength;
+        let lowerCheck = upperCheck + 1;
+        let numberCheck = upperCheck + 2;
+        let symbolCheck = upperCheck + 3;
 
         // Select the chars and clear seedArray
         for (let s = 0; s < seedArray.length; s++) {
           // Within the password length, so add next char to password
+          let newChar;
+
           if (s < passLength) {
             // Check if this character must be a space (for security answers)
             if (spaces.indexOf[s] >= 0) {
               // This position is a defined space
-              password = password + ' ';
+              newChar = ' ';
+            } else if (needsUpper && s === upperCheck % passAdjLength) {
+              // Must select character from upper character set
+              newChar = openSesame.upperChars[seedArray[s] %
+              (openSesame.upperChars.length - 1)];
+            } else if (needsLower && s === lowerCheck % passAdjLength) {
+              // Must select character from lower character set
+              newChar = openSesame.lowerChars[seedArray[s] %
+              (openSesame.lowerChars.length - 1)];
+            } else if (needsNumber && s === numberCheck % passAdjLength) {
+              // Must select character from number character set
+              newChar = openSesame.numberChars[seedArray[s] %
+              (openSesame.lowerChars.length - 1)];
+            } else if (needsSymbol && s === symbolCheck % passAdjLength) {
+              // Must select character from symbol character set
+              newChar = openSesame.symbolChars[seedArray[s] %
+              (openSesame.lowerChars.length - 1)];
             } else {
-              // Select character from character set
-              password = password + charSet[seedArray[s] % charSet.length];
+              // Select character from normal character set
+              newChar = charSet[seedArray[s] % (charSet.length - 1)];
+            }
+
+            password = password + newChar;
+
+            // Check which character set this belongs to and record
+            if (openSesame.upperChars.indexOf(newChar) >= 0) {
+              needsUpper = false;
+            } else if (openSesame.lowerChars.indexOf(newChar) >= 0) {
+              needsLower = false;
+            } else if (openSesame.numberChars.indexOf(newChar) >= 0) {
+              needsNumber = false;
+            } else if (openSesame.symbolChars.indexOf(newChar) >= 0) {
+              needsSymbol = false;
             }
           }
+
           // Re-set the seed array value
           seedArray[s] = 0;
         }

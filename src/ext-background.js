@@ -7,6 +7,7 @@ let extEncStore = {};
 let extEncHash = '';
 let extVersion = 1;
 let pageHasPassword = false;
+let pageHasUsername = false;
 
 /**
 * Chrome extension listener which responds to messages sent from pop-up page
@@ -19,7 +20,7 @@ chrome.runtime.onMessage.addListener(
     // console.log(request.message);
     // console.log(request);
 
-    if (request.message === ' set_password') {
+    if (request.message === 'set_password') {
       /* Populate password into password field on the page - called by
         pop-up page */
       // console.log('Executing set password');
@@ -37,6 +38,15 @@ chrome.runtime.onMessage.addListener(
             request.password + '";  }  catch(e)  { console.log(e);  }',
         });
       }
+
+      if (pageHasUsername) {
+        chrome.tabs.executeScript(null, {
+          code: 'try {document.querySelector(\'[autocomplete=' +
+            '"username"],[name="username"],[id="username"]\').value = "' +
+            request.userName + '";  }  catch(e)  { console.log(e);  }',
+        });
+      }
+
       return;
     } else if (request.message === 'store_phrase') {
       /* Store encrypted pass phrase values - called by pop-up page */
@@ -80,6 +90,7 @@ chrome.runtime.onMessage.addListener(
       extCurrentURL = pageURL;
 
       pageHasPassword = request.hasPassword;
+      pageHasUsername = request.hasUserName;
 
       /* console.log('Background page populate fields password type: '
           + extPasswordType); */
