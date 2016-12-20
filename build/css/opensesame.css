@@ -107,6 +107,14 @@ body {
   background-color: #fff;
 }
 
+.password-version {
+  box-sizing: border-box;
+
+  right: 0;
+
+  width: 3em;
+}
+
 .main-button {
   width: 100%;
   padding-top: 5px;
@@ -408,6 +416,11 @@ section.section--center {
 
 .mdl-menu__container {
   z-index: 99;
+}
+
+.menu-dropdown {
+  height: 42px;
+  line-height: 42px;
 }
 
 div .load-ball {

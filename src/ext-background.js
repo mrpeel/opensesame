@@ -5,7 +5,7 @@ let extSecurityQuestion = '';
 let extPasswordType = '';
 let extEncStore = {};
 let extEncHash = '';
-let extVersion = 1;
+let extVersion = '';
 let pageHasPassword = false;
 let pageHasUsername = false;
 
@@ -27,6 +27,7 @@ chrome.runtime.onMessage.addListener(
       extGivenName = request.givenName;
       extFamilyName = request.familyName;
       extPasswordType = request.passwordType;
+      extVersion = request.version || '1';
       extUsername = request.userName || '';
       extSecurityQuestion = request.securityQuestion || '';
       extEncHash = request.threeCharHash || '';
@@ -68,7 +69,7 @@ chrome.runtime.onMessage.addListener(
       // console.log('Executing set values');
       extPasswordType = request.passwordType || '';
       extUsername = request.userName || '';
-      extVersion = request.version || 1;
+      extVersion = request.version || '1';
       extSecurityQuestion = request.securityQuestion || '';
       extEncHash = request.threeCharHash || '';
       extEncStore = request.phraseStore || {};

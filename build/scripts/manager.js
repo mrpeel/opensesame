@@ -16,6 +16,7 @@ let domainName;
 let securityQuestion;
 let userName;
 let type;
+let version;
 let bodyNode;
 let password;
 let optionsVisible = false;
@@ -31,7 +32,6 @@ let lastPassGenTimeStamp;
 let successPrefix;
 let passPhraseState;
 
-let passwordDescription = 'Long password';
 
 /**
 * Set-up the service worker
@@ -134,6 +134,7 @@ window.addEventListener('load', function() {
   type = document.getElementById('type');
   bodyNode = document.querySelector('body');
   password = document.getElementById('password');
+  version = document.getElementById('version');
 
 
   /* Add input events which check if a previous required field has been
@@ -156,6 +157,13 @@ window.addEventListener('load', function() {
     clearPassword();
   }, false);
 
+  version.addEventListener('input', function() {
+    checkRequired();
+    clearPassword();
+  }, false);
+
+  version.addEventListener('focusout', checkVersion, false);
+  version.addEventListener('blur', checkVersion, false);
 
   // Set the pass phrase viewer button when it receieves the focus
   passPhrase.addEventListener('focus', showPassPhraseDisplayButton, false);
@@ -200,8 +208,8 @@ window.addEventListener('load', function() {
   securityQuestion.addEventListener('blur', sendValsToExt, false);
 
   // Add open and close for options section
-  document.getElementById('options').addEventListener('click',
-    openCloseOptions, false);
+  /* document.getElementById('options').addEventListener('click',
+    openCloseOptions, false); */
 
   /* Set up password type click events
      Loop through different values within password type drop down and add one
@@ -241,16 +249,22 @@ window.addEventListener('load', function() {
   type.disabled = false;
 
   /* Focus on the given name */
-  userName.focus();
-
-  // Set initial type of password
-  if (passwordType === undefined) {
-    setType('long-password');
+  if (domainName.value.trim() === '') {
+    domainName.focus();
+  } else {
+    userName.focus();
   }
 
   // Set initial pass phrase state
   if (passPhraseState === undefined) {
     setPassPhraseScreenState('editing');
+  }
+
+  // Set initial type of password
+  if (passwordType === undefined) {
+    window.setTimeout(function() {
+      setType('long-password');
+    });
   }
 }, false);
 
@@ -265,17 +279,35 @@ function closeDialog() {
 }
 
 /**
+* Check version number entered.  Must be an integer between 1 - 999.  Remove
+*  any non-numeric input
+*/
+function checkVersion() {
+  let versionVal = version.value;
+  versionVal = versionVal.replace(/[^0-9]/g, '');
+  if (versionVal === '') {
+    versionVal = '1';
+    version.parentElement.classList.add('is-dirty');
+  } else if (versionVal.length > 3) {
+    versionVal = versionVal.substring(0, 3);
+  }
+  version.value = versionVal;
+  version.parentElement.classList.remove('is-invalid');
+}
+
+
+/**
 * Record username change in options summary
 */
 function userNameUpdate() {
-  let optsSummary = document.getElementById('options-summary');
+  /* let optsSummary = document.getElementById('options-summary');
   let userText = document.getElementById('user-name').value;
 
   if (userText.length > 0) {
     userText = ', ' + userText;
   }
 
-  optsSummary.innerText = 'Options: ' + passwordDescription + userText;
+  optsSummary.innerText = 'Options: ' + passwordDescription + userText; */
 }
 
 /**
@@ -318,7 +350,7 @@ function sendValsToExt() {
 * Open or close option ssection
 */
 function openCloseOptions() {
-  optionsVisible = !optionsVisible;
+  /* optionsVisible = !optionsVisible;
 
   let optsDiv = document.getElementById('extra-options-div');
   let optsIcon = document.getElementById('options-icon');
@@ -330,7 +362,7 @@ function openCloseOptions() {
   } else {
     optsDiv.classList.add('hidden');
     optsIcon.innerHTML = 'keyboard_arrow_down';
-  }
+  } */
 }
 
 /**
@@ -477,7 +509,7 @@ function generatePassword() {
   let gDomainName = domainName.value.trim();
   let gUserName = userName.value.trim();
   let gSecurityQuestion = '';
-  let version = 1;
+  let gVersion = version.value;
 
   if (passwordType === 'answer' && securityQuestion.value.trim().length > 0) {
     /* Remove any punctuation, remove any consecutive spaces and convert to
@@ -487,7 +519,7 @@ function generatePassword() {
 
   if (passwordType) {
     openSesame.generatePassword(gUserName, gPassPhrase, gDomainName,
-      passwordType, version, gSecurityQuestion)
+      passwordType, gVersion, gSecurityQuestion)
       .then(function(passwordValue) {
         clearBodyClasses();
         /* Special classes are required when running as an extenstion
@@ -633,10 +665,9 @@ function setPassPhraseScreenState(passState) {
 */
 function checkConfirmation() {
   let confirmPassPhrase = document.getElementById('confirm-passphrase');
-  fullName = givenName.value.trim() + familyName.value.trim();
 
   if (confirmPassPhrase.value.length === 3) {
-    confirmThreeChars(confirmPassPhrase.value, fullName);
+    confirmThreeChars(confirmPassPhrase.value, userName.value.trim());
     zeroVar(confirmPassPhrase.value);
     confirmPassPhrase.value = '';
   }
@@ -815,7 +846,7 @@ function setType(passwordSelection) {
       break;
     case 'short-password':
       passwordDescription = 'Short password';
-      passwordLabel.innerText = 'Short password (4 letters / numbers)';
+      passwordLabel.innerText = 'Short password (6 letters / numbers)';
       break;
     case 'pin':
       generatePasswordButton.textContent = 'Produce PIN';
@@ -843,6 +874,8 @@ function setType(passwordSelection) {
       passwordLabel.innerText = 'Security answer';
       break;
   }
+
+  passwordLabel.parentElement.classList.add('is-dirty');
 
   userNameUpdate();
 

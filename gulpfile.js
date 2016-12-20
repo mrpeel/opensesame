@@ -171,6 +171,12 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
         replacement: 'temporaryphrasestore.js',
       }],
     }))
+    .pipe(replace({
+      patterns: [{
+        match: 'oscss',
+        replacement: 'opensesame.css',
+      }],
+    }))
     .pipe(htmlmin({
       collapseWhitespace: false,
     }))
@@ -213,6 +219,12 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
         replacement: 'temporaryphrasestore.min.js',
       }],
     }))
+    .pipe(replace({
+      patterns: [{
+        match: 'oscss',
+        replacement: 'opensesame.min.css',
+      }],
+    }))
     .pipe(htmlmin({
       collapseWhitespace: true,
     }))
@@ -226,6 +238,7 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
 gulp.task('copybuildjs', ['buildstandalonehtml'], function() {
   gulp.src(['src/simple_assert.js', 'src/passoff.js', 'src/manager.js',
     'src/cryptofunctions.js', 'src/temporaryphrasestore.js',
+    'src/opensesame.js',
   ])
     .pipe(gulp.dest('./build/scripts/'))
     .pipe(gulp.dest('./chrome-ext/build/scripts/'));
@@ -532,16 +545,16 @@ gulp.task('html', ['copytodistchromeext'], function() {
 });*/
 
 /* Standard server task */
-/*
-gulp.task('serve', ['copytodistchromeext'], function() {
+
+gulp.task('servebuild', function() {
   connect.server({
-    root: 'dist',
+    root: 'build',
     livereload: true,
   });
 
-  // Execute the html task anytime the source files change
-  gulp.watch('src/*.*', ['html']);
-}); */
+// Execute the reload task anytime the source files change
+// gulp.watch('src/*.*', ['servebuild']);
+});
 
 
 /* Task to deploy the built app to the github pages branch */

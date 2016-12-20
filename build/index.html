@@ -32,7 +32,7 @@
     <link href="https://fonts.googleapis.com/css?family=Muli&text=PassOpSasfYourPwdINAnweUmly" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="lib/material.min.css">
-    <link rel="stylesheet" href="css/opensesame.min.css">
+    <link rel="stylesheet" href="css/opensesame.css">
 </head>
 
 <body class="mdl-color--grey-200 mdl-base overflow-x-visible">
@@ -100,17 +100,17 @@
 
                     <div class="mdl-layout__content mdl-card__supporting-text overflow-x-visible">
 
-                      <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                          <input class="mdl-textfield__input" type="text" id="domain">
-                          <label class="mdl-textfield__label required-field" for="domain">Web site *</label>
-                          <span class="mdl-textfield__error">Web site is required</span>
-                      </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+                            <input class="mdl-textfield__input" type="text" id="domain">
+                            <label class="mdl-textfield__label required-field" for="domain">Web site *</label>
+                            <span class="mdl-textfield__error">required</span>
+                        </div>
 
-                      <div id="user-name-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                          <input class="mdl-textfield__input" type="text" id="user-name">
-                          <label class="mdl-textfield__label" for="user-name">User name *</label>
-                          <span class="mdl-textfield__error">User name is required</span>
-                      </div>
+                        <div id="user-name-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
+                            <input class="mdl-textfield__input" type="text" id="user-name">
+                            <label class="mdl-textfield__label" for="user-name">User name *</label>
+                            <span class="mdl-textfield__error">required</span>
+                        </div>
 
                         <div id="failure-toast" class="toast main-card hidden">
                             The entered characters don't match your pass phrase. Pass phrase cleared.
@@ -129,9 +129,43 @@
                             </button>
                             <!--</div>-->
                             <label id="passphrase-label" class="mdl-textfield__label required-field" for="passphrase">Open Sesame Pass phrase *</label>
-                            <span class="mdl-textfield__error">Open Sesame Pass Phrase is required</span>
+                            <span class="mdl-textfield__error">required</span>
                         </div>
 
+                        <div>&nbsp;</div>
+
+                        <div class="mdl-color-text--primary" for="password-selected">Password options</div>
+
+                        <div id="password-type-div row-flex">
+                            <div id="password-type" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label flex-element is-dirty">
+                                <!--<div id="password-selected" class="hover-link top-pad">Long password (14 characters)</div>-->
+                                <div class="mdl-textfield__input" type="text" id="password-selected"></div>
+                                <label class="mdl-textfield__label" for="password-selected">Type</label>
+
+                                <!--button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent right-align drop-down" id="password-options">
+                                    <i class="material-icons">more_vert</i>
+                                </button-->
+                            </div>
+
+                            <ul id="type" class="mdl-menu mdl-js-menu mdl-menu--top-left" for="password-selected">
+                                <li id="maximum-password" class="mdl-menu__item menu-dropdown">Maximum password (20 characters)</li>
+                                <li id="long-password" class="mdl-menu__item menu-dropdown">Long password (14 characters)</li>
+                                <li id="medium-password" class="mdl-menu__item menu-dropdown">Medium password (8 characters)</li>
+                                <li id="basic-password" class="mdl-menu__item menu-dropdown">Basic password (8 letters / numbers)</li>
+                                <li id="short-password" class="mdl-menu__item menu-dropdown">Short password (6 letters / numbers)</li>
+                                <li id="pin" class="mdl-menu__item menu-dropdown">Four digit PIN</li>
+                                <li id="pin-6" class="mdl-menu__item menu-dropdown">Six digit PIN</li>
+                                <li id="answer" class="mdl-menu__item menu-dropdown">Security answer</li>
+                            </ul>
+
+
+                            <div id="version-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label password-version">
+                                <!--<input class="mdl-textfield__input" type="text" pattern="-?[0-9]*" id="version" value="1" />-->
+                                <input class="mdl-textfield__input" type="number" min="1" max="999" id="version" value="1">
+                                <label class="mdl-textfield__label" for="version">Version</label>
+                                <span class="mdl-textfield__error">1 to 999</span>
+                            </div>
+                        </div>
 
 
                         <div id="security-question-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width hidden">
@@ -139,35 +173,19 @@
                             <label class="mdl-textfield__label required-field" for="security-question">Security question</label>
                         </div>
 
-                        <div id="options" class="row-flex hover-link options-open-close">
+
+
+
+
+
+                        <!--<div id="options" class="row-flex hover-link options-open-close">
                             <div id="options-summary" class="flex-element">Options: Long password</div>
 
                             <i id="options-icon" class="material-icons right-align">keyboard_arrow_down</i>
 
-                        </div>
+                        </div>-->
 
                         <div id="extra-options-div" class="extra-options hidden">
-                            <div id="password-type-div">
-                                <div id="password-type" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-dirty">
-                                    <div id="password-selected" class="hover-link top-pad">Long password (14 characters)</div>
-                                    <label class="mdl-textfield__label" for="password-selected">Password type</label>
-
-                                    <!--button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent right-align drop-down" id="password-options">
-                                        <i class="material-icons">more_vert</i>
-                                    </button-->
-                                </div>
-
-                                <ul id="type" class="mdl-menu mdl-js-menu mdl-menu--top-left" for="password-selected">
-                                    <li id="maximum-password" class="mdl-menu__item">Maximum password (20 characters)</li>
-                                    <li id="long-password" class="mdl-menu__item">Long password (14 characters)</li>
-                                    <li id="medium-password" class="mdl-menu__item">Medium password (8 characters)</li>
-                                    <li id="basic-password" class="mdl-menu__item">Basic password (8 letters / numbers)</li>
-                                    <li id="short-password" class="mdl-menu__item">Short password (4 letters / numbers)</li>
-                                    <li id="pin" class="mdl-menu__item">Four digit PIN</li>
-                                    <li id="pin-6" class="mdl-menu__item">Six digit PIN</li>
-                                    <li id="answer" class="mdl-menu__item">Security answer</li>
-                                </ul>
-                            </div>
 
                         </div>
 

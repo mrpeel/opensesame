@@ -30,6 +30,7 @@ chrome.runtime.onMessage.addListener(
       populateValue(domainName, request.url || '');
       populateValue(userName, request.userName || '');
       populateValue(securityQuestion, request.securityQuestion || '');
+      populateValue(version, request.version || '1');
       extHasPassword = request.hasPassword;
 
       // console.log('Populate fields password type: ' + request.passwordType);
@@ -90,6 +91,7 @@ function generateExtPassword() {
     'securityQuestion': securityQuestion.value,
     'password': password.textContent,
     'passwordType': passwordType,
+    'version': version.value,
     'threeCharHash': temporaryPhraseStore.threeCharHash,
     'phraseStore': temporaryPhraseStore.encData,
   });
@@ -106,6 +108,7 @@ function storeExtVals() {
     'securityQuestion': securityQuestion.value,
     'password': password.textContent,
     'passwordType': passwordType,
+    'version': version.value,
     'threeCharHash': temporaryPhraseStore.threeCharHash || '',
     'phraseStore': temporaryPhraseStore.encData || {},
   });
