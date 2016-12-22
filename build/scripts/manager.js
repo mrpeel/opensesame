@@ -818,6 +818,7 @@ function setType(passwordSelection) {
   let generatePasswordButton = document.getElementById('generate-password');
   let copyPasswordButton = document.getElementById('copy-password');
   let passwordCardHeader = document.getElementById('password-card-header');
+  let passwordText = document.getElementById('password-type-text');
 
   copyPasswordButton.textContent = 'Copy Password';
   successPrefix = 'Password';
@@ -832,23 +833,23 @@ function setType(passwordSelection) {
   switch (passwordSelection) {
     case 'maximum-password':
       passwordDescription = 'Maximum password';
-      passwordLabel.innerText = 'Maximum password (20 characters)';
+      passwordText.innerText = 'Maximum password (20 characters)';
       break;
     case 'long-password':
       passwordDescription = 'Long password';
-      passwordLabel.innerText = 'Long password (14 characters)';
+      passwordText.innerText = 'Long password (14 characters)';
       break;
     case 'medium-password':
       passwordDescription = 'Medium password';
-      passwordLabel.innerText = 'Medium password (8 characters)';
+      passwordText.innerText = 'Medium password (8 characters)';
       break;
     case 'basic-password':
       passwordDescription = 'Basic password';
-      passwordLabel.innerText = 'Basic password (8 letters / numbers)';
+      passwordText.innerText = 'Basic password (8 letters / numbers)';
       break;
     case 'short-password':
       passwordDescription = 'Short password';
-      passwordLabel.innerText = 'Short password (6 letters / numbers)';
+      passwordText.innerText = 'Short password (6 letters / numbers)';
       break;
     case 'pin':
       generatePasswordButton.textContent = 'Produce PIN';
@@ -856,7 +857,7 @@ function setType(passwordSelection) {
       copyPasswordButton.textContent = 'Copy PIN';
       successPrefix = 'PIN';
       passwordCardHeader.textContent = 'PIN';
-      passwordLabel.innerText = 'Four digit PIN';
+      passwordText.innerText = 'Four digit PIN';
       break;
     case 'pin-6':
       generatePasswordButton.textContent = 'Produce PIN';
@@ -864,7 +865,7 @@ function setType(passwordSelection) {
       copyPasswordButton.textContent = 'Copy PIN';
       successPrefix = 'PIN';
       passwordCardHeader.textContent = 'PIN';
-      passwordLabel.innerText = 'Six digit PIN';
+      passwordText.innerText = 'Six digit PIN';
       break;
     case 'answer':
       generatePasswordButton.textContent = 'Produce security answer';
@@ -873,7 +874,7 @@ function setType(passwordSelection) {
       successPrefix = 'Answer';
       passwordCardHeader.textContent = 'Answer';
       showElement('security-question-div');
-      passwordLabel.innerText = 'Security answer';
+      passwordText.innerText = 'Security answer';
       break;
   }
 

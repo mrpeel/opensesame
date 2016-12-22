@@ -89,12 +89,17 @@
 
                         <div>&nbsp;</div>
 
-                        <div class="mdl-color-text--primary" for="password-selected">Password</div>
+                        <div class="mdl-color-text--primary" for="password-selected">Options</div>
 
-                        <div id="password-type-div" class="row-flex left-indent">
+                        <div id="password-type-div" class="row-flex">
                             <div id="password-type" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label flex-element is-dirty">
                                 <!--<div id="password-selected" class="hover-link top-pad">Long password (14 characters)</div>-->
-                                <div class="mdl-textfield__input" type="text" id="password-selected"></div>
+                                <div class="mdl-textfield__input remove-underline" type="text" id="password-selected">
+                                    <span id="password-type-text"></span>
+                                    <button id="type-dropdown" class="inline-dropdown mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent" tabindex="-1">
+                                    <i class="material-icons">keyboard_arrow_down</i>
+                                </button>
+                                </div>
                                 <label class="mdl-textfield__label" for="password-selected">Type</label>
 
                                 <!--button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent right-align drop-down" id="password-options">
@@ -114,9 +119,9 @@
                             </ul>
 
 
-                            <div id="version-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label password-version">
+                            <div id="version-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label remove-underline password-version">
                                 <!--<input class="mdl-textfield__input" type="text" pattern="-?[0-9]*" id="version" value="1" />-->
-                                <input class="mdl-textfield__input" type="text" maxlength="3" pattern="[0-9]+" id="version" value="1" />
+                                <input class="mdl-textfield__input remove-underline" type="text" maxlength="3" pattern="[0-9]+" id="version" value="1" />
                                 <label class="mdl-textfield__label" for="version">Version</label>
                                 <span class="mdl-textfield__error">1 to 999</span>
                             </div>
