@@ -454,9 +454,9 @@ function passPhraseTimedClear() {
 */
 function passPhraseUpdated() {
   // Check if required values are present to create pass phrase
-  if (passPhrase.value.length > 0 && userName.length > 0) {
+  if (passPhrase.value.length > 0 && userName.value.length > 0) {
     // Generate and store the temporaryPhrase values
-    temporaryPhraseStore.encryptPhrase(passPhrase.value, userName)
+    temporaryPhraseStore.encryptPhrase(passPhrase.value, userName.value.trim())
       .then(function(val) {
         // If this is the chrome extension, send values to chrome extension
         sendValsToExt();
@@ -563,7 +563,7 @@ function populateOrCopyPassword() {
   /* Check if this is running within a Chrome extension and a password or
     PIN is being generated */
   if (isChromeExtension) {
-    let successToast = document.getElementById('success-toast');
+    // let successToast = document.getElementById('success-toast');
 
     // Call the extension password set function
     generateExtPassword();
@@ -578,9 +578,8 @@ function populateOrCopyPassword() {
     } else {
       /* Password will be directly inserted by ext-backgrounf.js,
         so show a password / pin inserted toast */
-      successToast.textContent = successPrefix + ' inserted';
       window.setTimeout(function() {
-        showToast(successToast, 'copy-password-div');
+        showSnackbar(successPrefix + ' inserted', 5, false);
       }, 250);
     }
   } else {
@@ -640,6 +639,10 @@ function setPassPhraseScreenState(passState) {
         Hide the pass phrase */
     // Showing the dialog
     showElement('confirm-dialog');
+    // Set the focus to the confirmation
+    window.setTimeout(function() {
+      document.getElementById('confirm-passphrase').focus();
+    });
   } else if (passState === 'failed') {
     /* An attempt to confirm the first three characters of the pass phrase
       failed.
@@ -651,7 +654,8 @@ function setPassPhraseScreenState(passState) {
     // Hide the confirm pass phrase
     hideElement('confirm-dialog');
     showElement('passphrase-div');
-    showToast('failure-toast', 'passphrase-div');
+    showSnackbar('The entered characters don\'t match your pass phrase. ' +
+      'Pass phrase cleared.', 5, true);
     window.setTimeout(function() {
       setPassPhraseScreenState('editing');
       passPhrase.focus();
@@ -790,9 +794,7 @@ function copyPasswordToClipboard() {
   try {
     // Now that we've selected the anchor text, execute the copy command
     if (document.execCommand('copy')) {
-      document.getElementById('success-toast').textContent = successPrefix +
-        ' copied to Clipboard';
-      showToast('success-toast', 'copy-password-div');
+      showSnackbar(successPrefix + ' copied to Clipboard', 5, false);
     }
   } catch (err) {
     hideElement('copy-password-div');
@@ -941,10 +943,34 @@ function runTests() {
 }
 
 /**
+* Display a snackbar message
+* @param {String} message - the message to display
+* @param {Integer} numberSeconds - the number of seconds to display the toast
+* @param {Boolean} isError - if this is an erro, the colour will be set
+*/
+function showSnackbar(message, numberSeconds, isError) {
+  // Show toast element
+  let notification = document.getElementById('open-sesame-snackbar');
+  let data = {
+    message: message,
+    timeout: (numberSeconds * 1000),
+  };
+  notification.MaterialSnackbar.showSnackbar(data);
+
+  let snackbarText = document.getElementById('open-sesame-snackbar-text');
+  if (isError) {
+    snackbarText.classList.add('snackbar-error');
+  } else {
+    snackbarText.classList.remove('snackbar-error');
+  }
+}
+
+/**
 * Display a toast message for 5 seconds
 * @param {String} toastElementName - the element to display as a toast
 * @param {String} coveredElementName - the element to cover with the toast
 */
+/*
 function showToast(toastElementName, coveredElementName) {
   // Show toast element
   hideElement(coveredElementName);
@@ -957,17 +983,18 @@ function showToast(toastElementName, coveredElementName) {
   window.setTimeout(function() {
     hideToast(toastElementName, coveredElementName);
   }, 5200);
-}
+}*/
 
 /**
 * Hide a toast message
 * @param {String} toastElementName - the element being displayed as a toast
 * @param {String} coveredElementName - the element covered with the toast
 */
+/*
 function hideToast(toastElementName, coveredElementName) {
   showElement(coveredElementName);
   hideElement(toastElementName);
-}
+}*/
 
 /**
 * Determine whether the pass phrase can be displayed or not based on

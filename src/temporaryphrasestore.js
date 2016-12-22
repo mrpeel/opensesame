@@ -1,5 +1,5 @@
 /* global Uint8Array, Promise  */
-/* global PBKDF2, convertDerivedKeyToHex, aesEncrypt, aesDecrypt, zeroVar,
+/* global pBKDF2, convertDerivedKeyToHex, aesEncrypt, aesDecrypt, zeroVar,
 zeroIntArray */
 /* global assert */
 
@@ -11,9 +11,9 @@ let TemporaryPhraseStore = function() {
 };
 
 /**
-* Encrypts the pass phrase using the name as a salt.  Runs a PBKDF2 500 times
+* Encrypts the pass phrase using the name as a salt.  Runs a pBKDF2 500 times
 * on the firsth three characters of the passphrase to generate a key.
-*     Then runs PBKDF2 250 times on the key to generate a hash to store for
+*     Then runs pBKDF2 250 times on the key to generate a hash to store for
 *     comparison later.
 *     The key is used to encrypt the data using AES and the result is stored.
 * @param {String} passphrase
@@ -37,11 +37,11 @@ TemporaryPhraseStore.prototype.encryptPhrase = function(passphrase, name) {
     if (typeof passphrase === 'string' && passphrase.length >= 3) {
       let firstThreeChars = passphrase.substring(0, 3);
 
-      PBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
+      pBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
         .then(function(key) {
           aesKey = convertDerivedKeyToHex(key);
 
-          return PBKDF2(convertDerivedKeyToHex(key), name +
+          return pBKDF2(convertDerivedKeyToHex(key), name +
             firstThreeChars, 250, 128);
         }).then(function(verificationHash) {
         tempStoreContext.threeCharHash = convertDerivedKeyToHex(
@@ -62,8 +62,8 @@ TemporaryPhraseStore.prototype.encryptPhrase = function(passphrase, name) {
 
 /**
 *  Descrypts the pass phrase using the first three chars and name.  Runs a
-*   PBKDF2 500 times on the firsth three characters of the passphrase
-* to generate a key.  Then runs PBKDF2 250 times on the key to generate a
+*   pBKDF2 500 times on the firsth three characters of the passphrase
+* to generate a key.  Then runs pBKDF2 250 times on the key to generate a
 * hash.  The generated hash is compared to the stored hash.  If they
 * match, the key used to decrypt the pass phrase using AES.  If not, the
 * encrypted data and has are cleared.
@@ -94,12 +94,12 @@ TemporaryPhraseStore.prototype.decryptPhrase = function(firstThreeChars, name) {
       reject(
         'First three characters parameter is not a 3 character string');
     } else {
-      PBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
+      pBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
         .then(function(key) {
           aesKey = convertDerivedKeyToHex(key);
           // console.log('Key: ' + aesKey);
 
-          return PBKDF2(convertDerivedKeyToHex(key), name +
+          return pBKDF2(convertDerivedKeyToHex(key), name +
             firstThreeChars, 250, 128);
         }).then(function(verificationHash) {
         // console.log('Stored hash: ' + tempStoreContext.threeCharHash);

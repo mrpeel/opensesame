@@ -43,6 +43,7 @@
             <section class="section--center mdl-grid password-grid overflow-x-visible">
                 <div class="mdl-card mdl-cell mdl-cell--6-col mdl-cell--3-offset-desktop mdl-cell--1-offset-tablet mdl-shadow--2dp overflow-x-visible primary-card">
 
+
                     <!--Passphrase char confirmation dialog-->
                     <div id="confirm-dialog" class="overlay hidden">
 
@@ -70,14 +71,6 @@
                     </div>
 
                     <div class="mdl-color--accent text--white card-header">
-                        <!--div class="mdl-color--blue-700 text--white card-header"-->
-
-                        <!--<div class="header-circle mdl-color--teal-600">
-                            <!--<button id="header-key" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon circle-icon-tall">
-                                <i class="material-icons circle-icon-tall">
-</i>
-                            </button>
-                        </div>-->
                         <h4 class="header-text" id="header-key">Open Sesame</h4>
                         <!--<div class="header-upper-right">
                             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent mdl-color-text--white icon-uper-right" id="password-options">
@@ -134,9 +127,9 @@
 
                         <div>&nbsp;</div>
 
-                        <div class="mdl-color-text--primary" for="password-selected">Password options</div>
+                        <div class="mdl-color-text--primary" for="password-selected">Password</div>
 
-                        <div id="password-type-div row-flex">
+                        <div id="password-type-div" class="row-flex left-indent">
                             <div id="password-type" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label flex-element is-dirty">
                                 <!--<div id="password-selected" class="hover-link top-pad">Long password (14 characters)</div>-->
                                 <div class="mdl-textfield__input" type="text" id="password-selected"></div>
@@ -161,7 +154,7 @@
 
                             <div id="version-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label password-version">
                                 <!--<input class="mdl-textfield__input" type="text" pattern="-?[0-9]*" id="version" value="1" />-->
-                                <input class="mdl-textfield__input" type="number" min="1" max="999" id="version" value="1">
+                                <input class="mdl-textfield__input" type="text" maxlength="3" pattern="[0-9]+" id="version" value="1">
                                 <label class="mdl-textfield__label" for="version">Version</label>
                                 <span class="mdl-textfield__error">1 to 999</span>
                             </div>
@@ -224,13 +217,6 @@
 
                     </button>
                     <div class="mdl-layout__content mdl-card__supporting-text">
-                        <div id="load-bar-ball" class="loader-four-balls hidden">
-                            <div class="load-ball"></div>
-                            <div class="load-ball"></div>
-                            <div class="load-ball"></div>
-                            <div class="load-ball"></div>
-                        </div>
-                        <!--<div id="load-bar-password" class="loader hidden"></div>-->
                         <div class="password-div">
                             <span id="password" class="password"></span>
                         </div>
@@ -248,12 +234,20 @@
 
                 </div>
 
+
                 <div id="update-message" class="update-message hidden">
                     <div class="update-message-text"><span>Open Sesame is about to update ...</span><span id="count-down-value" class="update-countdown-value"></span></div>
                 </div>
 
 
             </section>
+
+            <!--Snackbar / toast div -->
+            <div id="open-sesame-snackbar" class="mdl-js-snackbar mdl-snackbar snackbar-os">
+                <div id="open-sesame-snackbar-text" class="mdl-snackbar__text"></div>
+                <button class="mdl-snackbar__action" type="button"></button>
+            </div>
+
 
         </div>
 
