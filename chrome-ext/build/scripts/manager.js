@@ -15,6 +15,7 @@ let passPhrase;
 let domainName;
 let securityQuestion;
 let userName;
+let userNameDropDown;
 let type;
 let version;
 let bodyNode;
@@ -129,6 +130,7 @@ window.addEventListener('load', function() {
   /* Set-up global variables for the UI elements */
   domainName = document.getElementById('domain');
   userName = document.getElementById('user-name');
+  userNameDropDown = document.getElementById('username-dropdown');
   passPhrase = document.getElementById('passphrase');
   securityQuestion = document.getElementById('security-question');
   type = document.getElementById('type');
@@ -269,6 +271,20 @@ window.addEventListener('load', function() {
 }, false);
 
 /**
+* When values are populated from the background page to the pop-up page, this
+* function sets the is-dirty class to ensure that labels are rendered
+* correctly above the inpt fields
+* @param {String} pElement - the name if the element being populated
+* @param {String} pValue - the value for the element
+*/
+function populateValue(pElement, pValue) {
+  pElement.value = pValue;
+  if (pValue.length > 0) {
+    pElement.parentElement.classList.add('is-dirty');
+  }
+}
+
+/**
 * Close the dialog element
 */
 function closeDialog() {
@@ -286,12 +302,12 @@ function checkVersion() {
   let versionVal = version.value;
   versionVal = versionVal.replace(/[^0-9]/g, '');
   if (versionVal === '') {
+    populateValue(version, '1');
     versionVal = '1';
-    version.parentElement.classList.add('is-dirty');
   } else if (versionVal.length > 3) {
     versionVal = versionVal.substring(0, 3);
   }
-  version.value = versionVal;
+  populateValue(version, versionVal);
   version.parentElement.classList.remove('is-invalid');
 }
 
@@ -890,6 +906,56 @@ function setType(passwordSelection) {
   }
   // Clear password and hide password div
   clearPassword();
+}
+
+/**
+* Clears the list of usernames in the drop down and hides arrow button
+*/
+function clearUserNames() {
+  let userNames = document.getElementById('loaded-usernames');
+  while (userNames.firstChild) {
+    userNames.removeChild(userNames.firstChild);
+  }
+  userNameDropDown.classList.add('hidden');
+}
+
+/**
+* Populates  the list of usernames in the drop down and makes it visible
+* @param {Array} names - the names to list in the drop down
+*/
+function loadUserNames(names) {
+  if (names.length) {
+    let userNames = document.getElementById('loaded-usernames');
+    names.forEach(function(name) {
+      let nameItem = document.createElement('li');
+      nameItem.appendChild(document.createTextNode(name));
+      nameItem.setAttribute('id', name);
+      nameItem.classList.add('mdl-menu__item', 'menu-dropdown');
+      userNames.appendChild(nameItem);
+      nameItem.addEventListener('click', chooseName, false);
+    });
+    userNameDropDown.classList.remove('hidden');
+  }
+}
+
+/**
+* Calls the setUserName to set the function to the value of the current
+*  drop-down list item
+*/
+function chooseName() {
+  setUserName(this.id);
+}
+
+/**
+* Sets the username
+* @param {Array} name - the user name
+*/
+function setUserName(name) {
+  let userNames = document.getElementById('loaded-usernames');
+
+  populateValue(userName, name);
+  passPhrase.focus();
+  userNames.MaterialMenu.hide();
 }
 
 /**

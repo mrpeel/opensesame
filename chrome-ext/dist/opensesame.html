@@ -80,6 +80,17 @@
                             <input class="mdl-textfield__input" type="text" id="user-name" />
                             <label class="mdl-textfield__label" for="user-name">User name *</label>
                             <span class="mdl-textfield__error">required</span>
+                            <button id="username-dropdown" class="inline-dropdown right-align mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent" tabindex="-1">
+                            <i class="material-icons">keyboard_arrow_down</i>
+                          </button>
+
+
+                            <ul id="loaded-usernames" class="mdl-menu mdl-js-menu mdl-menu--bottom-right" for="username-dropdown">
+                                <li id="neilkloot" class="mdl-menu__item menu-dropdown">neilkloot</li>
+                                <li id="mrpeel" class="mdl-menu__item menu-dropdown">mrpeel</li>
+                                <li id="neilatjb" class="mdl-menu__item menu-dropdown">neilatjb</li>
+                                <li id="neilatlv@gmail.com" class="mdl-menu__item menu-dropdown">neilatlv@gmail.com</li>
+                            </ul>
                         </div>
 
                         <div id="failure-toast" class="toast main-card hidden">

@@ -1,6 +1,6 @@
 /* global chrome, document, passPhrase, password,
   domainName, passwordType, setType, temporaryPhraseStore,
-  setPassPhraseScreenState, userName, securityQuestion, */
+  setPassPhraseScreenState, userName, securityQuestion, populateValue */
 
 /* exported generateExtPassword,  extHasPassword, storeExtVals, storeExtPhrase
     clearExtPhrase */
@@ -132,18 +132,4 @@ function clearExtPhrase() {
   chrome.runtime.sendMessage({
     'message': 'clear_stored_phrase',
   });
-}
-
-/**
-* When values are populated from the background page to the pop-up page, this
-* function sets the is-dirty class to ensure that labels are rendered
-* correctly above the inpt fields
-* @param {String} pElement - the name if the element being populated
-* @param {String} pValue - the value for the element
-*/
-function populateValue(pElement, pValue) {
-  pElement.value = pValue;
-  if (pValue.length > 0) {
-    pElement.parentElement.classList.add('is-dirty');
-  }
 }
