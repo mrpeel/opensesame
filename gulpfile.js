@@ -62,12 +62,6 @@ gulp.task('buildserviceworker', ['clean'], function() {
     }))
     .pipe(replace({
       patterns: [{
-        match: 'manager-jsref',
-        replacement: 'manager.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
         match: 'crypto-jsref',
         replacement: 'cryptofunctions.js',
       }],
@@ -76,6 +70,18 @@ gulp.task('buildserviceworker', ['clean'], function() {
       patterns: [{
         match: 'phrasestore-jsref',
         replacement: 'temporaryphrasestore.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'firebase-jsref',
+        replacement: 'fb-auth.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'manager-jsref',
+        replacement: 'manager.js',
       }],
     }))
     .pipe(gulp.dest('./build/'));
@@ -113,8 +119,8 @@ gulp.task('distserviceworker', ['buildserviceworker'], function() {
     }))
     .pipe(replace({
       patterns: [{
-        match: 'manager-jsref',
-        replacement: 'manager.min.js',
+        match: 'firebase-jsref',
+        replacement: 'fb-auth.min.js',
       }],
     }))
     .pipe(replace({
@@ -128,7 +134,14 @@ gulp.task('distserviceworker', ['buildserviceworker'], function() {
         match: 'phrasestore-jsref',
         replacement: 'temporaryphrasestore.min.js',
       }],
-    })).pipe(gulp.dest('./dist/'));
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'manager-jsref',
+        replacement: 'manager.min.js',
+      }],
+    }))
+    .pipe(gulp.dest('./dist/'));
 });
 
 /* Build the html for the stand alone website version of Open Sesame.
@@ -155,12 +168,6 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
     }))
     .pipe(replace({
       patterns: [{
-        match: 'manager-jsref',
-        replacement: 'manager.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
         match: 'crypto-jsref',
         replacement: 'cryptofunctions.js',
       }],
@@ -169,6 +176,18 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
       patterns: [{
         match: 'phrasestore-jsref',
         replacement: 'temporaryphrasestore.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'firebase-jsref',
+        replacement: 'fb-auth.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'manager-jsref',
+        replacement: 'manager.js',
       }],
     }))
     .pipe(replace({
@@ -203,12 +222,6 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
     }))
     .pipe(replace({
       patterns: [{
-        match: 'manager-jsref',
-        replacement: 'manager.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
         match: 'crypto-jsref',
         replacement: 'cryptofunctions.min.js',
       }],
@@ -217,6 +230,18 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
       patterns: [{
         match: 'phrasestore-jsref',
         replacement: 'temporaryphrasestore.min.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'firebase-jsref',
+        replacement: 'fb-auth.min.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'manager-jsref',
+        replacement: 'manager.min.js',
       }],
     }))
     .pipe(replace({
@@ -238,7 +263,7 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
 gulp.task('copybuildjs', ['buildstandalonehtml'], function() {
   gulp.src(['src/simple_assert.js', 'src/passoff.js', 'src/manager.js',
     'src/cryptofunctions.js', 'src/temporaryphrasestore.js',
-    'src/opensesame.js',
+    'src/opensesame.js', 'src/fb-auth.js',
   ])
     .pipe(gulp.dest('./build/scripts/'))
     .pipe(gulp.dest('./chrome-ext/build/scripts/'));
@@ -295,6 +320,14 @@ gulp.task('minifyjs', ['copybuildjs'], function() {
 
   gulp.src(['src/cryptofunctions.js'])
     .pipe(rename('cryptofunctions.min.js'))
+    .pipe(uglify({
+      mangle: false,
+    }).on('error', gutil.log))
+    .pipe(gulp.dest('./dist/scripts/'))
+    .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
+
+  gulp.src(['src/fb-auth.js'])
+    .pipe(rename('fb-auth.min.js'))
     .pipe(uglify({
       mangle: false,
     }).on('error', gutil.log))
@@ -418,6 +451,12 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
     }))
     .pipe(replace({
       patterns: [{
+        match: 'firebase-jsref',
+        replacement: 'fb-auth.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
         match: 'ext-popup-jsref-jsref',
         replacement: 'ext-popup.js',
       }],
@@ -459,6 +498,12 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
       patterns: [{
         match: 'phrasestore-jsref',
         replacement: 'temporaryphrasestore.min.js',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'firebase-jsref',
+        replacement: 'fb-auth.min.js',
       }],
     }))
     .pipe(replace({

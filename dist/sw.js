@@ -1,15 +1,16 @@
 /* global self, caches, Promise, fetch */
 
-let staticCacheName = 'open-sesame-v1482561910466';
+let staticCacheName = 'open-sesame-v1482830649336';
 let preCache = [
   'lib/material.min.css',
   'lib/material.min.js',
   'css/opensesame.min.css',
   'scripts/simple_assert.min.js',
   'scripts/opensesame.min.js',
-  'scripts/manager.min.js',
   'scripts/cryptofunctions.min.js',
   'scripts/temporaryphrasestore.min.js',
+  'scripts/fb-auth.min.js',
+  'scripts/manager.min.js',
   'images/favicon.ico',
 ];
 let opaqueCacheOnRequest = [

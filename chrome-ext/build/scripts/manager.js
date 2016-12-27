@@ -10,8 +10,6 @@ window['setPassChangeRequired'] = setPassChangeRequired;
 
 // Global variables for UI elements
 let passPhrase;
-// let givenName;
-// let familyName;
 let domainName;
 let securityQuestion;
 let userName;
@@ -26,9 +24,15 @@ let isChromeExtension;
 let requiredElements = ['domain', 'user-name', 'passphrase'];
 
 // Variable for processing
-let openSesame;
-let temporaryPhraseStore;
+
+/* Set up the classes for password calculation and temporary pass
+  phrase storage */
+const openSesame = new OpenSesame();
+const temporaryPhraseStore = new TemporaryPhraseStore();
+const fbAuth = new FBAuth(firebaseDataCallback, firebaseDataCallback);
+
 let passwordType;
+let domainValues;
 let lastPassGenTimeStamp;
 let successPrefix;
 let passPhraseState;
@@ -121,11 +125,6 @@ window.addEventListener('load', function() {
     }
   }, false);
 
-
-  /* Set up the classes for password calculation and temporary pass
-    phrase storage */
-  openSesame = new OpenSesame();
-  temporaryPhraseStore = new TemporaryPhraseStore();
 
   /* Set-up global variables for the UI elements */
   domainName = document.getElementById('domain');
@@ -269,6 +268,161 @@ window.addEventListener('load', function() {
     });
   }
 }, false);
+
+/**
+* Callback function to receive data when firebase data is loaded
+*
+* @param {String} firebaseDomainValues - the domain values retrieved from
+*                                        firebase
+*/
+function firebaseDataCallback(firebaseDomainValues) {
+  let domainString = JSON.stringify(firebaseDomainValues)
+    .replace(/--dot--/g, '.');
+  domainValues = JSON.parse(domainString);
+
+  console.log(domainValues);
+}
+
+/**
+* If user is authenticated, retrieves and sets user names(s) associated with the
+* domain
+* @param {String} domain - the domain
+*/
+function setDomainUserNames(domain) {
+  // Clear any user names listed
+  clearUserNames();
+
+  if (domainValues && domainValues[domain]) {
+    // Set user name values
+    let domainVals = domainValues[domain];
+    let userNames = [];
+
+    // Retrieve unique user name values
+    domainVals.forEach(function(domainVal) {
+      if (userNames.indexOf(domainVal.userName) === 0) {
+        userNames.push(domainVal.userName);
+      }
+    });
+
+    // Load user names into drop down list
+    loadUserNames(userNames);
+  }
+}
+
+/**
+* If user is authenticated, retrieves and sets the password types
+* for the domain & user name combination
+* @param {String} domain - the domain
+* @param {String} userName - the userName
+*/
+function setUserNamePasswordTypes(domain, userName) {
+  // Clear any user names listed
+  resetPasswordTypesUsed();
+
+  if (domainValues && domainValues[domain] && domainValues[domain][userName]) {
+    // Set user name values
+    let passwordTypeVals = domainValues[domain][userName];
+    let mostRecentTimeStamp = 0;
+    let mostRecentpasswordType = '';
+
+    // Retrieve unique user name values
+    passwordTypeVals.forEach(function(passwordTypeVal) {
+      let typeReference = document.getElementById(passwordTypeVal.passwordType);
+
+      if (typeReference) {
+        typeReference.classList.add('green-text');
+        // Check if this is the most recently used password type
+        if (passwordTypeVal.lastUsed > mostRecentTimeStamp) {
+          mostRecentTimeStamp = passwordTypeVal.lastUsed;
+          mostRecentpasswordType = passwordTypeVal.passwordType;
+        }
+      }
+    });
+
+    // If a most recent password type exists, set it as the default type
+    if (mostRecentpasswordType !== '') {
+      setType(mostRecentpasswordType);
+    }
+  }
+}
+
+/**
+* If user is authenticated, retrieves the version to use with a supplied
+* for the domain,  user name and password type combination
+* @param {String} domain - the domain
+* @param {String} userName - the userName
+* @param {String} passwordType - the password type
+*/
+function setUserNamePasswordTypeVersion(domain, userName, passwordType) {
+  if (domainValues && domainValues[domain] && domainValues[domain][userName]) {
+    // Loop through values and set the version when the correct value is found
+    let passwordTypeVals = domainValues[domain][userName];
+
+    // Retrieve unique user name values
+    for (let valCnt = 0; valCnt < passwordTypeVals.length; valCnt++) {
+      if (passwordType === passwordTypeVals[valCnt].passwordType &&
+        passwordTypeVals[valCnt].passwordVersion) {
+        version.value = passwordTypeVal.passwordVersion;
+        return;
+      }
+    }
+  }
+}
+
+/**
+* Clears colors from drop down list items for password types
+*/
+function resetPasswordTypesUsed() {
+  // Clear any password types used
+  for (let lCounter = 0; lCounter < type.children.length; lCounter++) {
+    type.children[lCounter].classList.remove('green-text');
+  }
+}
+
+/**
+* If user is authenticated, retrieves the value(s) associated with the user
+* @return {Promise}  - promise which contains the user values or null
+*                       if the user is not auhtenticated
+*/
+function retrieveUserValues() {
+  return new Promise(function(resolve, reject) {
+    let userId = fbAuth.getUserId();
+
+    if (userId) {
+      return firebase.database().ref('/users/' + userId)
+        .once('value')
+        .then(function(snapshot) {
+          resolve(snapshot.val());
+        });
+    } else {
+      resolve(null);
+    }
+  });
+}
+
+/**
+* When a password is generated, if the user is authenticated
+*  the meta-data is sent to firebase
+* @param {String} domain - the domain name
+* @param {String} userName - the username
+* @param {String} passwordType - the type of password generated
+* @param {String} passwordVersion - the version of password generated
+*/
+function setDomainValue(domain, userName, passwordType, passwordVersion) {
+  let userId = fbAuth.getUserId();
+  let domainValue = domain.replace('.', '--dot--');
+
+
+  if (userId) {
+    firebase.database().ref('users/' + userId + '/domains/' + domainValue +
+      '/usernames/' + userName)
+      .update({
+        passwordType: passwordType,
+        passwordVersion: passwordVersion,
+        lastUsed: Date.now(),
+      });
+  }
+}
 
 /**
 * When values are populated from the background page to the pop-up page, this

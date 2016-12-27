@@ -31,11 +31,16 @@ html, body {
 }
 
 .mdl-textfield .inline-dropdown {
-  bottom: 0.7em;
+    bottom: 0.7em;
+}
+
+.green-text {
+  color: #388E3C;
+  font-weight: 500;
 }
 
 .remove-underline {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .flex-element {
@@ -57,8 +62,9 @@ html, body {
 }
 
 .left-indent {
-  padding-left: 2px;
+    padding-left: 2px;
 }
+
 
 /* card */
 
@@ -191,10 +197,12 @@ html, body {
         left: 0;
     }
 }
+
 @media (min-width: 480px) {
-.mdl-snackbar--active {
-    -webkit-transform: none;
-    transform: none;
+    .mdl-snackbar--active {
+        -webkit-transform: none;
+        transform: none;
+    }
 }
 
 .snackbar-error {
@@ -203,6 +211,7 @@ html, body {
 
 
 /* Toast */
+
 .toast {
     z-index: 2;
     opacity: 0.8;
@@ -228,7 +237,9 @@ html, body {
     border-radius: 2px;
 }
 
+
 /* Update message */
+
 .update-message {
     position: absolute;
     bottom: 24px;

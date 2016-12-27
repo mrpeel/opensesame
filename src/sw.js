@@ -7,9 +7,10 @@ let preCache = [
   'css/@@cssfile',
   'scripts/@@assert-jsref',
   'scripts/@@opensesame-jsref',
-  'scripts/@@manager-jsref',
   'scripts/@@crypto-jsref',
   'scripts/@@phrasestore-jsref',
+  'scripts/@@firebase-jsref',
+  'scripts/@@manager-jsref',
   'images/favicon.ico',
 ];
 let opaqueCacheOnRequest = [

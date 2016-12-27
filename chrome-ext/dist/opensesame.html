@@ -80,16 +80,12 @@
                             <input class="mdl-textfield__input" type="text" id="user-name" />
                             <label class="mdl-textfield__label" for="user-name">User name *</label>
                             <span class="mdl-textfield__error">required</span>
-                            <button id="username-dropdown" class="inline-dropdown right-align mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent" tabindex="-1">
+                            <button id="username-dropdown" class="inline-dropdown right-align mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent hidden" tabindex="-1">
                             <i class="material-icons">keyboard_arrow_down</i>
                           </button>
 
 
                             <ul id="loaded-usernames" class="mdl-menu mdl-js-menu mdl-menu--bottom-right" for="username-dropdown">
-                                <li id="neilkloot" class="mdl-menu__item menu-dropdown">neilkloot</li>
-                                <li id="mrpeel" class="mdl-menu__item menu-dropdown">mrpeel</li>
-                                <li id="neilatjb" class="mdl-menu__item menu-dropdown">neilatjb</li>
-                                <li id="neilatlv@gmail.com" class="mdl-menu__item menu-dropdown">neilatlv@gmail.com</li>
                             </ul>
                         </div>
 
@@ -134,7 +130,7 @@
                             </div>
 
                             <ul id="type" class="mdl-menu mdl-js-menu mdl-menu--top-left" for="password-selected">
-                                <li id="maximum-password" class="mdl-menu__item menu-dropdown">Maximum password (20 characters)</li>
+                                <li id="maximum-password" class="mdl-menu__item menu-dropdown green-text">Maximum password (20 characters)</li>
                                 <li id="long-password" class="mdl-menu__item menu-dropdown">Long password (14 characters)</li>
                                 <li id="medium-password" class="mdl-menu__item menu-dropdown">Medium password (8 characters)</li>
                                 <li id="basic-password" class="mdl-menu__item menu-dropdown">Basic password (8 letters / numbers)</li>
@@ -248,13 +244,15 @@
 </div>
 
 
-
-    <script defer src="lib/material.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-database.js"></script>    <script defer src="lib/material.min.js"></script>
     <script src="scripts/simple_assert.min.js"></script>
     <script src="scripts/opensesame.min.js"></script>
-    <script src="scripts/manager.min.js"></script>
     <script src="scripts/cryptofunctions.min.js"></script>
     <script src="scripts/temporaryphrasestore.min.js"></script>
+    <script src="scripts/fb-auth.min.js"></script>
+    <script src="scripts/manager.min.js"></script>
     <script src="scripts/@@ext-popup-jsref"></script>
 
 </body>
