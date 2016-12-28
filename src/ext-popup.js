@@ -1,4 +1,4 @@
-/* global chrome, document, passPhrase, password,
+/* global chrome, document, passPhrase, password, trimDomainName,
   domainName, passwordType, setType, temporaryPhraseStore,
   setPassPhraseScreenState, userName, securityQuestion, populateValue */
 
@@ -72,6 +72,8 @@ chrome.runtime.onMessage.addListener(
 
         setValuePopulated(passPhrase);
         setPassPhraseScreenState('stored');
+        // Call domain name prep function
+        trimDomainName();
       } else {
         // Pass phrase is not stored at all and is in standard editing mode
         setPassPhraseScreenState('editing');

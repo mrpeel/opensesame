@@ -130,6 +130,52 @@ let OpenSesame = function() {
 }; */
 
 /**
+ * Prepares a supplied domain name into its base domain
+ * @param {String} domainName the starting domain
+ * @return {String} the trimmed domain`
+ */
+OpenSesame.prototype.prepareDomain = function(domainName) {
+  let posDomain = 0;
+  let domainParts;
+  let calculatedDomain = '';
+  let domainCountryCode = '';
+
+  /* Retrieve domain value and trim the leading http://  or https://  */
+  let fullDomain = domainName.trim().replace(/^https?:\/\//g, '').toLowerCase();
+
+  /* Check whether the whole URL is there - remove anything with a '/'
+    onwards */
+  posDomain = fullDomain.indexOf('/');
+  if (posDomain > 0) {
+    fullDomain = fullDomain.substr(0, posDomain);
+  }
+
+  // Split base domain into its individual elements
+  domainParts = fullDomain.split('.');
+
+  /* Check whether the last domain element is a country code suffix, eg
+      mrpeeel.com.au, if so record it and remove it from the main compoments */
+  if (domainParts.length > 1 &&
+    openSesame.countryTLDs.indexOf(domainParts[domainParts.length - 1])
+    >= 0) {
+    // Save the country code and remove from domain elements array
+    domainCountryCode = '.' + domainParts[domainParts.length - 1];
+    domainParts = domainParts.slice(0, -1);
+  }
+
+  // if there are more than 2 elements remaining, only keep the last two
+  // eg photos.google.com = google.com, mail.google.com = google.com
+  if (domainParts.length > 2) {
+    domainParts = domainParts.slice(-2);
+  }
+
+  // Re-assemble base domain into final value with country code
+  calculatedDomain = domainParts.join('.') + domainCountryCode;
+
+  return calculatedDomain;
+};
+
+/**
  * Runs the generation of a password by generating a key (PBKDF2) and then
   using that key to sign (HMAC256) the constructed domain value
  * @param {String} userName the website username
@@ -184,43 +230,9 @@ OpenSesame.prototype.generatePassword = function(userName, passPhrase,
       // Set up parameters for PBKDF2 and HMAC functions
       let userNameValue = userName.trim().toLowerCase();
       let salt = passNS + '.' + userNameValue;
-      let posDomain = 0;
-      let domainParts;
-      let calculatedDomain = '';
-      let domainCountryCode = '';
 
-      /* Retrieve domain value and trim the leading http://  or https://  */
-      let fullDomain = domainName.replace(/^https?:\/\//g, '').toLowerCase();
-
-      /* Check whether the whole URL is there - remove anything with a '/'
-        onwards */
-      posDomain = fullDomain.indexOf('/');
-      if (posDomain > 0) {
-        fullDomain = fullDomain.substr(0, posDomain);
-      }
-
-      // Split base domain into its individual elements
-      domainParts = fullDomain.split('.');
-
-      /* Check whether the last domain element is a country code suffix, eg
-          mrpeeel.com.au */
-      if (domainParts.length > 1 &&
-        openSesame.countryTLDs.indexOf(domainParts[domainParts.length - 1])
-        >= 0) {
-        // Save the country code and remove from domain elements array
-        domainCountryCode = '.' + domainParts[domainParts.length - 1];
-        domainParts = domainParts.slice(0, -1);
-      }
-
-      // if there are more than 2 elements remaining, only keep the last two
-      // eg photos.google.com = google.com, mail.google.com = google.com
-      if (domainParts.length > 2) {
-        domainParts = domainParts.slice(-2);
-      }
-
-      // Re-assemble base domain into final value with country code
-      calculatedDomain = domainParts.join('.') + domainCountryCode;
-
+      // Convert domain name to calulated domain
+      let calculatedDomain = openSesame.prepareDomain(domainName);
       // Add user to domain value
       calculatedDomain = userNameValue + version + '@' + calculatedDomain;
 

@@ -163,13 +163,13 @@ window.addEventListener('load', function() {
     clearPassword();
   }, false);
 
-  version.addEventListener('focusout', checkVersion, false);
+  // version.addEventListener('focusout', checkVersion, false);
   version.addEventListener('blur', checkVersion, false);
 
   // Set the pass phrase viewer button when it receieves the focus
   passPhrase.addEventListener('focus', showPassPhraseDisplayButton, false);
-  passPhrase.addEventListener('focusin', showPassPhraseDisplayButton, false);
-  passPhrase.addEventListener('focusout', passPhraseUpdated, false);
+  /* passPhrase.addEventListener('focusin', showPassPhraseDisplayButton, false);
+  passPhrase.addEventListener('focusout', passPhraseUpdated, false); */
   passPhrase.addEventListener('blur', passPhraseUpdated, false);
 
   /* After pass phrase confirmation has been updated, check whether it is OK
@@ -180,22 +180,22 @@ window.addEventListener('load', function() {
   /* Make sure the pass phrase viewer button is hidden when pass phrase
     doesn't have the foxu */
   userName.addEventListener('focus', hidePassPhraseDisplayButton, false);
-  userName.addEventListener('focusin', hidePassPhraseDisplayButton, false);
+  /* userName.addEventListener('focusin', hidePassPhraseDisplayButton, false);
   userName.addEventListener('focusout', function() {
     userNameUpdate();
     sendValsToExt();
-  }, false);
+  }, false); */
   userName.addEventListener('blur', function() {
     userNameUpdate();
     sendValsToExt();
   }, false);
 
   domainName.addEventListener('focus', hidePassPhraseDisplayButton, false);
-  domainName.addEventListener('focusin', hidePassPhraseDisplayButton, false);
+  /* domainName.addEventListener('focusin', hidePassPhraseDisplayButton, false);
   domainName.addEventListener('focusout', function() {
     trimDomainName();
     sendValsToExt();
-  }, false);
+  }, false); */
   domainName.addEventListener('blur', function() {
     trimDomainName();
     sendValsToExt();
@@ -203,9 +203,9 @@ window.addEventListener('load', function() {
 
   securityQuestion.addEventListener('focus', hidePassPhraseDisplayButton,
     false);
-  securityQuestion.addEventListener('focusin', hidePassPhraseDisplayButton,
+  /* securityQuestion.addEventListener('focusin', hidePassPhraseDisplayButton,
     false);
-  securityQuestion.addEventListener('focusout', sendValsToExt, false);
+  securityQuestion.addEventListener('focusout', sendValsToExt, false); */
   securityQuestion.addEventListener('blur', sendValsToExt, false);
 
   // Add open and close for options section
@@ -216,7 +216,9 @@ window.addEventListener('load', function() {
      Loop through different values within password type drop down and add one
      listener for each value */
   for (let lCounter = 0; lCounter < type.children.length; lCounter++) {
-    type.children[lCounter].addEventListener('click', chooseType, false);
+    if (type.children[lCounter].nodeName === 'LI') {
+      type.children[lCounter].addEventListener('click', chooseType, false);
+    }
   }
 
   // Run tests when the header is clicked
@@ -281,6 +283,9 @@ function firebaseDataCallback(firebaseDomainValues) {
   domainValues = JSON.parse(domainString);
 
   console.log(domainValues);
+  if (domainName.value !== '') {
+    setDomainUserNames(openSesame.prepareDomain(domainName.value));
+  }
 }
 
 /**
@@ -292,20 +297,45 @@ function setDomainUserNames(domain) {
   // Clear any user names listed
   clearUserNames();
 
-  if (domainValues && domainValues[domain]) {
+  if (domainValues && domainValues[domain] &&
+    domainValues[domain]['usernames']) {
     // Set user name values
-    let domainVals = domainValues[domain];
+    let domainUsers = domainValues[domain]['usernames'];
     let userNames = [];
+    let mostRecentTimeStamp = 0;
+    let mostRecentUserName = '';
 
     // Retrieve unique user name values
-    domainVals.forEach(function(domainVal) {
-      if (userNames.indexOf(domainVal.userName) === 0) {
-        userNames.push(domainVal.userName);
+    Object.keys(domainUsers).forEach(function(domainUser) {
+      if (domainUser.indexOf(domainUser) === 0) {
+        userNames.push(domainUser);
       }
+      let passwordTypeVals = domainValues[domain].usernames[domainUser];
+
+      /* Retrieve individual password values to check the timestamps
+         for the most recent username */
+      Object.keys(passwordTypeVals).forEach(function(passwordType) {
+        // Check if this is the most recently used user name
+        if (passwordTypeVals[passwordType].lastUsed > mostRecentTimeStamp) {
+          mostRecentTimeStamp = passwordTypeVals[passwordType].lastUsed;
+          mostRecentUserName = domainUser;
+        }
+      });
     });
+
+    if (mostRecentUserName !== '') {
+      populateValue(userName, mostRecentUserName);
+    }
 
     // Load user names into drop down list
     loadUserNames(userNames);
+
+    if (userName.value !== '') {
+      userNameUpdate();
+    }
+  } else {
+    setType('long-password');
+    version.value = 1;
   }
 }
 
@@ -319,30 +349,38 @@ function setUserNamePasswordTypes(domain, userName) {
   // Clear any user names listed
   resetPasswordTypesUsed();
 
-  if (domainValues && domainValues[domain] && domainValues[domain][userName]) {
+  if (domainValues && domainValues[domain] &&
+    domainValues[domain].usernames[userName]) {
     // Set user name values
-    let passwordTypeVals = domainValues[domain][userName];
+    let passwordTypeVals = domainValues[domain].usernames[userName];
     let mostRecentTimeStamp = 0;
-    let mostRecentpasswordType = '';
+    let mostRecentPasswordType = '';
 
     // Retrieve unique user name values
-    passwordTypeVals.forEach(function(passwordTypeVal) {
-      let typeReference = document.getElementById(passwordTypeVal.passwordType);
+    Object.keys(passwordTypeVals).forEach(function(passwordType) {
+      let typeReference = document.getElementById(passwordType);
+      let typeTooltip = document.getElementById(passwordType + '-tooltip');
 
       if (typeReference) {
         typeReference.classList.add('green-text');
+        typeTooltip.classList.remove('hidden');
         // Check if this is the most recently used password type
-        if (passwordTypeVal.lastUsed > mostRecentTimeStamp) {
-          mostRecentTimeStamp = passwordTypeVal.lastUsed;
-          mostRecentpasswordType = passwordTypeVal.passwordType;
+        if (passwordTypeVals[passwordType].lastUsed > mostRecentTimeStamp) {
+          mostRecentTimeStamp = passwordTypeVals[passwordType].lastUsed;
+          typeTooltip.innerText = relativeDate(passwordTypeVals[passwordType]
+            .lastUsed);
+          mostRecentPasswordType = passwordType;
         }
       }
     });
 
     // If a most recent password type exists, set it as the default type
-    if (mostRecentpasswordType !== '') {
-      setType(mostRecentpasswordType);
+    if (mostRecentPasswordType !== '') {
+      setType(mostRecentPasswordType);
     }
+  } else {
+    setType('long-password');
+    version.value = 1;
   }
 }
 
@@ -354,18 +392,20 @@ function setUserNamePasswordTypes(domain, userName) {
 * @param {String} passwordType - the password type
 */
 function setUserNamePasswordTypeVersion(domain, userName, passwordType) {
-  if (domainValues && domainValues[domain] && domainValues[domain][userName]) {
+  if (domainValues && domainValues[domain] &&
+    domainValues[domain].usernames[userName]) {
     // Loop through values and set the version when the correct value is found
-    let passwordTypeVals = domainValues[domain][userName];
+    let passwordTypeVals = domainValues[domain].usernames[userName];
 
-    // Retrieve unique user name values
-    for (let valCnt = 0; valCnt < passwordTypeVals.length; valCnt++) {
-      if (passwordType === passwordTypeVals[valCnt].passwordType &&
-        passwordTypeVals[valCnt].passwordVersion) {
-        version.value = passwordTypeVal.passwordVersion;
+    Object.keys(passwordTypeVals).forEach(function(passwordTypeKey) {
+      if (passwordTypeKey === passwordType &&
+        passwordTypeVals[passwordTypeKey].passwordVersion) {
+        version.value = passwordTypeVals[passwordTypeKey].passwordVersion;
         return;
       }
-    }
+    });
+  } else {
+    version.value = 1;
   }
 }
 
@@ -375,7 +415,13 @@ function setUserNamePasswordTypeVersion(domain, userName, passwordType) {
 function resetPasswordTypesUsed() {
   // Clear any password types used
   for (let lCounter = 0; lCounter < type.children.length; lCounter++) {
-    type.children[lCounter].classList.remove('green-text');
+    if (type.children[lCounter].nodeName === 'LI') {
+      // Remove text highlighting
+      type.children[lCounter].classList.remove('green-text');
+    } else {
+      // Hide tool tip
+      type.children[lCounter].classList.add('hidden');
+    }
   }
 }
 
@@ -383,7 +429,7 @@ function resetPasswordTypesUsed() {
 * If user is authenticated, retrieves the value(s) associated with the user
 * @return {Promise}  - promise which contains the user values or null
 *                       if the user is not auhtenticated
-*/
+
 function retrieveUserValues() {
   return new Promise(function(resolve, reject) {
     let userId = fbAuth.getUserId();
@@ -398,7 +444,7 @@ function retrieveUserValues() {
       resolve(null);
     }
   });
-}
+}*/
 
 /**
 * When a password is generated, if the user is authenticated
@@ -408,16 +454,15 @@ function retrieveUserValues() {
 * @param {String} passwordType - the type of password generated
 * @param {String} passwordVersion - the version of password generated
 */
-function setDomainValue(domain, userName, passwordType, passwordVersion) {
+function recordGeneration(domain, userName, passwordType, passwordVersion) {
   let userId = fbAuth.getUserId();
-  let domainValue = domain.replace('.', '--dot--');
 
+  let domainValue = domain.replace('.', '--dot--');
 
   if (userId) {
     firebase.database().ref('users/' + userId + '/domains/' + domainValue +
-      '/usernames/' + userName)
+      '/usernames/' + userName + '/' + passwordType)
       .update({
-        passwordType: passwordType,
         passwordVersion: passwordVersion,
         lastUsed: Date.now(),
       });
@@ -467,17 +512,12 @@ function checkVersion() {
 
 
 /**
-* Record username change in options summary
+* Set the used password types where appropriate
 */
 function userNameUpdate() {
-  /* let optsSummary = document.getElementById('options-summary');
-  let userText = document.getElementById('user-name').value;
-
-  if (userText.length > 0) {
-    userText = ', ' + userText;
+  if (domainName.value !== '' && userName.value !== '') {
+    setUserNamePasswordTypes(domainName.value, userName.value);
   }
-
-  optsSummary.innerText = 'Options: ' + passwordDescription + userText; */
 }
 
 /**
@@ -641,14 +681,6 @@ function passPhraseUpdated() {
 }
 
 /**
-* Set-up the UI state for the password being generated, and add values
-*  to the temporaryStore
-*/
-function passwordGenerated() {
-  passPhraseTimedClear();
-}
-
-/**
 * Generate the password for the combination of values
 */
 function generatePassword() {
@@ -702,16 +734,20 @@ function generatePassword() {
 
 
         password.textContent = passwordValue;
-        hideElement('load-bar-ball');
 
         populateOrCopyPassword();
 
-        passwordGenerated();
+        passPhraseTimedClear();
 
         setPassPhraseScreenState('holding');
 
         // Clear the generated password after 30 seconds on the screen
-        window.setTimeout(clearPassword, 30000);
+        window.setTimeout(function() {
+          // Record meta-data
+          recordGeneration(gDomainName, gUserName, passwordType, gVersion);
+          // Clear password from the screen
+          clearPassword();
+        }, 30000);
       })
       .catch(function(err) {
         error.textContent = err.message;
@@ -875,18 +911,7 @@ function isReadyToGenerate() {
   // Check for required value highlights
   checkRequired();
 
-  // Make sure the domain name value has been trimmed
-  trimDomainName();
-
-  // Trim of any www prefix, eg 'www.'  , 'www1.', 'www-87.'
-  let calculatedDomainName = domainName.value.replace(/^www[\w-]*./g, '').trim()
-    .toLowerCase();
-
-  // If the value is only 'w', 'ww', 'www', or 'www.' then treat as a non-value
-  if (calculatedDomainName === 'w' || calculatedDomainName === 'ww' ||
-    calculatedDomainName === 'www') {
-    calculatedDomainName = '';
-  }
+  let calculatedDomainName = openSesame.prepareDomain(domainName.value);
 
   /**
   * Check if minimum values have been completed - all types need name and
@@ -907,16 +932,10 @@ function isReadyToGenerate() {
 *  http(s):// and anything including and after a forward slash
 */
 function trimDomainName() {
-  let posDomain = 0;
+  domainName.value = openSesame.prepareDomain(domainName.value);
 
-  /* Retrieve domain value and trim the leading http:// or https:// */
-  domainName.value = domainName.value.replace(/^https?:\/\//g, '').toLowerCase()
-    .trim();
-
-  // Check whether the whole URL is there - remove anything with a '/' onwards
-  posDomain = domainName.value.indexOf('/');
-  if (posDomain > 0) {
-    domainName.value = domainName.value.substr(0, posDomain);
+  if (domainName.value !== '') {
+    setDomainUserNames(domainName.value);
   }
 }
 
@@ -998,6 +1017,9 @@ function setType(passwordSelection) {
   hideElement('security-question-div');
   passwordType = passwordSelection;
 
+  setUserNamePasswordTypeVersion(domain.value, userName.value,
+    passwordSelection);
+
   let passwordLabel = document.getElementById('password-selected');
 
   switch (passwordSelection) {
@@ -1050,8 +1072,6 @@ function setType(passwordSelection) {
 
   passwordLabel.parentElement.classList.add('is-dirty');
 
-  userNameUpdate();
-
   clearBodyClasses();
   if (passwordType === 'answer') {
     bodyNode.classList.add('ext-answer');
@@ -1090,6 +1110,10 @@ function loadUserNames(names) {
     });
     userNameDropDown.classList.remove('hidden');
   }
+
+  if (userName.value === '') {
+    populateValue(userName, names[0]);
+  }
 }
 
 /**
@@ -1110,6 +1134,8 @@ function setUserName(name) {
   populateValue(userName, name);
   passPhrase.focus();
   userNames.MaterialMenu.hide();
+  // Call the logic to reload password types and versions
+  userNameUpdate();
 }
 
 /**
@@ -1255,4 +1281,57 @@ function setPassChangeRequired() {
 function changePassPhrase() {
   clearPassword();
   showPassPhraseDisplayButton();
+}
+
+/**
+* Takes a unix timestamp date and generates a relative date phrase for it
+* @param {Integer} timestamp - the unix timestamp
+* @return {String} a relative date phrase
+*/
+function relativeDate(timestamp) {
+  let date = new Date(timestamp);
+  let nowDate = new Date();
+  let diff = ((nowDate.getTime() - date.getTime()) / 1000);
+  let dayDiff = Math.floor(diff / 86400);
+  // Check if less than 24 hours but yesterday
+  if (dayDiff === 0 && (nowDate.getDate() - date.getDate()) > 0) {
+    dayDiff = 1;
+  }
+  /* Use 334 as the year calculation because over 11 months should appear like
+      a year */
+  let yearDiff = Math.floor(dayDiff / 334);
+  let year = date.getFullYear();
+  let monthDesc = ['January', 'February', 'March', 'Aprail', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+
+  // Greater than 4 weeks ago
+  if (isNaN(dayDiff) || dayDiff < 0 || dayDiff > 31)
+    // Check how many years ago
+    if (yearDiff > 0) {
+      // More than 11 month ago, so quote month and year
+      return monthDesc[date.getMonth()] + ' ' + year;
+    } else {
+      // Within the last year, so use 'Last June' format
+      return 'last ' + monthDesc[date.getMonth()];
+  }
+
+  if (dayDiff == 0 && diff < 60) {
+    return 'just now';
+  } else if (dayDiff == 0 && diff < 120) {
+    return 'a minute ago';
+  } else if (dayDiff == 0 && diff < 3600) {
+    return Math.floor(diff / 60) + ' minutes ago';
+  } else if (dayDiff == 0 && diff < 7200) {
+    return 'an hour ago';
+  } else if (dayDiff == 0) {
+    return Math.floor(diff / 7200) + ' hours ago';
+  } else if (dayDiff == 1) {
+    return 'yesterday';
+  } else if (dayDiff < 7) {
+    return dayDiff + ' days ago';
+  } else if (dayDiff >= 7 && dayDiff < 10) {
+    return 'a week ago';
+  } else if (dayDiff <= 31) {
+    return Math.ceil(dayDiff / 7) + ' weeks ago';
+  }
 }
