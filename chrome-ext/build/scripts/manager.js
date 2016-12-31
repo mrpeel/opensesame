@@ -32,10 +32,9 @@ let requiredElements = ['domain', 'user-name', 'passphrase'];
 
 /* Set up the classes for password calculation and temporary pass
   phrase storage */
-const openSesame = new OpenSesame();
-const temporaryPhraseStore = new TemporaryPhraseStore();
-const fbAuth = new FBAuth(firebaseSignInCallback, firebaseSignOutCallback,
-  firebaseDataCallback, firebaseDataCallback);
+let openSesame;
+let temporaryPhraseStore;
+let fbAuth;
 
 let passwordType;
 let domainValues;
@@ -131,6 +130,8 @@ window.addEventListener('load', function() {
     }
   }, false);
 
+  openSesame = new OpenSesame();
+  temporaryPhraseStore = new TemporaryPhraseStore();
 
   /* Set-up global variables for the UI elements */
   domainName = document.getElementById('domain');
@@ -292,6 +293,11 @@ window.addEventListener('load', function() {
       setType('long-password');
     });
   }
+
+  // Set-up firebase auth
+  fbAuth = new FBAuth(firebaseSignInCallback, firebaseSignOutCallback,
+    firebaseDataCallback, firebaseDataCallback);
+
 
   // Check current auth state
   if (!fbAuth.getUserId()) {
@@ -876,7 +882,7 @@ function setPassPhraseScreenState(passState) {
     // Set the focus to the confirmation
     window.setTimeout(function() {
       document.getElementById('confirm-passphrase').focus();
-    });
+    }, 0);
   } else if (passState === 'failed') {
     /* An attempt to confirm the first three characters of the pass phrase
       failed.

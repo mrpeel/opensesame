@@ -61,7 +61,7 @@
                             <p></p>
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
 
-                                <input class="mdl-textfield__input passphrase" type="password" id="confirm-passphrase" autofocus maxlength="3">
+                                <input class="mdl-textfield__input passphrase" type="password" id="confirm-passphrase" tabindex="1" maxlength="3">
                                 <label class="mdl-textfield__label required-field" for="passphrase">First three characters of pass phrase</label>
                             </div>
 
@@ -74,8 +74,8 @@
 
                     <div class="mdl-color--accent text--white card-header">
                         <h4 class="header-text" id="header-key">Open Sesame</h4>
-                        <div class="sign-in">
-                            <button id="sign-in" class="signin-button mdl-button mdl-js-button mdl-js-ripple-effect hidden">
+                        <div class="sign-in" tabindex="-1">
+                            <button id="sign-in" class="signin-button mdl-button mdl-js-button mdl-js-ripple-effect hidden" tabindex="-1">
                               <!--<img src="images/btn_google.png" class="signin-button-icon" />Google</button>-->
                             <svg width="46px" height="46px" viewBox="4 4 50 50" version="1.1" id="svg2">
                                 <g id="Google-Button" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
@@ -101,7 +101,7 @@
                                 <img id="photo" class="photo">
                             </div>
                         </div>
-                        <div id="loader" class="mdl-spinner mdl-js-spinner auth-loader is-active"></div>
+                        <div id="loader" class="mdl-spinner mdl-js-spinner auth-loader"></div>
                     </div>
 
                     <div id="user-card" class="mdl-card mdl-shadow--2dp user-card hidden">
@@ -124,13 +124,13 @@
                     <div class="mdl-layout__content mdl-card__supporting-text overflow-x-visible">
 
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                            <input class="mdl-textfield__input" type="text" id="domain">
+                            <input class="mdl-textfield__input" type="text" id="domain" tabindex="2">
                             <label class="mdl-textfield__label required-field" for="domain">Web site *</label>
                             <span class="mdl-textfield__error">required</span>
                         </div>
 
                         <div id="user-name-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
-                            <input class="mdl-textfield__input" type="text" id="user-name">
+                            <input class="mdl-textfield__input" type="text" id="user-name" tabindex="3">
                             <label class="mdl-textfield__label" for="user-name">User name *</label>
                             <span class="mdl-textfield__error">required</span>
                             <button id="username-dropdown" class="inline-dropdown right-align mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent hidden" tabindex="-1">
@@ -142,14 +142,9 @@
                             </ul>
                         </div>
 
-                        <div id="failure-toast" class="toast main-card hidden">
-                            The entered characters don't match your pass phrase. Pass phrase cleared.
-                        </div>
-
-
                         <div id="passphrase-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width">
                             <!--<div class="text-with-button">-->
-                            <input class="mdl-textfield__input passphrase flex-field" type="password" id="passphrase">
+                            <input class="mdl-textfield__input passphrase flex-field" type="password" id="passphrase" tabindex="4">
 
                             <button id="show-passphrase" class="show-password mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent hidden" tabindex="-1">
                                 <i class="material-icons">visibility</i>
@@ -169,7 +164,7 @@
                         <div id="password-type-div" class="row-flex">
                             <div id="password-type" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label flex-element is-dirty">
                                 <!--<div id="password-selected" class="hover-link top-pad">Long password (14 characters)</div>-->
-                                <div class="mdl-textfield__input remove-underline" type="text" id="password-selected">
+                                <div class="mdl-textfield__input remove-underline" type="text" id="password-selected" tabindex="5">
                                     <span id="password-type-text"></span>
                                     <button id="type-dropdown" class="inline-dropdown mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-button-accent" tabindex="-1">
                                     <i class="material-icons">keyboard_arrow_down</i>
@@ -204,7 +199,7 @@
 
                             <div id="version-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label remove-underline password-version">
                                 <!--<input class="mdl-textfield__input" type="text" pattern="-?[0-9]*" id="version" value="1" />-->
-                                <input class="mdl-textfield__input remove-underline" type="text" maxlength="3" pattern="[0-9]+" id="version" value="1">
+                                <input class="mdl-textfield__input remove-underline" type="text" maxlength="3" pattern="[0-9]+" id="version" value="1" tabindex="6">
                                 <label class="mdl-textfield__label" for="version">Version</label>
                                 <span class="mdl-textfield__error">1 to 999</span>
                             </div>
@@ -212,7 +207,7 @@
 
 
                         <div id="security-question-div" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-full-width hidden">
-                            <input class="mdl-textfield__input" type="text" id="security-question">
+                            <input class="mdl-textfield__input" type="text" id="security-question" tabindex="7">
                             <label class="mdl-textfield__label required-field" for="security-question">Security question</label>
                         </div>
 
@@ -241,7 +236,7 @@
 
                     <div class="mdl-card__actions">
                         <div class="mdl-card__supporting-text">
-                            <button id="generate-password" class="main-button mdl-button--colored mdl-button--accent mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                            <button id="generate-password" class="main-button mdl-button--colored mdl-button--accent mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" tabindex="8">
                                 Produce Long Password
                             </button>
                         </div>

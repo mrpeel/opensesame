@@ -1,6 +1,6 @@
 /* global self, caches, Promise, fetch */
 
-let staticCacheName = 'open-sesame-v1483159502684';
+let staticCacheName = 'open-sesame-v1483169660245';
 let preCache = [
   'lib/material.min.css',
   'lib/material.min.js',
