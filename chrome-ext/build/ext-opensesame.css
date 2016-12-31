@@ -14,6 +14,10 @@ html, body {
     color: #000;
 }
 
+.bold {
+    font-weight: 500;
+}
+
 .row-flex {
     display: -webkit-flex;
     display: flex;
@@ -30,13 +34,64 @@ html, body {
     flex: none;
 }
 
+.text-right-align {
+    text-align: right;
+}
+
 .mdl-textfield .inline-dropdown {
     bottom: 0.7em;
 }
 
 .green-text {
-  color: #388E3C;
-  font-weight: 500;
+    color: #388E3C;
+    font-weight: 500;
+}
+
+.photo {
+    height: 3.25em;
+    width: 3.25em;
+    border-radius: 50%;
+    position: absolute;
+    right: 0.85em;
+    top: 0.85em;
+}
+
+.sign-in {
+    position: absolute;
+    right: 18px;
+    top: 24px;
+}
+
+.signin-button-text {
+    vertical-align: top;
+    margin-left: -12px;
+}
+
+.signin-button {
+    background-color: #fff;
+    color: rgba(0, 0, 0, 0.54);
+    text-transform: none;
+    padding-left: 0;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 0;
+}
+
+.signin-button:hover {
+    background-color: rgba(238, 238, 238, 0.54);
+}
+
+.card-photo {
+    height: 5em;
+    width: 5em;
+    border-radius: 50%;
+    left: 0;
+    top: 0.85em;
+}
+
+.card-details {
+    padding-left: 10px;
+    padding-top: 10px;
 }
 
 .remove-underline {
@@ -45,6 +100,10 @@ html, body {
 
 .flex-element {
     flex: auto;
+}
+
+.non-flex-element {
+    flex: none;
 }
 
 .top-pad {
@@ -502,6 +561,24 @@ section.section--center {
     position: absolute;
     right: 20px;
     bottom: 20px;
+}
+
+.user-card {
+    z-index: 999;
+    position: absolute;
+    right: 10px;
+    top: 70px;
+    background-color: white;
+}
+
+.button-padding {
+    padding: 5px;
+}
+
+.auth-loader {
+    position: absolute;
+    left: calc(50% - 14px);
+    top: calc(50% - 14px);
 }
 
 body {

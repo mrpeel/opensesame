@@ -18,6 +18,11 @@ let type;
 let version;
 let bodyNode;
 let password;
+let signedInSection;
+let signInButton;
+let signOutButton;
+let userCard;
+let loader;
 let optionsVisible = false;
 let isChromeExtension;
 
@@ -29,7 +34,8 @@ let requiredElements = ['domain', 'user-name', 'passphrase'];
   phrase storage */
 const openSesame = new OpenSesame();
 const temporaryPhraseStore = new TemporaryPhraseStore();
-const fbAuth = new FBAuth(firebaseDataCallback, firebaseDataCallback);
+const fbAuth = new FBAuth(firebaseSignInCallback, firebaseSignOutCallback,
+  firebaseDataCallback, firebaseDataCallback);
 
 let passwordType;
 let domainValues;
@@ -136,7 +142,11 @@ window.addEventListener('load', function() {
   bodyNode = document.querySelector('body');
   password = document.getElementById('password');
   version = document.getElementById('version');
-
+  signInButton = document.getElementById('sign-in');
+  signedInSection = document.getElementById('signed-in');
+  signOutButton = document.getElementById('sign-out');
+  userCard = document.getElementById('user-card');
+  loader = document.getElementById('loader');
 
   /* Add input events which check if a previous required field has been
     skipped, and ensure that the generated password card has been cleared
@@ -245,6 +255,19 @@ window.addEventListener('load', function() {
   document.getElementById('close-password-confirm').addEventListener(
     'click', closeDialog, false);
 
+  // Set-up auth buttons
+  signedInSection.addEventListener('click', function() {
+    userCard.classList.remove('hidden');
+  }, false);
+  signInButton.addEventListener('click', googleSignIn, false);
+  signOutButton.addEventListener('click', googleSignOut, false);
+
+  document.getElementById('main-section').addEventListener('focus',
+    function() {
+      console.log('Focus');
+    },
+    false);
+
   /* Enable UI elements */
   domainName.disabled = false;
   userName.disabled = false;
@@ -268,6 +291,11 @@ window.addEventListener('load', function() {
     window.setTimeout(function() {
       setType('long-password');
     });
+  }
+
+  // Check current auth state
+  if (!fbAuth.getUserId()) {
+    firebaseSignOutCallback();
   }
 }, false);
 
@@ -1334,4 +1362,125 @@ function relativeDate(timestamp) {
   } else if (dayDiff <= 31) {
     return Math.ceil(dayDiff / 7) + ' weeks ago';
   }
+}
+
+/**
+ * Sign user in with Google redirect
+ */
+function googleSignIn() {
+  showLoader();
+  fbAuth.logIn().catch(function(err) {
+    hideLoader();
+    if (err.code = 'auth/network-request-failed') {
+      showSnackbar('No internet connection', 5, true);
+    } else {
+      showSnackbar('Cannot connect', 5, true);
+      console.log(error);
+    }
+  });
+}
+
+/**
+ * Sign user out of Google
+ */
+function googleSignOut() {
+  fbAuth.logOut();
+  closeUserCard();
+}
+
+/**
+ * Displays the UI for a signed in user.
+ * @param {Object} user - contains basic user details:
+ √ {
+   userId: fbAuth.uid,
+   photoURL: fbAuth.photoURL,
+   name: fbAuth.name,
+   email: fbAuth.email,
+  }
+ */
+function firebaseSignInCallback(user) {
+  let photo = document.getElementById('photo');
+  let cardPhoto = document.getElementById('card-photo');
+  let name = document.getElementById('display-name');
+  let email = document.getElementById('display-email');
+
+  signInButton.classList.add('hidden');
+  signedInSection.classList.remove('hidden');
+  hideLoader();
+
+  if (user.photoURL) {
+    photo.src = user.photoURL;
+    photo.classList.remove('hidden');
+    cardPhoto.src = user.photoURL;
+    cardPhoto.classList.remove('hidden');
+  } else {
+    photo.classList.add('hidden');
+    cardPhoto.classList.add('hidden');
+  }
+
+  if (user.name && user.name !== '') {
+    name.innerText = user.name;
+    name.classList.remove('hidden');
+  } else {
+    name.classList.add('hidden');
+  }
+
+  if (user.email && user.email !== '') {
+    email.innerText = user.email;
+    email.classList.remove('hidden');
+  } else {
+    email.classList.add('hidden');
+  }
+}
+
+/**
+ * Displays the UI for a signed out user.
+ */
+function firebaseSignOutCallback() {
+  // Reset domain values - make sure other processes have completed
+  window.setTimeout(function() {
+    if (!signInButton) {
+      signInButton = document.getElementById('sign-in');
+    }
+    if (!signedInSection) {
+      signedInSection = document.getElementById('signed-in');
+    }
+    hideLoader();
+    domainValues = null;
+    signInButton.classList.remove('hidden');
+    signedInSection.classList.add('hidden');
+
+    closeUserCard();
+  }, 0);
+}
+
+/**
+ * Closes the user card
+ */
+function closeUserCard() {
+  if (!userCard) {
+    userCard = document.getElementById('user-card');
+  }
+  userCard.classList.add('hidden');
+}
+
+
+/**
+ * Shows loading spinner
+ */
+function showLoader() {
+  if (!loader) {
+    loader = document.getElementById('loader');
+  }
+  loader.classList.add('is-active');
+}
+
+/**
+ * Hides loading spinner
+ */
+function hideLoader() {
+  if (!loader) {
+    loader = document.getElementById('loader');
+  }
+  loader.classList.remove('is-active');
 }

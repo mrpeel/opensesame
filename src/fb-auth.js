@@ -12,10 +12,16 @@
 class FBAuth {
   /** Sets up the basic connection details to firebase and state change
   *    events
-  * @param {Function} childAddedCallback - the callback when new data is added
-  * @param {Function} childChangedCallback - the callback when data is changed
+  * @param {Function} signInCallback - the callback when sign in occurs -
+  *                                     returns user id,  photoURL, name & email
+  * @param {Function} signOutCallBack - the callback when sign out occurs
+  * @param {Function} childAddedCallback - the callback when new data is added -
+  *                                         returns all data
+  * @param {Function} childChangedCallback - the callback when data is changed -
+  *                                         returns all data
   */
-  constructor(childAddedCallback, childChangedCallback) {
+  constructor(signInCallback, signOutCallBack,
+    childAddedCallback, childChangedCallback) {
     let fbAuth = this;
     let config = {
       apiKey: 'AIzaSyCQmNa81aSqSBHExjDXKWkx2uDoAMPexOw',
@@ -25,10 +31,16 @@ class FBAuth {
     // Connect to firebase
     firebase.initializeApp(config);
 
-    // Set fbAuth to null initially
+    // Set user variables to null initially
     fbAuth.uid = null;
+    fbAuth.photoURL = null;
+    fbAuth.name = null;
+    fbAuth.email = null;
+
 
     // Set-up callbacks if supplied
+    fbAuth.signInCallback = signInCallback || null;
+    fbAuth.signOutCallback = signOutCallBack || null;
     fbAuth.childAddedCallback = childAddedCallback || null;
     fbAuth.childChangedCallback = childChangedCallback || null;
 
@@ -39,6 +51,9 @@ class FBAuth {
       // console.log(user);
       if (user) {
         fbAuth.uid = user.uid;
+        fbAuth.photoURL = user.photoURL || null;
+        fbAuth.name = user.displayName;
+        fbAuth.email = user.email;
 
         let userRef = firebase.database().ref('users/' + user.uid);
 
@@ -54,27 +69,53 @@ class FBAuth {
             fbAuth.childChangedCallback(data.val());
           });
         }
+
+        // If supplied, call the sign in callback
+        if (fbAuth.signInCallback) {
+          fbAuth.signInCallback({
+            userId: fbAuth.uid,
+            photoURL: fbAuth.photoURL,
+            name: fbAuth.name,
+            email: fbAuth.email,
+          });
+        }
       } else {
         fbAuth.uid = null;
+        fbAuth.photoURL = null;
+        fbAuth.name = null;
+        fbAuth.email = null;
+
+        // If supplied, call the sign out callback
+        if (fbAuth.signOutCallback) {
+          fbAuth.signOutCallback();
+        }
       }
     });
   }
 
-  /** Authenticates the user if not already authenticated, and
-  *     returns the firebase user Id
-  * @return {Promise} - a promise with the user Id on success or an error
+  /** Authenticates the user if not already authenticated
+  * @return {Promise} - a promise with the result of calling sign in
   */
   logIn() {
-    return new Promise(function(resolve, reject) {
-      if (firebase.auth().currentUser) {
-        // Already signed in
-        resolve(firebase.auth().currentUser.uid);
-      } else {
-        // Sign in using google
-        let provider = new firebase.auth.GoogleAuthProvider();
+    if (!firebase.auth().currentUser) {
+      // Already signed in
+      // Sign in using google
+      let provider = new firebase.auth.GoogleAuthProvider();
 
-        firebase.auth().signInWithRedirect(provider);
-      }
+      return firebase.auth().signInWithRedirect(provider);
+    }
+  }
+
+  /** Check result of redirect logIn
+  * @return {Promise} result of whether user is authenticated
+  */
+  isAuthenticated() {
+    return new Promise(function(resolve, reject) {
+      firebase.auth().getRedirectResult().then(function(result) {
+        resolve(true);
+      }).catch(function(error) {
+        reject(error);
+      });
     });
   }
 
@@ -89,6 +130,28 @@ class FBAuth {
       return fbAuth.uid;
     } else {
       return null;
+    }
+  }
+
+  /** Returns current user's photo or null if not authenticated / no photo
+  *
+  * @return {String} - the URL for the user's photo
+  */
+  getUserPhotoURL() {
+    let fbAuth = this;
+
+    if (fbAuth.uid && fbAuth.photoURL) {
+      return fbAuth.photoURL;
+    } else {
+      return null;
+    }
+  }
+
+  /** Logs user out
+  */
+  logOut() {
+    if (firebase.auth().currentUser) {
+      firebase.auth().signOut();
     }
   }
 }
