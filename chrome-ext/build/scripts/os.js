@@ -1,3 +1,1050 @@
+/* global console */
+
+/* exported assert */
+
+const ASSERT_ENABLED = true;
+const ASSERT_ERROR = false;
+const ASSERT_VERBOSE = false;
+
+/**
+ * Simple assertions - checks global variables to decide whether to run and
+ * if it runs whether to throw an error or log a console message
+ * @param {Objecy} condition - conditional statement to assess
+ * @param {Sring} message - message to log if condition is false
+ */
+function assert(condition, message) {
+  if (ASSERT_ENABLED && !condition) {
+    if (ASSERT_ERROR) {
+      throw new Error('Assertion failed' + typeof message === 'undefined' ? '' :
+        message);
+    } else {
+      console.log('Assertion failed');
+      console.log(typeof message === 'undefined' ? '' : message);
+    }
+  } else if (ASSERT_VERBOSE && condition) {
+    console.log(typeof message === 'undefined' ? '' : message);
+  }
+}
+
+/* global CryptoJS, Promise, Uint8Array, window, TextEncoder,
+TextDecoder */
+/* global assert */
+
+/* Ensure functions are always adressable after minification / compilation */
+window['pBKDF2'] = pBKDF2;
+window['HMACSHA256'] = hMACSHA256;
+window['aesEncrypt'] = aesEncrypt;
+window['aesDecrypt'] = aesDecrypt;
+window['convertDerivedKeyToHex'] = convertDerivedKeyToHex;
+window['convertWordArrayToHex'] = convertWordArrayToHex;
+window['convertWordArrayToUint8Array'] = convertWordArrayToUint8Array;
+window['convertUint8ArrayToHex'] = convertUint8ArrayToHex;
+window['convertHexToUint8Array'] = convertHexToUint8Array;
+window['zeroVar'] = zeroVar;
+window['zeroIntArray'] = zeroIntArray;
+
+/**
+  * Executes the PBKDF2 function.  If crypto subtle is supported it is used.
+  *  If not,  the CryptoJS PBKDF2 function is wrapped
+  *  in a promise.   Either way, it returns the derived key
+  * @param {String} password -  the password to perform the function on
+  * @param {String} salt - the salt to apply
+  * @param {Integer} numIterations - the number of iterations to perform
+  * @param {Integer} keyLength - the length for the derived key
+  * @return {Promise} A promise which resolves to the derived key.
+ */
+function pBKDF2(password, salt, numIterations, keyLength) {
+  'use strict';
+
+  assert(password !== '',
+    'PBKDF2 password: ' +
+    password);
+  assert(salt !== '',
+    'PBKDF2 salt: ' +
+    salt);
+  assert(typeof numIterations === 'number',
+    'PBKDF2 numIterations: ' +
+    numIterations);
+  assert(typeof keyLength === 'number',
+    'PBKDF2 keyLength: ' +
+    keyLength);
+
+
+  if (window.crypto && window.crypto.subtle) {
+    // use the subtle crypto functions
+    let cryptoTextEncoder = new TextEncoder('utf-8');
+
+    let saltBuffer = cryptoTextEncoder.encode(salt);
+    let passwordBuffer = cryptoTextEncoder.encode(password);
+
+    return window.crypto.subtle.importKey('raw', passwordBuffer, {
+      name: 'PBKDF2',
+    }, false, ['deriveBits']).then(function(key) {
+      return window.crypto.subtle.deriveBits({
+        name: 'PBKDF2',
+        iterations: numIterations,
+        salt: saltBuffer,
+        hash: 'SHA-1',
+      }, key, keyLength);
+    });
+  } else {
+    // use the CryptJS function
+    return new Promise(function(resolve, reject) {
+      let derivedKey = CryptoJS.PBKDF2(password, salt, {
+        iterations: numIterations,
+        keySize: keyLength / 32,
+      });
+
+      resolve(derivedKey);
+    });
+  }
+}
+
+/**
+* Executes the HMAC-SHA256 function.  If crypto subtle is supported it is
+* used.  If not,  the CryptoJS HmacSHA256 function is wrapped
+* in a promise, the converts the Word Array to a Uint8Array.  Returns the
+*  MAC as a Uint8Array.
+* @param {String} plainText - the plaintext data to be signed
+* @param {String} key - the key to use for the signing
+* @return {Promise} A promise which resolves a Uint8Array with the MAC.
+ */
+function hMACSHA256(plainText, key) {
+  'use strict';
+
+  if (window.crypto && window.crypto.subtle) {
+    // use the subtle crypto functions
+    return new Promise(function(resolve, reject) {
+      let cryptoTextEncoder = new TextEncoder('utf-8');
+      let plainTextBuffer = cryptoTextEncoder.encode(plainText);
+
+      window.crypto.subtle.importKey('raw', key, {
+        name: 'HMAC',
+        hash: {
+          name: 'SHA-256',
+        },
+      }, false, ['sign']) /* not extractable */
+        .then(function(importedKey) {
+          return window.crypto.subtle.sign({
+            name: 'HMAC',
+            hash: {
+              name: 'SHA-256',
+            },
+          }, importedKey, plainTextBuffer);
+        })
+        .then(function(mac) {
+          let macArray = new Uint8Array(mac);
+
+          resolve(macArray);
+        });
+    });
+  } else {
+    // use the CryptJS function
+    return new Promise(function(resolve, reject) {
+      let mac = CryptoJS.HmacSHA256(plainText, key);
+      let macArray = convertWordArrayToUint8Array(mac);
+      // Convert to uInt8Array
+      resolve(macArray);
+    });
+  }
+}
+
+/**
+ * Executes an AES encryption.  If crypto subtle is supported it is used.
+ *  If not,  the CryptoJS AES encryption function is wrapped in a promise.
+ * Returns the encrypted data.
+ * @param {String} plainText - the plaintext data to be encrypted
+ * @param {String} key - the encryption key as a hex string.
+ * @return {Promise} A promise which resolves to the encryted data.
+ */
+function aesEncrypt(plainText, key) {
+  'use strict';
+  if (window.crypto && window.crypto.subtle) {
+    // use the subtle crypto functions
+    return new Promise(function(resolve, reject) {
+      let cryptoTextEncoder = new TextEncoder('utf-8');
+      let plainTextBuffer = cryptoTextEncoder.encode(plainText);
+
+      // Key will be supplied in hex - so need to convert to Uint8Array
+      let aesKey = convertHexToUint8Array(key);
+
+      // Create random initialisation vector
+      let iv = window.crypto.getRandomValues(new Uint8Array(16));
+
+      window.crypto.subtle.importKey('raw', aesKey, {
+        name: 'AES-CBC',
+        length: 128,
+      }, false, ['encrypt']) /* not extractable */
+        .then(function(importedKey) {
+          return window.crypto.subtle.encrypt({
+            'name': 'AES-CBC',
+            'iv': iv,
+          }, importedKey, plainTextBuffer);
+        })
+        .then(function(encryptedData) {
+          let encryptedArray = new Uint8Array(encryptedData);
+
+          resolve({
+            'iv': iv,
+            'ciphertext': encryptedArray,
+          }); // Return an object so the iv is contained with the ciphertext
+        });
+    });
+  } else {
+    // use the CryptJS function
+    return new Promise(function(resolve, reject) {
+      let encrypted = CryptoJS.AES.encrypt(plainText, key);
+      resolve(encrypted);
+    });
+  }
+}
+
+/**
+ * Executes an AES decryption.  If crypto subtle is supported it is used.
+ *    If not,  the CryptoJS AES decryption function is wrapped in a promise.
+ * Returns the decrypted data.
+ * @param {String} encryptedData - the ciphertext data to be decrypted
+ * @param {String} key - the decryption key as a hex string.
+ * @return {Promise} A promise which resolves to the plain text data.
+ */
+function aesDecrypt(encryptedData, key) {
+  'use strict';
+
+  if (window.crypto && window.crypto.subtle) {
+    // use the subtle crypto functions
+    return new Promise(function(resolve, reject) {
+      // Key will be supplied in hex - so need to convert to Uint8Array
+      // let cryptoTextEncoder = new TextEncoder('utf-8');
+      let cryptoTextDecoder = new TextDecoder('utf-8');
+      let aesKey = convertHexToUint8Array(key);
+
+      window.crypto.subtle.importKey('raw', aesKey, {
+        'name': 'AES-CBC',
+        'length': 128,
+      }, false, ['decrypt']) /* not extractable */
+        .then(function(importedKey) {
+          return window.crypto.subtle.decrypt({
+            'name': 'AES-CBC',
+            'iv': encryptedData.iv, // Same IV as for encryption
+          },
+            importedKey,
+            encryptedData.ciphertext
+          );
+        })
+        .then(function(decryptedData) {
+          let decryptedArray = new Uint8Array(decryptedData);
+          let plainText = cryptoTextDecoder.decode(decryptedArray);
+
+          resolve(plainText);
+        });
+    });
+  } else {
+    // use the CryptJS function
+    return new Promise(function(resolve, reject) {
+      let decrypted = CryptoJS.AES.decrypt(encyptedData, key);
+      let plainText = CryptoJS.enc.Utf8.stringify(decrypted);
+      resolve(plainText);
+    });
+  }
+}
+
+/**
+ * Converts a derived key to a hex string.  Determines whether using subtle
+  *crypto of CryptoJS and uses appropriate function
+ * @param {wordArray} derivedKey
+ * @return {String}
+ */
+function convertDerivedKeyToHex(derivedKey) {
+  'use strict';
+
+  if (window.crypto && window.crypto.subtle) {
+    return convertUint8ArrayToHex(new Uint8Array(derivedKey));
+  } else {
+    return convertUint8ArrayToHex(convertWordArrayToUint8Array(derivedKey));
+  }
+}
+
+/**
+ * Converts a word array into a Hex String by chaining together canversion to
+ *  Uint8Array, then to hex
+ * @param {wordArray} wordArray
+ * @return {String}
+ */
+function convertWordArrayToHex(wordArray) {
+  'use strict';
+
+  return convertUint8ArrayToHex(convertWordArrayToUint8Array(wordArray));
+}
+
+/**
+ * Converts a word array into a Uint8Array.
+ * @param {wordArray} wordArray
+ * @return {Uint8Array}
+ */
+function convertWordArrayToUint8Array(wordArray) {
+  'use strict';
+
+  let words = wordArray.words;
+  let sigBytes = wordArray.sigBytes;
+
+  // Convert
+  let u8 = new Uint8Array(sigBytes);
+  for (let i = 0; i < sigBytes; i++) {
+    let byte = (words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+    u8[i] = byte;
+  }
+
+  return u8;
+}
+
+/**
+ * Converts a Uint8Array into a Uint8Array to a hex string.
+ * @param {Uint8Array} u8Array
+ * @return {String}.
+ */
+function convertUint8ArrayToHex(u8Array) {
+  let i;
+  let len;
+  let hex = '';
+  let c;
+
+  for (i = 0, len = u8Array.length; i < len; i += 1) {
+    c = u8Array[i].toString(16);
+    if (c.length < 2) {
+      c = '0' + c;
+    }
+    hex += c;
+  }
+
+  return hex;
+}
+
+
+/**
+ * Converts a Hex string into a Uint8Array.
+ * @param {String} hex
+ * @return {Uint8Array}
+ */
+function convertHexToUint8Array(hex) {
+  let i;
+  let byteLen = hex.length / 2;
+  let arr;
+  let j = 0;
+
+  if (byteLen !== parseInt(byteLen, 10)) {
+    throw new Error('Invalid hex length ' + hex.length);
+  }
+
+  arr = new Uint8Array(byteLen);
+
+  for (i = 0; i < byteLen; i += 1) {
+    arr[i] = parseInt(hex[j] + hex[j + 1], 16);
+    j += 2;
+  }
+
+  return arr;
+}
+
+/**
+* Utility function to replace a string's value with all zeroes
+* @param {String} varToZero
+* @return {String}
+ */
+function zeroVar(varToZero) {
+  return Array(varToZero.length).join('0');
+}
+
+/**
+ * Utility function to replace an array's value with all zeroes
+ * @param {Array} arrayToZero
+ * @return {Array}
+ */
+function zeroIntArray(arrayToZero) {
+  let holdingVal = arrayToZero;
+  for (let aCounter = 0; aCounter < arrayToZero.length; aCounter++) {
+    holdingVal[aCounter] = 0;
+  }
+  return holdingVal;
+}
+
+/* global Uint8Array, Promise  */
+/* global pBKDF2, convertDerivedKeyToHex, aesEncrypt, aesDecrypt, zeroVar,
+zeroIntArray */
+/* global assert */
+
+'use strict';
+
+/** Class to handle temporary storage of passphrase in an encrypted state
+*    and subsequent attempt to retrieve the poass phrase.  The first three
+*    chars of the passphrase are used to encrypt and decrypt the pass phrase.
+*/
+class TemporaryPhraseStore {
+  /**
+  * constructor
+  */
+  constructor() {
+    this.ns = 'cake.man.io';
+  }
+
+  /**
+  * Encrypts the pass phrase using the name as a salt.  Runs a pBKDF2 500 times
+  * on the firsth three characters of the passphrase to generate a key.
+  *     Then runs pBKDF2 250 times on the key to generate a hash to store for
+  *     comparison later.
+  *     The key is used to encrypt the data using AES and the result is stored.
+  * @param {String} passphrase
+  * @param {String} name
+  * @return {promise} A promise which will be resolved with eoither 'Success' or
+  *  rejected with an error.
+   */
+  encryptPhrase(passphrase, name) {
+    assert(passphrase !== '',
+      'TemporaryPhraseStore.prototype.encryptPhrase passphrase: ' +
+      passPhrase);
+    assert(name !== '',
+      'TemporaryPhraseStore.prototype.encryptPhrase userName: ' + name);
+
+
+    let aesKey;
+    let tempStoreContext = this;
+    return new Promise(function(resolve, reject) {
+      if (typeof passphrase === 'string' && passphrase.length >= 3) {
+        let firstThreeChars = passphrase.substring(0, 3);
+
+        pBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
+          .then(function(key) {
+            aesKey = convertDerivedKeyToHex(key);
+
+            return pBKDF2(convertDerivedKeyToHex(key), name +
+              firstThreeChars, 250, 128);
+          }).then(function(verificationHash) {
+          tempStoreContext.threeCharHash = convertDerivedKeyToHex(
+            verificationHash);
+
+          return aesEncrypt(passphrase, aesKey);
+        }).then(function(encryptedData) {
+          tempStoreContext.encData = encryptedData;
+          resolve('Success');
+        }).catch(function(err) {
+          reject(err);
+        });
+      } else {
+        reject('Pass phrase must be a sring at least three characters long');
+      }
+    });
+  }
+
+  /**
+  *  Descrypts the pass phrase using the first three chars and name.  Runs a
+  *   pBKDF2 500 times on the firsth three characters of the passphrase
+  * to generate a key.  Then runs pBKDF2 250 times on the key to generate a
+  * hash.  The generated hash is compared to the stored hash.  If they
+  * match, the key used to decrypt the pass phrase using AES.  If not, the
+  * encrypted data and has are cleared.
+  * @param {String} firstThreeChars
+  * @param {String} name
+  * @return {promise} A promise which will be resolved with the pass phrasee or
+  *  rejected with an error.
+  */
+  decryptPhrase(firstThreeChars, name) {
+    assert(firstThreeChars !== '',
+      'TemporaryPhraseStore.prototype.decryptPhrase firstThreeChars: ' +
+      firstThreeChars);
+    assert(name !== '', 'TemporaryPhraseStore.prototype.decryptPhrase name: ' +
+      name);
+
+    let tempStoreContext = this;
+    let aesKey;
+
+    return new Promise(function(resolve, reject) {
+      if (typeof tempStoreContext.encData === 'undefined') {
+        reject('No encrypted data found');
+      } else if (typeof firstThreeChars !== 'string' ||
+        firstThreeChars.length !== 3) {
+        tempStoreContext.clearStore();
+
+        reject(
+          'First three characters parameter is not a 3 character string');
+      } else {
+        pBKDF2(name + firstThreeChars, name + tempStoreContext.ns, 500, 128)
+          .then(function(key) {
+            aesKey = convertDerivedKeyToHex(key);
+            // console.log('Key: ' + aesKey);
+
+            return pBKDF2(convertDerivedKeyToHex(key), name +
+              firstThreeChars, 250, 128);
+          }).then(function(verificationHash) {
+          // console.log('Stored hash: ' + tempStoreContext.threeCharHash);
+          // console.log('Verification hash: ' + convertDerivedKeyToHex(
+          // verificationHash));
+
+          if (tempStoreContext.threeCharHash === convertDerivedKeyToHex(
+              verificationHash)) {
+            // console.log('Encrypted data');
+            // console.log(tempStoreContext.encData);
+
+            aesDecrypt(tempStoreContext.encData, aesKey)
+              .then(function(plainText) {
+                resolve(plainText);
+              });
+          } else {
+            tempStoreContext.clearStore();
+            reject('First three characters did not match');
+          }
+        });
+      }
+    });
+  }
+
+  /** Clears any stored data for the hash and encrypted pass phrase
+   */
+  clearStore() {
+    if (typeof this.threeCharHash !== 'undefined') {
+      zeroVar(this.threeCharHash);
+      delete this.threeCharHash;
+    }
+
+    if (typeof this.encData !== 'undefined') {
+      if (typeof this.encData.iv === 'string') {
+        zeroVar(this.encData.iv);
+        this.encData.iv = '';
+      } else if (this.encData.iv.constructor.name === 'Uint8Array') {
+        zeroIntArray(this.encData.iv);
+        this.encData.iv = [];
+      }
+
+      if (typeof this.encData.ciphertext === 'string') {
+        zeroVar(this.encData.ciphertext);
+        this.encData.ciphertext = '';
+      } else if (this.encData.ciphertext.constructor.name === 'Uint8Array') {
+        zeroIntArray(this.encData.ciphertext);
+        this.encData.ciphertext = [];
+      }
+
+      delete this.encData;
+    }
+  }
+
+  /**
+  * Allows values to be stored which were created separately.  This
+  *  functionality is required for the chrome extension which stores and returns
+  *  values
+  * @param {String} threeCharHash
+  * @param {Uint8Array} encData
+  */
+  storeValues(threeCharHash, encData) {
+    assert(threeCharHash !== '',
+      'TemporaryPhraseStore.prototype.storeValues threeCharHash: ' +
+      threeCharHash);
+    assert(encData !== '',
+      'TemporaryPhraseStore.prototype.storeValues encData: ' +
+      encData);
+
+    this.threeCharHash = threeCharHash;
+    this.encData = encData;
+  }
+}
+
+window['TemporaryPhraseStore'] = TemporaryPhraseStore;
+
+/** OpenSesame class encapsulating the functionality for generating a password.
+    Requires cryptofunctions.js which determies whether to use subtle crypto
+     or cryptojs and executes the appropriate functions.
+*/
+
+/* global Promise, zeroVar  */
+'use strict';
+
+/**
+ *
+ * OpenSesame uses BKDF2 to generate salted password and HMAC256 to generate a
+* seed.  The seed is then ued to generate a password based on a chosen template.
+ */
+class OpenSesame {
+  /**
+   * Constructor.  Sets up all the base values required for password
+   *  generation
+   */
+  constructor() {
+    //  The namespace used in calculateKey
+    this.keyNS = 'cake.man.opensesame';
+
+    //  The namespaces used in calculateSeed
+    this.passwordNS = 'cake.man.opensesame.password';
+    this.loginNS = 'cake.man.opensesame.login';
+    this.answerNS = 'cake.man.opensesame.answer';
+
+    //  The values which will be populated for creating the password
+    this.lowerChars = 'abcdefghijklmnopqrstuvwxyz';
+    this.upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    this.numberChars = '0123456789';
+    this.symbolChars = '!@#$%^&*()';
+
+    //  The templates that passwords may be created from
+    //  The characters map to MPW.passchars
+    this.passwordTypes = {
+      'maximum-password': {
+        'charSet': this.upperChars + this.lowerChars + this.numberChars +
+          this.symbolChars,
+        'length': 20,
+        'needsUpper': true,
+        'needsLower': true,
+        'needsNumber': true,
+        'needsSymbol': true,
+      },
+      'long-password': {
+        'charSet': this.upperChars + this.lowerChars + this.numberChars +
+          this.symbolChars,
+        'length': 14,
+        'needsUpper': true,
+        'needsLower': true,
+        'needsNumber': true,
+        'needsSymbol': true,
+      },
+      'medium-password': {
+        'charSet': this.upperChars + this.lowerChars + this.numberChars +
+          this.symbolChars,
+        'length': 8,
+        'needsUpper': true,
+        'needsLower': true,
+        'needsNumber': true,
+        'needsSymbol': true,
+      },
+      'basic-password': {
+        'charSet': this.upperChars + this.lowerChars + this.numberChars,
+        'length': 8,
+        'needsUpper': true,
+        'needsLower': true,
+        'needsNumber': true,
+      },
+      'short-password': {
+        'charSet': this.upperChars + this.lowerChars + this.numberChars,
+        'length': 6,
+        'needsUpper': true,
+        'needsLower': true,
+        'needsNumber': true,
+      },
+      'pin': {
+        'charSet': this.numberChars,
+        'length': 4,
+      },
+      'pin-6': {
+        'charSet': this.numberChars,
+        'length': 6,
+      },
+      'answer': {
+        'charSet': this.lowerChars,
+        'length': 16,
+        /* Spaces will split the generated answer into chunks which look like
+           word by making specific characters spaces */
+        'spaces': [3, 6, 12],
+      },
+    };
+
+
+    /* All the country top level domain suffixes - used for determining the
+      domain from a URL N.B. '.io' has been excluded becuase it is used like
+       .com, eg github.io */
+    this.countryTLDs = ['ac', 'ad', 'ae', 'af', 'ag', 'ai', 'al', 'am', 'an',
+      'ao', 'aq', 'ar', 'as', 'at', 'au', 'aw', 'ax', 'az', 'ba', 'bb', 'bd',
+      'be', 'bf', 'bg', 'bh', 'bi', 'bj', 'bm', 'bn', 'bo', 'br', 'bs', 'bt',
+      'bv', 'bw', 'by', 'bz', 'ca', 'cc', 'cd', 'cf', 'cg', 'ch', 'ci', 'ck',
+      'cl', 'cm', 'cn', 'co', 'cr', 'cs', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz',
+      'dd', 'de', 'dj', 'dk', 'dm', 'do', 'dz', 'ec', 'ee', 'eg', 'eh', 'er',
+      'es', 'et', 'eu', 'fi', 'fj', 'fk', 'fm', 'fo', 'fr', 'ga', 'gb', 'gd',
+      'ge', 'gf', 'gg', 'gh', 'gi', 'gl', 'gm', 'gn', 'gp', 'gq', 'gr', 'gs',
+      'gt', 'gu', 'gw', 'gy', 'hk', 'hm', 'hn', 'hr', 'ht', 'hu', 'id', 'ie',
+      'il', 'im', 'in', 'iq', 'ir', 'is', 'it', 'je', 'jm', 'jo', 'jp',
+      'ke', 'kg', 'kh', 'ki', 'km', 'kn', 'kp', 'kr', 'kw', 'ky', 'kz', 'la',
+      'lb', 'lc', 'li', 'lk', 'lr', 'ls', 'lt', 'lu', 'lv', 'ly', 'ma', 'mc',
+      'md', 'me', 'mg', 'mh', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mq', 'mr',
+      'ms', 'mt', 'mu', 'mv', 'mw', 'mx', 'my', 'mz', 'na', 'nc', 'ne', 'nf',
+      'ng', 'ni', 'nl', 'no', 'np', 'nr', 'nu', 'nz', 'om', 'pa', 'pe', 'pf',
+      'pg', 'ph', 'pk', 'pl', 'pm', 'pn', 'pr', 'ps', 'pt', 'pw', 'py', 'qa',
+      're', 'ro', 'rs', 'ru', 'rw', 'sa', 'sb', 'sc', 'sd', 'se', 'sg', 'sh',
+      'si', 'sj', 'sk', 'sl', 'sm', 'sn', 'so', 'sr', 'ss', 'st', 'su', 'sv',
+      'sx', 'sy', 'sz', 'tc', 'td', 'tf', 'tg', 'th', 'tj', 'tk', 'tl', 'tm',
+      'tn', 'to', 'tp', 'tr', 'tt', 'tv', 'tw', 'tz', 'ua', 'ug', 'uk', 'us',
+      'uy', 'uz', 'va', 'vc', 've', 'vg', 'vi', 'vn', 'vu', 'wf', 'ws', 'ye',
+      'yt', 'yu', 'za', 'zm', 'zw'];
+  }
+
+  /**
+   * Prepares a supplied domain name into its base domain
+   * @param {String} domainName the starting domain
+   * @return {String} the trimmed domain`
+   */
+  prepareDomain(domainName) {
+    let posDomain = 0;
+    let domainParts;
+    let calculatedDomain = '';
+    let domainCountryCode = '';
+
+    /* Retrieve domain value and trim the leading http://  or https://  */
+    let fullDomain = domainName.trim().replace(/^https?:\/\//g, '')
+      .toLowerCase();
+
+    /* Check whether the whole URL is there - remove anything with a '/'
+      onwards */
+    posDomain = fullDomain.indexOf('/');
+    if (posDomain > 0) {
+      fullDomain = fullDomain.substr(0, posDomain);
+    }
+
+    // Split base domain into its individual elements
+    domainParts = fullDomain.split('.');
+
+    /* Check whether the last domain element is a country code suffix, eg
+        mrpeeel.com.au, if so record it and remove it from the main compoments
+    */
+    if (domainParts.length > 1 &&
+      openSesame.countryTLDs.indexOf(domainParts[domainParts.length - 1])
+      >= 0) {
+      // Save the country code and remove from domain elements array
+      domainCountryCode = '.' + domainParts[domainParts.length - 1];
+      domainParts = domainParts.slice(0, -1);
+    }
+
+    // if there are more than 2 elements remaining, only keep the last two
+    // eg photos.google.com = google.com, mail.google.com = google.com
+    if (domainParts.length > 2) {
+      domainParts = domainParts.slice(-2);
+    }
+
+    // Re-assemble base domain into final value with country code
+    calculatedDomain = domainParts.join('.') + domainCountryCode;
+
+    return calculatedDomain;
+  }
+
+  /**
+   * Runs the generation of a password by generating a key (PBKDF2) and then
+    using that key to sign (HMAC256) the constructed domain value
+   * @param {String} userName the website username
+   * @param {String} passPhrase the open sesame pass phrase
+   * @param {String} domainName the website domain
+   * @param {String} passwordType password type to generate
+   * @param {String} vers the version of the password (defaults to 1)
+   * @param {String} securityQuestion the security question for generating
+   *                                  an answer
+   * @return {Promise} a promise which will resolve the generated password.
+   */
+  generatePassword(userName, passPhrase,
+    domainName, passwordType, vers, securityQuestion) {
+    'use strict';
+
+    let passNS = '';
+    let version = vers || 1;
+    let securityQuestionValue = securityQuestion || '';
+
+
+    if (passPhrase.length === 0) {
+      return Promise.reject(new Error('Passphrase not present'));
+    }
+
+    if (domainName.length === 0) {
+      return Promise.reject(new Error('Domain name not present'));
+    }
+
+    if (userName.length === 0) {
+      return Promise.reject(new Error('Domain name not present'));
+    }
+
+
+    if (passwordType === 'answer' && securityQuestion.length === 0) {
+      return Promise.reject(new Error('Security question not present'));
+    }
+
+
+    try {
+      let openSesame = this;
+
+      // return promise which resolves to the generated password
+      return new Promise(function(resolve, reject) {
+        passNS = openSesame.passwordNS;
+
+        if (passwordType === 'answer') {
+          passNS = openSesame.answerNS;
+        } else if (passwordType == 'login') {
+          passNS = openSesame.loginNS;
+        }
+
+        // Set up parameters for PBKDF2 and HMAC functions
+        let userNameValue = userName.trim().toLowerCase();
+        let salt = passNS + '.' + userNameValue;
+
+        // Convert domain name to calulated domain
+        let calculatedDomain = openSesame.prepareDomain(domainName);
+        // Add user to domain value
+        calculatedDomain = userNameValue + version + '@' + calculatedDomain;
+
+        // For an answer, add the security question to domain value
+        if (passwordType === 'answer') {
+          /* Strip out any punctuation or multiple spaces and convert to
+            lower case */
+          securityQuestionValue = securityQuestionValue
+            .replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()?'']/g, '')
+            .replace(/  +/g, ' ')
+            .trim()
+            .toLowerCase();
+          calculatedDomain = calculatedDomain + ':' + securityQuestionValue;
+        }
+
+
+        // parameters: password, salt, numIterations, keyLength
+        return pBKDF2(openSesame.passPhrase, salt, 750, 128)
+          .then(function(key) {
+            // console.log('Derived key: ' + key);
+
+            return hMACSHA256(calculatedDomain, key);
+          }).then(function(seedArray) {
+          //  Set up passowrd length and any spaces for generated value
+          let passLength = openSesame.passwordTypes[passwordType].length;
+          let passAdjLength = passLength - 1;
+          let spaces = openSesame.passwordTypes[passwordType].spaces || [];
+          let charSet = openSesame.passwordTypes[passwordType].charSet;
+          let password = '';
+          // Variables to check for password complexity
+          let needsUpper = openSesame.passwordTypes[passwordType].needsUpper
+            || false;
+          let needsLower = openSesame.passwordTypes[passwordType].needsLower
+            || false;
+          let needsNumber = openSesame.passwordTypes[passwordType].needsNumber
+            || false;
+          let needsSymbol = openSesame.passwordTypes[passwordType].needsSymbol
+            || false;
+
+          /* Determine the character number to start checking for minimum
+            password complexity */
+          let upperCheck = seedArray[0] % passAdjLength;
+          let lowerCheck = upperCheck + 1;
+          let numberCheck = upperCheck + 2;
+          let symbolCheck = upperCheck + 3;
+
+          // Select the chars and clear seedArray
+          for (let s = 0; s < seedArray.length; s++) {
+            // Within the password length, so add next char to password
+            let newChar;
+
+            if (s < passLength) {
+              // Check if this character must be a space (for security answers)
+              if (spaces.indexOf(s) >= 0) {
+                // This position is a defined space
+                newChar = ' ';
+              } else if (needsUpper && s === upperCheck % passAdjLength) {
+                // Must select character from upper character set
+                newChar = openSesame.upperChars[seedArray[s] %
+                (openSesame.upperChars.length - 1)];
+              } else if (needsLower && s === lowerCheck % passAdjLength) {
+                // Must select character from lower character set
+                newChar = openSesame.lowerChars[seedArray[s] %
+                (openSesame.lowerChars.length - 1)];
+              } else if (needsNumber && s === numberCheck % passAdjLength) {
+                // Must select character from number character set
+                newChar = openSesame.numberChars[seedArray[s] %
+                (openSesame.numberChars.length - 1)];
+              } else if (needsSymbol && s === symbolCheck % passAdjLength) {
+                // Must select character from symbol character set
+                newChar = openSesame.symbolChars[seedArray[s] %
+                (openSesame.symbolChars.length - 1)];
+              } else {
+                // Select character from normal character set
+                newChar = charSet[seedArray[s] % (charSet.length - 1)];
+              }
+
+              password = password + newChar;
+
+              // Check which character set this belongs to and record
+              if (openSesame.upperChars.indexOf(newChar) >= 0) {
+                needsUpper = false;
+              } else if (openSesame.lowerChars.indexOf(newChar) >= 0) {
+                needsLower = false;
+              } else if (openSesame.numberChars.indexOf(newChar) >= 0) {
+                needsNumber = false;
+              } else if (openSesame.symbolChars.indexOf(newChar) >= 0) {
+                needsSymbol = false;
+              }
+            }
+
+            // Re-set the seed array value
+            seedArray[s] = 0;
+          }
+
+          // Clear pass phrase values
+          passPhrase = zeroVar(passPhrase);
+
+          resolve(password);
+        })
+          .catch(function(e) {
+            return Promise.reject(e);
+          });
+      });
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+}
+
+window['OpenSesame'] = OpenSesame;
+
+/* global firebase,  */
+
+/* exported FBAuth */
+
+'use strict';
+
+/** Firebase auth class to handle the firebase authentication and return the
+* firebase user id
+*/
+class FBAuth {
+  /** Sets up the basic connection details to firebase and state change
+  *    events
+  * @param {Function} signInCallback - the callback when sign in occurs -
+  *                                     returns user id,  photoURL, name & email
+  * @param {Function} signOutCallBack - the callback when sign out occurs
+  * @param {Function} childAddedCallback - the callback when new data is added -
+  *                                         returns all data
+  * @param {Function} childChangedCallback - the callback when data is changed -
+  *                                         returns all data
+  */
+  constructor(signInCallback, signOutCallBack,
+    childAddedCallback, childChangedCallback) {
+    let fbAuth = this;
+    let config = {
+      apiKey: 'AIzaSyCQmNa81aSqSBHExjDXKWkx2uDoAMPexOw',
+      authDomain: 'open-sesame-f1f51.firebaseapp.com',
+      databaseURL: 'https://open-sesame-f1f51.firebaseio.com',
+    };
+    // Connect to firebase
+    firebase.initializeApp(config);
+
+    // Set user variables to null initially
+    fbAuth.uid = null;
+    fbAuth.photoURL = null;
+    fbAuth.name = null;
+    fbAuth.email = null;
+
+
+    // Set-up callbacks if supplied
+    fbAuth.signInCallback = signInCallback || null;
+    fbAuth.signOutCallback = signOutCallBack || null;
+    fbAuth.childAddedCallback = childAddedCallback || null;
+    fbAuth.childChangedCallback = childChangedCallback || null;
+
+
+    // On auth state change, record the userId
+    firebase.auth().onAuthStateChanged(function(user) {
+      // console.log('Firebase auth state change');
+      // console.log(user);
+      if (user) {
+        fbAuth.uid = user.uid;
+        fbAuth.photoURL = user.photoURL || null;
+        fbAuth.name = user.displayName;
+        fbAuth.email = user.email;
+
+        let userRef = firebase.database().ref('users/' + user.uid);
+
+        // Once authenticated, register the correct callbacks if supplied
+        if (fbAuth.childAddedCallback) {
+          userRef.on('child_added', function(data) {
+            fbAuth.childAddedCallback(data.val());
+          });
+        }
+
+        if (fbAuth.childChangedCallback) {
+          userRef.on('child_changed', function(data) {
+            fbAuth.childChangedCallback(data.val());
+          });
+        }
+
+        // If supplied, call the sign in callback
+        if (fbAuth.signInCallback) {
+          fbAuth.signInCallback({
+            userId: fbAuth.uid,
+            photoURL: fbAuth.photoURL,
+            name: fbAuth.name,
+            email: fbAuth.email,
+          });
+        }
+      } else {
+        fbAuth.uid = null;
+        fbAuth.photoURL = null;
+        fbAuth.name = null;
+        fbAuth.email = null;
+
+        // If supplied, call the sign out callback
+        if (fbAuth.signOutCallback) {
+          fbAuth.signOutCallback();
+        }
+      }
+    });
+  }
+
+  /** Authenticates the user if not already authenticated
+  * @return {Promise} - a promise with the result of calling sign in
+  */
+  logIn() {
+    if (!firebase.auth().currentUser) {
+      // Already signed in
+      // Sign in using google
+      let provider = new firebase.auth.GoogleAuthProvider();
+
+      return firebase.auth().signInWithRedirect(provider);
+    }
+  }
+
+  /** Check result of redirect logIn
+  * @return {Promise} result of whether user is authenticated
+  */
+  isAuthenticated() {
+    return new Promise(function(resolve, reject) {
+      firebase.auth().getRedirectResult().then(function(result) {
+        resolve(true);
+      }).catch(function(error) {
+        reject(error);
+      });
+    });
+  }
+
+  /** Returns current user's Id or null if not authenticated
+  *
+  * @return {String} - the userId or null if not authenticated
+  */
+  getUserId() {
+    let fbAuth = this;
+
+    if (fbAuth.uid) {
+      return fbAuth.uid;
+    } else {
+      return null;
+    }
+  }
+
+  /** Returns current user's photo or null if not authenticated / no photo
+  *
+  * @return {String} - the URL for the user's photo
+  */
+  getUserPhotoURL() {
+    let fbAuth = this;
+
+    if (fbAuth.uid && fbAuth.photoURL) {
+      return fbAuth.photoURL;
+    } else {
+      return null;
+    }
+  }
+
+  /** Logs user out
+  */
+  logOut() {
+    if (firebase.auth().currentUser) {
+      firebase.auth().signOut();
+    }
+  }
+}
+
+window['FBAuth'] = FBAuth;
+
 /* global OpenSesame, document, window, console, navigator, extHasPassword,
   generateExtPassword, clearExtPhrase,  storeExtVals, zeroVar,
    TemporaryPhraseStore */
@@ -294,14 +1341,20 @@ window.addEventListener('load', function() {
     });
   }
 
-  // Set-up firebase auth
-  fbAuth = new FBAuth(firebaseSignInCallback, firebaseSignOutCallback,
-    firebaseDataCallback, firebaseDataCallback);
+  /* Attempt to set-up firebase auth - this will fail if there is no
+     network connection */
+  try {
+    fbAuth = new FBAuth(firebaseSignInCallback, firebaseSignOutCallback,
+      firebaseDataCallback, firebaseDataCallback);
 
 
-  // Check current auth state
-  if (!fbAuth.getUserId()) {
-    firebaseSignOutCallback();
+    // Check current auth state
+    if (!fbAuth.getUserId()) {
+      firebaseSignOutCallback();
+    }
+  } catch (err) {
+    console.log('Cannot create firebase object');
+    console.log(err);
   }
 }, false);
 
@@ -1489,4 +2542,142 @@ function hideLoader() {
     loader = document.getElementById('loader');
   }
   loader.classList.remove('is-active');
+}
+
+/* global chrome, document, passPhrase, password, trimDomainName,
+  domainName, passwordType, setType, temporaryPhraseStore,
+  setPassPhraseScreenState, userName, securityQuestion, populateValue */
+
+/* exported generateExtPassword,  extHasPassword, storeExtVals, storeExtPhrase
+    clearExtPhrase */
+
+// Extra variable only present for Chrome Extension
+let extHasPassword;
+isChromeExtension = true;
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Send a message to the active tab
+  chrome.tabs.query({
+    active: true,
+    currentWindow: true,
+  }, function(tabs) {
+    let activeTab = tabs[0];
+    chrome.tabs.sendMessage(activeTab.id, {
+      'message': 'clicked_browser_action',
+    });
+  });
+});
+
+
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if (request.message === 'populate_fields') {
+      populateValue(domainName, request.url || '');
+      populateValue(userName, request.userName || '');
+      populateValue(securityQuestion, request.securityQuestion || '');
+      populateValue(version, request.version || '1');
+      extHasPassword = request.hasPassword;
+
+      // console.log('Populate fields password type: ' + request.passwordType);
+      setType(request.passwordType);
+
+      // Determine state of password, and set the appropriate values
+      if (request.threeCharHash && request.threeCharHash.length > 0 &&
+        request.phraseStore &&
+        request.phraseStore.iv) {
+        /* Pass phrase has been encrypted and requires confirmation of the
+          first three characters */
+        let eIV;
+        let eCiphertext;
+        /* Uint8 values get lost in translation.  Values will need to be
+          converted back tio Uint8Array */
+        if (!(request.phraseStore.iv instanceof Uint8Array)) {
+          let iv = Object.keys(request.phraseStore.iv).map(function(key) {
+            return request.phraseStore.iv[key];
+          });
+          eIV = Uint8Array.from(iv);
+        } else {
+          eIV = request.phraseStore.iv;
+        }
+
+        if (!(request.phraseStore.ciphertext instanceof Uint8Array)) {
+          let ciphertext = Object.keys(request.phraseStore.ciphertext).map(
+            function(key) {
+              return request.phraseStore.ciphertext[key];
+            });
+          eCiphertext = Uint8Array.from(ciphertext);
+        } else {
+          eCiphertext = request.phraseStore.ciphertext;
+        }
+
+        temporaryPhraseStore.storeValues(request.threeCharHash, {
+          iv: eIV,
+          ciphertext: eCiphertext,
+        });
+
+        setValuePopulated(passPhrase);
+        setPassPhraseScreenState('stored');
+        // Call domain name prep function
+        trimDomainName();
+      } else {
+        // Pass phrase is not stored at all and is in standard editing mode
+        setPassPhraseScreenState('editing');
+      }
+    }
+  }
+);
+
+/**
+* Sends a message to background page when the pasword has been setTimeout
+* store open sesame parameters for next time the extension is loaded
+*/
+function generateExtPassword() {
+  chrome.runtime.sendMessage({
+    'message': 'set_password',
+    'userName': userName.value,
+    'securityQuestion': securityQuestion.value,
+    'password': password.textContent,
+    'passwordType': passwordType,
+    'version': version.value,
+    'threeCharHash': temporaryPhraseStore.threeCharHash,
+    'phraseStore': temporaryPhraseStore.encData,
+  });
+}
+
+/**
+* Sends a message to background page to store open sesame parameters
+* for next time the extension is loaded
+*/
+function storeExtVals() {
+  chrome.runtime.sendMessage({
+    'message': 'set_values',
+    'userName': userName.value,
+    'securityQuestion': securityQuestion.value,
+    'password': password.textContent,
+    'passwordType': passwordType,
+    'version': version.value,
+    'threeCharHash': temporaryPhraseStore.threeCharHash || '',
+    'phraseStore': temporaryPhraseStore.encData || {},
+  });
+}
+
+/**
+* Sends a message to background page to store open sesame encrypted pass phrase
+*/
+function storeExtPhrase() {
+  chrome.runtime.sendMessage({
+    'message': 'store_phrase',
+    'threeCharHash': temporaryPhraseStore.threeCharHash || '',
+    'phraseStore': temporaryPhraseStore.encData || {},
+  });
+}
+
+/**
+* Sends a message to background page to clear a stored encrypted pass phrase
+*/
+function clearExtPhrase() {
+  chrome.runtime.sendMessage({
+    'message': 'clear_stored_phrase',
+  });
 }

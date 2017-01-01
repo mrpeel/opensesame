@@ -294,14 +294,20 @@ window.addEventListener('load', function() {
     });
   }
 
-  // Set-up firebase auth
-  fbAuth = new FBAuth(firebaseSignInCallback, firebaseSignOutCallback,
-    firebaseDataCallback, firebaseDataCallback);
+  /* Attempt to set-up firebase auth - this will fail if there is no
+     network connection */
+  try {
+    fbAuth = new FBAuth(firebaseSignInCallback, firebaseSignOutCallback,
+      firebaseDataCallback, firebaseDataCallback);
 
 
-  // Check current auth state
-  if (!fbAuth.getUserId()) {
-    firebaseSignOutCallback();
+    // Check current auth state
+    if (!fbAuth.getUserId()) {
+      firebaseSignOutCallback();
+    }
+  } catch (err) {
+    console.log('Cannot create firebase object');
+    console.log(err);
   }
 }, false);
 

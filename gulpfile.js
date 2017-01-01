@@ -5,6 +5,7 @@ const del = require('del');
 const replace = require('gulp-replace-task');
 const fileinclude = require('gulp-file-include');
 const rename = require('gulp-rename');
+const regexRename = require('gulp-regex-rename');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const nano = require('gulp-cssnano');
@@ -26,6 +27,7 @@ gulp.task('default', ['watch']);
 gulp.task('clean', function() {
   return del([
     './build/**/*',
+    './name-cache/**/*',
     './dist/**/*',
     './chrome-ext/**/*',
   ]);
@@ -50,38 +52,8 @@ gulp.task('buildserviceworker', ['clean'], function() {
     }))
     .pipe(replace({
       patterns: [{
-        match: 'assert-jsref',
-        replacement: 'simple_assert.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'opensesame-jsref',
-        replacement: 'opensesame.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'crypto-jsref',
-        replacement: 'cryptofunctions.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'phrasestore-jsref',
-        replacement: 'temporaryphrasestore.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'firebase-jsref',
-        replacement: 'fb-auth.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'manager-jsref',
-        replacement: 'manager.js',
+        match: 'os-jsref',
+        replacement: 'os.js',
       }],
     }))
     .pipe(gulp.dest('./build/'));
@@ -107,38 +79,8 @@ gulp.task('distserviceworker', ['buildserviceworker'], function() {
     }))
     .pipe(replace({
       patterns: [{
-        match: 'assert-jsref',
-        replacement: 'simple_assert.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'opensesame-jsref',
-        replacement: 'opensesame.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'firebase-jsref',
-        replacement: 'fb-auth.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'crypto-jsref',
-        replacement: 'cryptofunctions.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'phrasestore-jsref',
-        replacement: 'temporaryphrasestore.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'manager-jsref',
-        replacement: 'manager.min.js',
+        match: 'os-jsref',
+        replacement: 'os.min.js',
       }],
     }))
     .pipe(gulp.dest('./dist/'));
@@ -156,38 +98,8 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
     }))
     .pipe(replace({
       patterns: [{
-        match: 'assert-jsref',
-        replacement: 'simple_assert.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'opensesame-jsref',
-        replacement: 'opensesame.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'crypto-jsref',
-        replacement: 'cryptofunctions.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'phrasestore-jsref',
-        replacement: 'temporaryphrasestore.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'firebase-jsref',
-        replacement: 'fb-auth.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'manager-jsref',
-        replacement: 'manager.js',
+        match: 'os-jsref',
+        replacement: 'os.js',
       }],
     }))
     .pipe(replace({
@@ -210,38 +122,8 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
     }))
     .pipe(replace({
       patterns: [{
-        match: 'assert-jsref',
-        replacement: 'simple_assert.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'opensesame-jsref',
-        replacement: 'opensesame.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'crypto-jsref',
-        replacement: 'cryptofunctions.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'phrasestore-jsref',
-        replacement: 'temporaryphrasestore.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'firebase-jsref',
-        replacement: 'fb-auth.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'manager-jsref',
-        replacement: 'manager.min.js',
+        match: 'os-jsref',
+        replacement: 'os.min.js',
       }],
     }))
     .pipe(replace({
@@ -261,10 +143,15 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
 * versions of Open Sesame for the build directory.
 */
 gulp.task('copybuildjs', ['buildstandalonehtml'], function() {
-  gulp.src(['src/simple_assert.js', 'src/passoff.js', 'src/manager.js',
-    'src/cryptofunctions.js', 'src/temporaryphrasestore.js',
-    'src/opensesame.js', 'src/fb-auth.js',
+  gulp.src(['src/simple_assert.js', 'src/manager.js', 'src/cryptofunctions.js',
   ])
+    .pipe(gulp.dest('./build/scripts/'))
+    .pipe(gulp.dest('./chrome-ext/build/scripts/'));
+
+  gulp.src(['src/temporaryphrasestore.js', 'src/opensesame.js',
+    'src/fb-auth.js',
+  ])
+    .pipe(concat('classes.js'))
     .pipe(gulp.dest('./build/scripts/'))
     .pipe(gulp.dest('./chrome-ext/build/scripts/'));
 
@@ -281,7 +168,7 @@ gulp.task('minifyjs', ['copybuildjs'], function() {
   gulp.src(['src/simple_assert.js'])
     .pipe(rename('simple_assert.min.js'))
     .pipe(uglify({
-      mangle: false,
+      'name-cache': './name-cache/names.json',
     }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
@@ -289,7 +176,7 @@ gulp.task('minifyjs', ['copybuildjs'], function() {
   gulp.src(['src/opensesame.js'])
     .pipe(rename('opensesame.min.js'))
     .pipe(uglify({
-      mangle: false,
+      'keep-fnames': true,
     }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
@@ -297,7 +184,7 @@ gulp.task('minifyjs', ['copybuildjs'], function() {
   gulp.src(['src/manager.js'])
     .pipe(rename('manager.min.js'))
     .pipe(uglify({
-      mangle: false,
+      'name-cache': './name-cache/names.json',
     }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
@@ -305,7 +192,7 @@ gulp.task('minifyjs', ['copybuildjs'], function() {
   gulp.src(['src/cryptofunctions.js'])
     .pipe(rename('cryptofunctions.min.js'))
     .pipe(uglify({
-      mangle: false,
+      'name-cache': './name-cache/names.json',
     }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
@@ -313,7 +200,7 @@ gulp.task('minifyjs', ['copybuildjs'], function() {
   gulp.src(['src/temporaryphrasestore.js'])
     .pipe(rename('temporaryphrasestore.min.js'))
     .pipe(uglify({
-      mangle: false,
+      'name-cache': './name-cache/names.json',
     }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
@@ -321,7 +208,7 @@ gulp.task('minifyjs', ['copybuildjs'], function() {
   gulp.src(['src/cryptofunctions.js'])
     .pipe(rename('cryptofunctions.min.js'))
     .pipe(uglify({
-      mangle: false,
+      'name-cache': './name-cache/names.json',
     }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
@@ -329,16 +216,50 @@ gulp.task('minifyjs', ['copybuildjs'], function() {
   gulp.src(['src/fb-auth.js'])
     .pipe(rename('fb-auth.min.js'))
     .pipe(uglify({
-      mangle: false,
+      'name-cache': './name-cache/names.json',
     }).on('error', gutil.log))
     .pipe(gulp.dest('./dist/scripts/'))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
 
   // Extra js file used in the chrome extension only
-  gulp.src(['ext-popup.js'])
+  gulp.src(['src/ext-popup.js'])
     .pipe(rename('ext-popup.min.js'))
     .pipe(uglify({
-      mangle: false,
+      'name-cache': './name-cache/names.json',
+    }).on('error', gutil.log))
+    .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
+});
+
+/* Minify the javascript for the stand alone website and extension versions
+*  of Open Sesame for the dist directories.
+*/
+gulp.task('copyandminifyjs', ['buildstandalonehtml'], function() {
+  // Copy then minify the individual stand alone and extension files
+  gulp.src(['src/simple_assert.js', 'src/cryptofunctions.js',
+    'src/temporaryphrasestore.js', 'src/opensesame.js', 'src/fb-auth.js',
+    'src/manager.js'])
+    .pipe(concat('os.js'))
+    .pipe(gulp.dest('./build/scripts/'))
+    .pipe(regexRename(/\.js$/, '.min.js').on('error', gutil.log))
+    .pipe(debug())
+    .pipe(uglify({
+      'warnings': true,
+    }).on('error', gutil.log))
+    .pipe(gulp.dest('./dist/scripts/'));
+
+  /* Copy then minify the js file for the chrome extension */
+  gulp.src(['src/simple_assert.js', 'src/cryptofunctions.js',
+    'src/temporaryphrasestore.js', 'src/opensesame.js', 'src/fb-auth.js',
+    'src/manager.js', 'src/ext-popup.js'])
+    .pipe(concat('os.js'))
+    .pipe(gulp.dest('./chrome-ext/build/scripts/'))
+    .pipe(regexRename(/\.js$/, '.min.js').on('error', gutil.log))
+    .pipe(debug())
+    .pipe(uglify({
+      'warnings': true,
+      'mangle': {
+        'keep_fnames': true,
+      },
     }).on('error', gutil.log))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
 });
@@ -346,7 +267,7 @@ gulp.task('minifyjs', ['copybuildjs'], function() {
 /* Minify the CSS used for Open Sesame (same is used for stand alone and
  * chrome extension).
  */
-gulp.task('minifycss', ['minifyjs'], function() {
+gulp.task('minifycss', ['copyandminifyjs'], function() {
   gulp.src(['src/style.css'])
     .pipe(rename('opensesame.css'))
     .pipe(gulp.dest('./build/css/'))
@@ -421,44 +342,8 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
     }))
     .pipe(replace({
       patterns: [{
-        match: 'assert-jsref',
-        replacement: 'simple_assert.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'opensesame-jsref',
-        replacement: 'opensesame.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'manager-jsref',
-        replacement: 'manager.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'crypto-jsref',
-        replacement: 'cryptofunctions.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'phrasestore-jsref',
-        replacement: 'temporaryphrasestore.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'firebase-jsref',
-        replacement: 'fb-auth.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'ext-popup-jsref-jsref',
-        replacement: 'ext-popup.js',
+        match: 'os-jsref',
+        replacement: 'os.js',
       }],
     }))
     .pipe(rename('opensesame.html'))
@@ -472,44 +357,8 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
     }))
     .pipe(replace({
       patterns: [{
-        match: 'assert-jsref',
-        replacement: 'simple_assert.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'opensesame-jsref',
-        replacement: 'opensesame.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'manager-jsref',
-        replacement: 'manager.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'crypto-jsref',
-        replacement: 'cryptofunctions.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'phrasestore-jsref',
-        replacement: 'temporaryphrasestore.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'firebase-jsref',
-        replacement: 'fb-auth.min.js',
-      }],
-    }))
-    .pipe(replace({
-      patterns: [{
-        match: 'ext-popup-jsref-jsref',
-        replacement: 'ext-popup.min.js',
+        match: 'os-jsref',
+        replacement: 'os.min.js',
       }],
     }))
     .pipe(rename('opensesame.html'))
@@ -519,15 +368,14 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
 /* Concatenate the main css and specialised chrome extension css and minifies
  *  it.
  */
-
 gulp.task('minifyextcss', ['buildexthtml'], function() {
   gulp.src(['src/style.css', 'src/ext-style.css'])
     .pipe(debug())
     .pipe(concat('ext-opensesame.css'))
-    .pipe(gulp.dest('./chrome-ext/build/'))
+    .pipe(gulp.dest('./chrome-ext/build/css/'))
     .pipe(rename('ext-opensesame.min.css'))
     .pipe(nano()).on('error', gutil.log)
-    .pipe(gulp.dest('./chrome-ext/dist/'));
+    .pipe(gulp.dest('./chrome-ext/dist/css/'));
 });
 
 /* Build manifest file
@@ -556,7 +404,7 @@ gulp.task('copytochromeext', ['buildmanifestfiles'], function() {
   gulp.src(['src/ext-background.js', 'src/ext-content.js'])
     .pipe(debug())
     .pipe(gulp.dest('./chrome-ext/build/scripts/'))
-    .pipe(gulp.dest('./chrome-ext/dist/script/'));
+    .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
 
   gulp.src(['src/opensesame-38.png'])
     .pipe(debug())

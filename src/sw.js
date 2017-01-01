@@ -5,12 +5,7 @@ let preCache = [
   'lib/material.min.css',
   'lib/material.min.js',
   'css/@@cssfile',
-  'scripts/@@assert-jsref',
-  'scripts/@@opensesame-jsref',
-  'scripts/@@crypto-jsref',
-  'scripts/@@phrasestore-jsref',
-  'scripts/@@firebase-jsref',
-  'scripts/@@manager-jsref',
+  'scripts/@@os-jsref',
   'images/favicon.ico',
 ];
 let opaqueCacheOnRequest = [

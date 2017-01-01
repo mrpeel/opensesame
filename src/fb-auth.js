@@ -2,8 +2,6 @@
 
 /* exported FBAuth */
 
-// window['FBAuth'] = FBAuth;
-
 'use strict';
 
 /** Firebase auth class to handle the firebase authentication and return the
@@ -155,3 +153,5 @@ class FBAuth {
     }
   }
 }
+
+window['FBAuth'] = FBAuth;
