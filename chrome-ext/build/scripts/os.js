@@ -32,7 +32,7 @@ TextDecoder */
 
 /* Ensure functions are always adressable after minification / compilation */
 window['pBKDF2'] = pBKDF2;
-window['HMACSHA256'] = hMACSHA256;
+window['hMACSHA256'] = hMACSHA256;
 window['aesEncrypt'] = aesEncrypt;
 window['aesDecrypt'] = aesDecrypt;
 window['convertDerivedKeyToHex'] = convertDerivedKeyToHex;
@@ -71,21 +71,30 @@ function pBKDF2(password, salt, numIterations, keyLength) {
 
 
   if (window.crypto && window.crypto.subtle) {
-    // use the subtle crypto functions
-    let cryptoTextEncoder = new TextEncoder('utf-8');
+    return new Promise(function(resolve, reject) {
+      // use the subtle crypto functions
+      let cryptoTextEncoder = new TextEncoder('utf-8');
 
-    let saltBuffer = cryptoTextEncoder.encode(salt);
-    let passwordBuffer = cryptoTextEncoder.encode(password);
+      let saltBuffer = cryptoTextEncoder.encode(salt);
+      let passwordBuffer = cryptoTextEncoder.encode(password);
 
-    return window.crypto.subtle.importKey('raw', passwordBuffer, {
-      name: 'PBKDF2',
-    }, false, ['deriveBits']).then(function(key) {
-      return window.crypto.subtle.deriveBits({
+      window.crypto.subtle.importKey('raw', passwordBuffer, {
         name: 'PBKDF2',
-        iterations: numIterations,
-        salt: saltBuffer,
-        hash: 'SHA-1',
-      }, key, keyLength);
+      }, false, ['deriveBits'])
+        .then(function(key) {
+          return window.crypto.subtle.deriveBits({
+            name: 'PBKDF2',
+            iterations: numIterations,
+            salt: saltBuffer,
+            hash: 'SHA-1',
+          }, key, keyLength);
+        })
+        .then(function(derivedKey) {
+          resolve(derivedKey);
+        })
+        .catch(function(err) {
+          reject(err);
+        });
     });
   } else {
     // use the CryptJS function
@@ -400,7 +409,7 @@ class TemporaryPhraseStore {
   encryptPhrase(passphrase, name) {
     assert(passphrase !== '',
       'TemporaryPhraseStore.prototype.encryptPhrase passphrase: ' +
-      passPhrase);
+      passphrase);
     assert(name !== '',
       'TemporaryPhraseStore.prototype.encryptPhrase userName: ' + name);
 
@@ -672,13 +681,15 @@ class OpenSesame {
   /**
    * Prepares a supplied domain name into its base domain
    * @param {String} domainName the starting domain
-   * @return {String} the trimmed domain`
+   * @return {String} the prepared domain
    */
   prepareDomain(domainName) {
     let posDomain = 0;
     let domainParts;
     let calculatedDomain = '';
     let domainCountryCode = '';
+
+    let openSesame = this;
 
     /* Retrieve domain value and trim the leading http://  or https://  */
     let fullDomain = domainName.trim().replace(/^https?:\/\//g, '')
@@ -718,6 +729,32 @@ class OpenSesame {
   }
 
   /**
+   * Prepares a supplied user name into its base value - trimmed and lower case
+   * @param {String} userName the starting user name
+   * @return {String} the prepared user name
+   */
+  prepareUserName(userName) {
+    return userName.trim().toLowerCase();
+  }
+
+  /**
+   * Prepares a supplied security question into its base value
+   *    remove punctuation
+   *    remove consecutive spaces
+   *    trim the text
+   *    make lower case
+   * @param {String} securityQuestion the starting security question
+   * @return {String} the prepared security question
+   */
+  prepareSecurityQuestion(securityQuestion) {
+    return securityQuestion
+      .replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()?''"?]/g, '')
+      .replace(/  +/g, ' ')
+      .trim()
+      .toLowerCase();
+  }
+
+  /**
    * Runs the generation of a password by generating a key (PBKDF2) and then
     using that key to sign (HMAC256) the constructed domain value
    * @param {String} userName the website username
@@ -738,23 +775,26 @@ class OpenSesame {
     let securityQuestionValue = securityQuestion || '';
 
 
-    if (passPhrase.length === 0) {
+    if (!passPhrase || passPhrase.length === 0) {
       return Promise.reject(new Error('Passphrase not present'));
     }
 
-    if (domainName.length === 0) {
+    if (!domainName || domainName.length === 0) {
       return Promise.reject(new Error('Domain name not present'));
     }
 
-    if (userName.length === 0) {
-      return Promise.reject(new Error('Domain name not present'));
+    if (!userName || userName.length === 0) {
+      return Promise.reject(new Error('User name not present'));
     }
 
+    if (!passwordType || passwordType.length === 0) {
+      return Promise.reject(new Error('Password type not present'));
+    }
 
-    if (passwordType === 'answer' && securityQuestion.length === 0) {
+    if (passwordType && passwordType === 'answer' &&
+      securityQuestion.length === 0) {
       return Promise.reject(new Error('Security question not present'));
     }
-
 
     try {
       let openSesame = this;
@@ -770,7 +810,7 @@ class OpenSesame {
         }
 
         // Set up parameters for PBKDF2 and HMAC functions
-        let userNameValue = userName.trim().toLowerCase();
+        let userNameValue = openSesame.prepareUserName(userName);
         let salt = passNS + '.' + userNameValue;
 
         // Convert domain name to calulated domain
@@ -780,19 +820,14 @@ class OpenSesame {
 
         // For an answer, add the security question to domain value
         if (passwordType === 'answer') {
-          /* Strip out any punctuation or multiple spaces and convert to
-            lower case */
-          securityQuestionValue = securityQuestionValue
-            .replace(/[.,-\/#!$%\^&\*;:{}=\-_`~()?'']/g, '')
-            .replace(/  +/g, ' ')
-            .trim()
-            .toLowerCase();
+          securityQuestionValue = openSesame.prepareSecurityQuestion(
+            securityQuestionValue);
           calculatedDomain = calculatedDomain + ':' + securityQuestionValue;
         }
 
 
         // parameters: password, salt, numIterations, keyLength
-        return pBKDF2(openSesame.passPhrase, salt, 750, 128)
+        pBKDF2(passPhrase, salt, 750, 128)
           .then(function(key) {
             // console.log('Derived key: ' + key);
 
@@ -1542,6 +1577,11 @@ function retrieveUserValues() {
 * @param {String} passwordVersion - the version of password generated
 */
 function recordGeneration(domain, userName, passwordType, passwordVersion) {
+  // Firebase may not load at all if network connectivity problem
+  if (!fbAuth) {
+    return;
+  }
+
   let userId = fbAuth.getUserId();
 
   let domainValue = domain.replace('.', '--dot--');
@@ -2427,6 +2467,11 @@ function relativeDate(timestamp) {
  * Sign user in with Google redirect
  */
 function googleSignIn() {
+  // Firebase may not load at all if network connectivity problem
+  if (!fbAuth) {
+    return;
+  }
+
   showLoader();
   fbAuth.logIn().catch(function(err) {
     hideLoader();
@@ -2443,7 +2488,10 @@ function googleSignIn() {
  * Sign user out of Google
  */
 function googleSignOut() {
-  fbAuth.logOut();
+  // Firebase may not load at all if network connectivity problem
+  if (fbAuth) {
+    fbAuth.logOut();
+  }
   closeUserCard();
 }
 

@@ -495,6 +495,11 @@ function retrieveUserValues() {
 * @param {String} passwordVersion - the version of password generated
 */
 function recordGeneration(domain, userName, passwordType, passwordVersion) {
+  // Firebase may not load at all if network connectivity problem
+  if (!fbAuth) {
+    return;
+  }
+
   let userId = fbAuth.getUserId();
 
   let domainValue = domain.replace('.', '--dot--');
@@ -1380,6 +1385,11 @@ function relativeDate(timestamp) {
  * Sign user in with Google redirect
  */
 function googleSignIn() {
+  // Firebase may not load at all if network connectivity problem
+  if (!fbAuth) {
+    return;
+  }
+
   showLoader();
   fbAuth.logIn().catch(function(err) {
     hideLoader();
@@ -1396,7 +1406,10 @@ function googleSignIn() {
  * Sign user out of Google
  */
 function googleSignOut() {
-  fbAuth.logOut();
+  // Firebase may not load at all if network connectivity problem
+  if (fbAuth) {
+    fbAuth.logOut();
+  }
   closeUserCard();
 }
 

@@ -14,7 +14,7 @@ const ghPages = require('gulp-gh-pages');
 const gutil = require('gulp-util');
 const debug = require('gulp-debug');
 const htmlmin = require('gulp-htmlmin');
-
+const mochaPhantomJS = require('gulp-mocha-phantomjs');
 
 /* Use a dependency chain to build in the correct order - starting with the
   final task.
@@ -139,97 +139,6 @@ gulp.task('buildstandalonehtml', ['distserviceworker'], function() {
     .pipe(gulp.dest('./dist/'));
 });
 
-/* Copy the unminifed javascript for the stand alone website and extension
-* versions of Open Sesame for the build directory.
-*/
-gulp.task('copybuildjs', ['buildstandalonehtml'], function() {
-  gulp.src(['src/simple_assert.js', 'src/manager.js', 'src/cryptofunctions.js',
-  ])
-    .pipe(gulp.dest('./build/scripts/'))
-    .pipe(gulp.dest('./chrome-ext/build/scripts/'));
-
-  gulp.src(['src/temporaryphrasestore.js', 'src/opensesame.js',
-    'src/fb-auth.js',
-  ])
-    .pipe(concat('classes.js'))
-    .pipe(gulp.dest('./build/scripts/'))
-    .pipe(gulp.dest('./chrome-ext/build/scripts/'));
-
-  // The extension requires one extra js file
-  gulp.src(['ext-popup.js'])
-    .pipe(gulp.dest('./chrome-ext/build/scripts/'));
-});
-
-
-/* Minify the javascript for the stand alone website and extension versions
-* version of Open Sesame for the dist directory.
-*/
-gulp.task('minifyjs', ['copybuildjs'], function() {
-  gulp.src(['src/simple_assert.js'])
-    .pipe(rename('simple_assert.min.js'))
-    .pipe(uglify({
-      'name-cache': './name-cache/names.json',
-    }).on('error', gutil.log))
-    .pipe(gulp.dest('./dist/scripts/'))
-    .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
-
-  gulp.src(['src/opensesame.js'])
-    .pipe(rename('opensesame.min.js'))
-    .pipe(uglify({
-      'keep-fnames': true,
-    }).on('error', gutil.log))
-    .pipe(gulp.dest('./dist/scripts/'))
-    .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
-
-  gulp.src(['src/manager.js'])
-    .pipe(rename('manager.min.js'))
-    .pipe(uglify({
-      'name-cache': './name-cache/names.json',
-    }).on('error', gutil.log))
-    .pipe(gulp.dest('./dist/scripts/'))
-    .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
-
-  gulp.src(['src/cryptofunctions.js'])
-    .pipe(rename('cryptofunctions.min.js'))
-    .pipe(uglify({
-      'name-cache': './name-cache/names.json',
-    }).on('error', gutil.log))
-    .pipe(gulp.dest('./dist/scripts/'))
-    .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
-
-  gulp.src(['src/temporaryphrasestore.js'])
-    .pipe(rename('temporaryphrasestore.min.js'))
-    .pipe(uglify({
-      'name-cache': './name-cache/names.json',
-    }).on('error', gutil.log))
-    .pipe(gulp.dest('./dist/scripts/'))
-    .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
-
-  gulp.src(['src/cryptofunctions.js'])
-    .pipe(rename('cryptofunctions.min.js'))
-    .pipe(uglify({
-      'name-cache': './name-cache/names.json',
-    }).on('error', gutil.log))
-    .pipe(gulp.dest('./dist/scripts/'))
-    .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
-
-  gulp.src(['src/fb-auth.js'])
-    .pipe(rename('fb-auth.min.js'))
-    .pipe(uglify({
-      'name-cache': './name-cache/names.json',
-    }).on('error', gutil.log))
-    .pipe(gulp.dest('./dist/scripts/'))
-    .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
-
-  // Extra js file used in the chrome extension only
-  gulp.src(['src/ext-popup.js'])
-    .pipe(rename('ext-popup.min.js'))
-    .pipe(uglify({
-      'name-cache': './name-cache/names.json',
-    }).on('error', gutil.log))
-    .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
-});
-
 /* Minify the javascript for the stand alone website and extension versions
 *  of Open Sesame for the dist directories.
 */
@@ -257,9 +166,6 @@ gulp.task('copyandminifyjs', ['buildstandalonehtml'], function() {
     .pipe(debug())
     .pipe(uglify({
       'warnings': true,
-      'mangle': {
-        'keep_fnames': true,
-      },
     }).on('error', gutil.log))
     .pipe(gulp.dest('./chrome-ext/dist/scripts/'));
 });
@@ -292,9 +198,26 @@ gulp.task('copymaterial', ['minifycss'], function() {
     .pipe(gulp.dest('./chrome-ext/dist/lib/'));
 });
 
+/* Copy polyfills to library directory */
+gulp.task('copypollyfills', ['copymaterial'], function() {
+  gulp.src(['lib/crypto.min.js', 'lib/Promise.min.js'])
+    .pipe(gulp.dest('./build/lib/'))
+    .pipe(gulp.dest('./dist/lib/'))
+    .pipe(gulp.dest('./chrome-ext/build/lib/'))
+    .pipe(gulp.dest('./chrome-ext/dist/lib/'));
+});
+
+/* Special task to build the three CyrptoJS files used into a single file */
+gulp.task('buildcryptojs', ['copypollyfills'], function() {
+  gulp.src(['lib/aes.js', 'lib/pbkdf2.js', 'lib/hmac-sha256.js'])
+    .pipe(debug())
+    .pipe(concat('crypto.min.js'))
+    .pipe(gulp.dest('./lib/'));
+});
+
 /* Copy the favicon files
  */
-gulp.task('copyfavicon', ['copymaterial'], function() {
+gulp.task('copyfavicon', ['buildcryptojs'], function() {
   gulp.src(['src/*.png', 'src/*.ico'])
     .pipe(debug())
     .pipe(gulp.dest('./build/images/'))
@@ -456,10 +379,8 @@ gulp.task('deploy', function() {
     .pipe(ghPages());
 });
 
-/* Special task to build the three CyrptoJS files used into a single file */
-gulp.task('buildcryptojs', function() {
-  gulp.src(['lib/aes.js', 'lib/pbkdf2.js', 'lib/hmac-sha256.js'])
-    .pipe(debug())
-    .pipe(concat('cryptojs.js'))
-    .pipe(gulp.dest('./build/'));
+gulp.task('execute-tests', function() {
+  return gulp
+    .src('test/index.html')
+    .pipe(mochaPhantomJS());
 });

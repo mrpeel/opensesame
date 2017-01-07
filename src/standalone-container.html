@@ -42,10 +42,10 @@
 
     <script>
         // If Promise is not supported, include the polyfill
-        window.Promise || document.write("<script src=Promise.min.js><\/script>");
+        window.Promise || document.write("<script src=lib\/Promise.min.js><\/script>");
 
         // If subtle crypto not supported, add cryptoJS functions
-        (window.crypto && window.crypto.subtle) || document.write("<script src=cryptojs.js><\/script>");
+        (window.crypto && window.crypto.subtle) || document.write("<script src=lib\/crypto.min.js><\/script>");
 
     </script>
     <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>

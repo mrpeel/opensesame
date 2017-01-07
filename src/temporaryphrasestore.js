@@ -31,7 +31,7 @@ class TemporaryPhraseStore {
   encryptPhrase(passphrase, name) {
     assert(passphrase !== '',
       'TemporaryPhraseStore.prototype.encryptPhrase passphrase: ' +
-      passPhrase);
+      passphrase);
     assert(name !== '',
       'TemporaryPhraseStore.prototype.encryptPhrase userName: ' + name);
 

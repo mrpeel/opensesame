@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Open Sesame Test Runner</title>
+
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css">
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="browser-chai-as-promised.js"></script>
+    <script src="../src/simple_assert.js"></script>
+    <script src="../src/cryptofunctions.js"></script>
+    <script src="../src/opensesame.js"></script>
+    <script src="../src/temporaryphrasestore.js"></script>
+  </head>
+
+
+<body>
+  <h1>Open Sesame Tests</h1>
+
+  <div id="mocha"></div>
+
+
+    <!-- Specs  -->
+    <script src="opensesame-spec-mocha.js"></script>
+
+    <script>
+          console.log('mocha run');
+          mocha.run('opensesame-spec-mocha.js');
+    </script>
+
+
+</body>
+
+</html>

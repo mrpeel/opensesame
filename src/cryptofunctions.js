@@ -4,7 +4,7 @@ TextDecoder */
 
 /* Ensure functions are always adressable after minification / compilation */
 window['pBKDF2'] = pBKDF2;
-window['HMACSHA256'] = hMACSHA256;
+window['hMACSHA256'] = hMACSHA256;
 window['aesEncrypt'] = aesEncrypt;
 window['aesDecrypt'] = aesDecrypt;
 window['convertDerivedKeyToHex'] = convertDerivedKeyToHex;
@@ -43,21 +43,30 @@ function pBKDF2(password, salt, numIterations, keyLength) {
 
 
   if (window.crypto && window.crypto.subtle) {
-    // use the subtle crypto functions
-    let cryptoTextEncoder = new TextEncoder('utf-8');
+    return new Promise(function(resolve, reject) {
+      // use the subtle crypto functions
+      let cryptoTextEncoder = new TextEncoder('utf-8');
 
-    let saltBuffer = cryptoTextEncoder.encode(salt);
-    let passwordBuffer = cryptoTextEncoder.encode(password);
+      let saltBuffer = cryptoTextEncoder.encode(salt);
+      let passwordBuffer = cryptoTextEncoder.encode(password);
 
-    return window.crypto.subtle.importKey('raw', passwordBuffer, {
-      name: 'PBKDF2',
-    }, false, ['deriveBits']).then(function(key) {
-      return window.crypto.subtle.deriveBits({
+      window.crypto.subtle.importKey('raw', passwordBuffer, {
         name: 'PBKDF2',
-        iterations: numIterations,
-        salt: saltBuffer,
-        hash: 'SHA-1',
-      }, key, keyLength);
+      }, false, ['deriveBits'])
+        .then(function(key) {
+          return window.crypto.subtle.deriveBits({
+            name: 'PBKDF2',
+            iterations: numIterations,
+            salt: saltBuffer,
+            hash: 'SHA-1',
+          }, key, keyLength);
+        })
+        .then(function(derivedKey) {
+          resolve(derivedKey);
+        })
+        .catch(function(err) {
+          reject(err);
+        });
     });
   } else {
     // use the CryptJS function
