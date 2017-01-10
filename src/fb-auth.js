@@ -104,6 +104,17 @@ class FBAuth {
     }
   }
 
+  /** Authenticates the user if not already authenticated using supplied token
+  * @param {Object} token - the auth token to use
+  * @return {Promise} - a promise with the result of calling sign in
+  */
+  logInWithToken(token) {
+    if (!firebase.auth().currentUser) {
+      let credential = firebase.auth.GoogleAuthProvider.credential(null, token);
+      return firebase.auth().signInWithCredential(credential);
+    }
+  }
+
   /** Check result of redirect logIn
   * @return {Promise} result of whether user is authenticated
   */

@@ -98,15 +98,15 @@ chrome.runtime.onMessage.addListener(
 
       // Supply page values and held values from previously
       chrome.runtime.sendMessage({
-        ' message': 'populate_fields',
-        ' url': pageURL,
-        ' hasPassword': pageHasPassword,
-        ' version': extVersion,
-        ' passwordType': extPasswordType,
-        ' userName': extUsername,
-        ' securityQuestion': extSecurityQuestion,
-        ' threeCharHash': extEncHash,
-        ' phraseStore': extEncStore,
+        'message': 'populate_fields',
+        'url': pageURL,
+        'hasPassword': pageHasPassword,
+        'version': extVersion,
+        'passwordType': extPasswordType,
+        'userName': extUsername,
+        'securityQuestion': extSecurityQuestion,
+        'threeCharHash': extEncHash,
+        'phraseStore': extEncStore,
       });
 
       // After values have been supplied, clear the stored phrase and hash

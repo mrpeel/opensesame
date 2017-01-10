@@ -13,6 +13,11 @@
     <script src="../src/cryptofunctions.js"></script>
     <script src="../src/opensesame.js"></script>
     <script src="../src/temporaryphrasestore.js"></script>
+    <script>
+        // Remove global crypto object to force polyfill usage
+        delete window.crypto;
+    </script>
+    <script src="../lib/crypto.min.js"></script>
   </head>
 
 
@@ -20,6 +25,7 @@
   <h1>Open Sesame Tests</h1>
 
   <div id="mocha"></div>
+
 
 
     <!-- Specs  -->

@@ -14,7 +14,6 @@ const ghPages = require('gulp-gh-pages');
 const gutil = require('gulp-util');
 const debug = require('gulp-debug');
 const htmlmin = require('gulp-htmlmin');
-const mochaPhantomJS = require('gulp-mocha-phantomjs');
 
 /* Use a dependency chain to build in the correct order - starting with the
   final task.
@@ -265,6 +264,12 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
     }))
     .pipe(replace({
       patterns: [{
+        match: 'oscss',
+        replacement: 'ext-opensesame.css',
+      }],
+    }))
+    .pipe(replace({
+      patterns: [{
         match: 'os-jsref',
         replacement: 'os.js',
       }],
@@ -277,6 +282,12 @@ gulp.task('buildexthtml', ['copytodisttest'], function() {
     .pipe(fileinclude({
       prefix: '@@',
       basepath: '@file',
+    }))
+    .pipe(replace({
+      patterns: [{
+        match: 'oscss',
+        replacement: 'ext-opensesame.min.css',
+      }],
     }))
     .pipe(replace({
       patterns: [{
@@ -377,10 +388,4 @@ gulp.task('servebuild', function() {
 gulp.task('deploy', function() {
   return gulp.src('./dist/**/*')
     .pipe(ghPages());
-});
-
-gulp.task('execute-tests', function() {
-  return gulp
-    .src('test/index.html')
-    .pipe(mochaPhantomJS());
 });

@@ -3,7 +3,7 @@
   setPassPhraseScreenState, userName, securityQuestion, populateValue */
 
 /* exported generateExtPassword,  extHasPassword, storeExtVals, storeExtPhrase
-    clearExtPhrase */
+    clearExtPhrase, returnExtAuthToken, removeExtAuthToken */
 
 // Extra variable only present for Chrome Extension
 let extHasPassword;
@@ -70,7 +70,7 @@ chrome.runtime.onMessage.addListener(
           ciphertext: eCiphertext,
         });
 
-        setValuePopulated(passPhrase);
+        passPhrase.parentElement.classList.add('is-dirty');
         setPassPhraseScreenState('stored');
         // Call domain name prep function
         trimDomainName();
@@ -133,5 +133,38 @@ function storeExtPhrase() {
 function clearExtPhrase() {
   chrome.runtime.sendMessage({
     'message': 'clear_stored_phrase',
+  });
+}
+
+/**
+* Returns a chrome extension auth token to use in firebase
+*/
+function returnExtAuthToken() {
+  // Request an OAuth token from the Chrome Identity API.
+  chrome.identity.getAuthToken({
+    interactive: true,
+  }, function(token) {
+    let returnToken = null;
+    if (chrome.runtime.lastError) {
+      console.error(chrome.runtime.lastError);
+    } else if (token) {
+      returnToken = token;
+    } else {
+      console.error('The OAuth Token was null');
+    }
+
+    return returnToken;
+  });
+}
+
+/**
+* Removes a cached auth token
+* @param {Object} token - the auth token to remove
+*/
+function removeExtAuthToken(token) {
+  chrome.identity.removeCachedAuthToken({
+    token: token,
+  }, function() {
+    startAuth(interactive);
   });
 }

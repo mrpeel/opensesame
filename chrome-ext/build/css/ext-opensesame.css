@@ -603,14 +603,14 @@ body {
 
 @font-face {
   font-family: 'Muli';
-  src: url('muli.woff2') format('woff2');
+  src: url('../fonts/muli.woff2') format('woff2');
 }
 
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
-  src: url('material-icons.woff2') format('woff2');
+  src: url('../fonts/material-icons.woff2') format('woff2');
 }
 
 .material-icons {
@@ -634,7 +634,7 @@ body {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 400;
-  src: local('Roboto'), local('Roboto-Regular'), url('roboto-v15-latin-ext_cyrillic_greek-ext_greek_cyrillic-ext_vietnamese_latin-regular.woff2') format('woff2');
+  src: local('Roboto'), local('Roboto-Regular'), url('../fonts/roboto-v15-latin-ext_cyrillic_greek-ext_greek_cyrillic-ext_vietnamese_latin-regular.woff2') format('woff2');
 }
 
 /* roboto-500 - latin-ext_cyrillic_greek-ext_greek_cyrillic-ext_vietnamese_latin */
@@ -642,5 +642,5 @@ body {
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
-  src: local('Roboto Medium'), local('Roboto-Medium'), url('roboto-v15-latin-ext_cyrillic_greek-ext_greek_cyrillic-ext_vietnamese_latin-500.woff2') format('woff2');
+  src: local('Roboto Medium'), local('Roboto-Medium'), url('../fonts/roboto-v15-latin-ext_cyrillic_greek-ext_greek_cyrillic-ext_vietnamese_latin-500.woff2') format('woff2');
 }

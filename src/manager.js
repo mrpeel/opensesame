@@ -263,23 +263,19 @@ window.addEventListener('load', function() {
   signInButton.addEventListener('click', googleSignIn, false);
   signOutButton.addEventListener('click', googleSignOut, false);
 
-  document.getElementById('main-section').addEventListener('focus',
-    function() {
-      console.log('Focus');
-    },
-    false);
-
   /* Enable UI elements */
   domainName.disabled = false;
   userName.disabled = false;
   passPhrase.disabled = false;
   type.disabled = false;
 
-  /* Focus on the given name */
+  /* Put focus on first unpopulated field */
   if (domainName.value.trim() === '') {
     domainName.focus();
-  } else {
+  } else if (userName.value.trim() === '') {
     userName.focus();
+  } else if (passPhrase.value.trim() === '') {
+    passPhrase.focus();
   }
 
   // Set initial pass phrase state
@@ -322,7 +318,6 @@ function firebaseDataCallback(firebaseDomainValues) {
     .replace(/--dot--/g, '.');
   domainValues = JSON.parse(domainString);
 
-  console.log(domainValues);
   if (domainName.value !== '') {
     setDomainUserNames(openSesame.prepareDomain(domainName.value));
   }
@@ -503,10 +498,11 @@ function recordGeneration(domain, userName, passwordType, passwordVersion) {
   let userId = fbAuth.getUserId();
 
   let domainValue = domain.replace('.', '--dot--');
+  let userNameValue = userName.replace('.', '--dot--');
 
   if (userId) {
     firebase.database().ref('users/' + userId + '/domains/' + domainValue +
-      '/usernames/' + userName + '/' + passwordType)
+      '/usernames/' + userNameValue + '/' + passwordType)
       .update({
         passwordVersion: passwordVersion,
         lastUsed: Date.now(),
@@ -905,8 +901,8 @@ function setPassPhraseScreenState(passState) {
     // Hide the confirm pass phrase
     hideElement('confirm-dialog');
     showElement('passphrase-div');
-    showSnackbar('The entered characters don\'t match your pass phrase. ' +
-      'Pass phrase cleared.', 5, true);
+    showSnackbar('Characters entered don\'t match the saved pass phrase. ' +
+      'Pass phrase cleared.', 8, true);
     window.setTimeout(function() {
       setPassPhraseScreenState('editing');
       passPhrase.focus();
@@ -1391,15 +1387,35 @@ function googleSignIn() {
   }
 
   showLoader();
-  fbAuth.logIn().catch(function(err) {
-    hideLoader();
-    if (err.code = 'auth/network-request-failed') {
-      showSnackbar('No internet connection', 5, true);
+  if (isChromeExtension) {
+    // Retrieve chrome extension auth token
+    let token = returnExtAuthToken();
+    if (token) {
+      // Authrorize Firebase with the OAuth Access Token.
+      fbAuth.logInWithToken(token).catch(function(error) {
+        // The OAuth token might have been invalidated. Remove it from cache.
+        if (error.code === 'auth/invalid-credential') {
+          removeExtAuthToken(token);
+        }
+        console.log(error);
+        hideLoader();
+      });
     } else {
-      showSnackbar('Cannot connect', 5, true);
-      console.log(error);
+      console.log('The OAuth Token was null');
+      hideLoader();
     }
-  });
+  } else {
+    // Use normal auth
+    fbAuth.logIn().catch(function(err) {
+      hideLoader();
+      if (err.code = 'auth/network-request-failed') {
+        showSnackbar('No internet connection', 5, true);
+      } else {
+        showSnackbar('Cannot connect', 5, true);
+        console.log(error);
+      }
+    });
+  }
 }
 
 /**
