@@ -1389,21 +1389,18 @@ function googleSignIn() {
   showLoader();
   if (isChromeExtension) {
     // Retrieve chrome extension auth token
-    let token = returnExtAuthToken();
-    if (token) {
-      // Authrorize Firebase with the OAuth Access Token.
-      fbAuth.logInWithToken(token).catch(function(error) {
-        // The OAuth token might have been invalidated. Remove it from cache.
-        if (error.code === 'auth/invalid-credential') {
-          removeExtAuthToken(token);
-        }
-        console.log(error);
-        hideLoader();
-      });
-    } else {
-      console.log('The OAuth Token was null');
+    returnExtAuthToken().then(function(token) {
+      return fbAuth.logInWithToken(token);
+    }).then(function() {
       hideLoader();
-    }
+    }).catch(function(err) {
+      // The OAuth token might have been invalidated. Remove it from cache.
+      if (err.code === 'auth/invalid-credential') {
+        removeExtAuthToken(token);
+      }
+      console.log(err);
+      hideLoader();
+    });
   } else {
     // Use normal auth
     fbAuth.logIn().catch(function(err) {

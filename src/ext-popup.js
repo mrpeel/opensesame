@@ -138,22 +138,25 @@ function clearExtPhrase() {
 
 /**
 * Returns a chrome extension auth token to use in firebase
+* @return {Promise} - a promise which will resolve with the token
 */
 function returnExtAuthToken() {
   // Request an OAuth token from the Chrome Identity API.
-  chrome.identity.getAuthToken({
-    interactive: true,
-  }, function(token) {
-    let returnToken = null;
-    if (chrome.runtime.lastError) {
-      console.error(chrome.runtime.lastError);
-    } else if (token) {
-      returnToken = token;
-    } else {
-      console.error('The OAuth Token was null');
-    }
+  return new Promise(function(resolve, reject) {
+    chrome.identity.getAuthToken({
+      interactive: true,
+    }, function(token) {
+      console.log(token);
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      }
 
-    return returnToken;
+      if (!token) {
+        reject('The OAuth token was null');
+      } else {
+        resolve(token);
+      }
+    });
   });
 }
 
