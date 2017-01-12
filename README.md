@@ -26,7 +26,7 @@ Open Sesame generates the following types of passwords:
 
 
 
-## How it works
+## How password generation works
 Open sesame uses PBKDF2 and HMAC256 crypto functions.  'window.crypto.subtle' it used when it is supported by the browser, otherwise CryptoJS is loaded.  
 
 The steps to generate a password are:
@@ -39,6 +39,19 @@ The steps to generate a password are:
 6. From the starting character check that each required character type (upper / lower / number / symbol) exists in the password.  If the character type hasn't already been selected, choose the next character from the specific character set required (upper / lower / number / symbol).
 7. The generated password is returned as a string.
 
+## Retaining meta-data in firebase
+After using the initial version for 6 months as a chrome extension, the only real problem I was having was remembering which sites I had used Open Sesame for, and what settings I had used at the site.  As a result, I decided to add the option to authenticate with firebase using OAuth and a google sign in.
+
+The password generation works whether the user is authenticated or not.  If the user isn't authenticated, then after a password is generated, the process is complete.  However, if the user is authenticated, then the settings will be sent to firebase.  Firebase records:
+* Web site domain
+* User name
+* Password type
+* Password version
+* (Only for security answer) security question
+
+**Pass phrases and generated passwords are not recorded**.
+
+Although recording meta-data represents a source of potential leakage of important information, without the ability to have this information retained and auto-filled, using Open Sesame can becomes unworkable for infrequently visited sites.  In addition, in terms of password versioning, it was extremely difficult to remember which version I was up to with each username / domain name combination.  For these reasons, it was better to have a centralised place secured by a Google sign in for recording meta-data.
 
 ## Libraries used
 * Material Design Lite
