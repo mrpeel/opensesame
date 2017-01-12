@@ -22,7 +22,6 @@ Open Sesame generates the following types of passwords:
 * Short password (4 characters - only uses letters and numbers)
 * Four digit PIN
 * Six digit PIN
-* User name
 * Security answer
 
 
