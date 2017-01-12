@@ -42,7 +42,7 @@ The steps to generate a password are:
 ## Retaining meta-data in firebase
 After using the initial version for 6 months as a chrome extension, the only real problem I was having was remembering which sites I had used Open Sesame for, and what settings I had used at the site.  As a result, I decided to add the option to authenticate with firebase using OAuth and a google sign in.
 
-The password generation works whether the user is authenticated or not.  If the user isn't authenticated, then after a password is generated, the process is complete.  However, if the user is authenticated, then the settings will be sent to firebase..  Data is secured per user and only available to that user for reading / writing.  Firebase records:
+The password generation works whether the user is authenticated or not.  If the user isn't authenticated, then after a password is generated, the process is complete.  However, if the user is authenticated, then the settings will be sent to firebase.  Data is secured per user and only available to that user for reading / writing.  Firebase records:
 * Web site domain
 * User name
 * Password type
