@@ -4,15 +4,15 @@ The Open Sesame Password Manager remembers your passwords without remembering yo
 It is a standalone web-app ([https://open-sesame-f1f51.firebaseapp.com/]) and a chrome-extension which allows unique passwords to be generated for a website domain.  The generation is deterministic which means that the same set of values will always generate the same password.  This allows Open Sesame to 'remember' your passwords.
 
 ## What it does
-Open Sesame generates passwords using the combination of fields and password type.  The same combination always generates the same password.  A change to any of the fields or password type will result in a different password being generated.  This means that using the same personal details and pass phrase for different websites will generate a different password for each site.
+Open Sesame generates passwords using the combination of fields and password type.  The same combination always generates the same password.  A change to any of the fields or password type will result in a different password being generated.  This means that using the same details and pass phrase for different websites will generate a different password for each site.
 
 Open Sesame generates passwords using the following fields:
 * Web site domain
 * User name
-* Open Sesame Pass phrase
+* Open Sesame pass phrase
 * Password type
 * Password version
-* (Only for security answer) Security question
+* (Only for security answer) security question
 
 Open Sesame generates the following types of passwords:
 * Maximum password (20 characters)
