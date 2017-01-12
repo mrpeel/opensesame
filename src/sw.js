@@ -1,20 +1,20 @@
-/*global self, caches, Promise, URL, location, fetch */
+/* global self, caches, Promise, fetch */
 
-var staticCacheName = 'open-sesame-v@@timestamp';
-var preCache = [
-  'material.min.css',
-  'material.min.js',
-  '@@cssfile',
-  '@@jsfile',
-  'favicon.ico'
+let staticCacheName = 'open-sesame-v@@timestamp';
+let preCache = [
+  'lib/material.min.css',
+  'lib/material.min.js',
+  'css/@@cssfile',
+  'scripts/@@os-jsref',
+  'images/favicon.ico',
 ];
-var opaqueCacheOnRequest = [
+let opaqueCacheOnRequest = [
   'https://fonts.gstatic.com',
-  'https://fonts.googleapis.com'
+  'https://fonts.googleapis.com',
 ];
 
 self.addEventListener('install', function(event) {
-  //When cache is installed add everything in the pre-cache list
+  // When cache is installed add everything in the pre-cache list
   event.waitUntil(
     caches.open(staticCacheName).then(function(cache) {
       return cache.addAll(preCache);
@@ -23,7 +23,7 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener('activate', function(event) {
-  //On activation ,delet any previous version of the smes-otg cache
+  // On activation ,delet any previous version of the smes-otg cache
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(
@@ -39,38 +39,46 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
-  var requestUrl = new URL(event.request.url);
-
-  //Check if URL is opaque and should be cached on request
-  for (var prefixCounter = 0; prefixCounter < opaqueCacheOnRequest.length; prefixCounter++) {
+  // Check if URL is opaque and should be cached on request
+  for (let prefixCounter = 0; prefixCounter <
+    opaqueCacheOnRequest.length; prefixCounter++) {
     if (event.request.url.startsWith(opaqueCacheOnRequest[prefixCounter])) {
       opaqueCacheOnFirstRequest(event.request);
       break;
     }
   }
 
-  //The default behaviour is to check if it's in the cache, and either serve it from the cache or the network request
+  /* The default behaviour is to check if it's in the cache, and either
+    serve it from the cache or the network request */
   event.respondWith(checkCacheAndRespond(event.request));
 });
 
+/**
+*  Checks cache for URL and if cached returns object, otherwise
+*   returns URL fetch
+* @param {Object} request
+* @return {Object}
+*/
 function checkCacheAndRespond(request) {
   return caches.match(request).then(function(response) {
     return response || fetch(request);
   });
 }
 
+/**
+*  Opaque URLs fail when attempting to work with the response object
+*   so for these URLs, if they are not already cached, they are added with
+*   a call to add
+* @param {Object} request
+* @return {Object}
+*/
 function opaqueCacheOnFirstRequest(request) {
-
-  /*Opaque URLs fail when attempting to work with the response object
-     so for these URLs, if they are not already cached, they are added with a call to add
-  */
   return caches.open(staticCacheName).then(function checkCache(cache) {
     cache.match(request).then(function(response) {
       if (!response) {
         cache.add(request.url);
       }
     });
-
   });
 }
 
