@@ -31,13 +31,13 @@ Open sesame uses PBKDF2 and HMAC256 crypto functions.  'window.crypto.subtle' it
 
 The steps to generate a password are:
 
-1. Set the complexity requirements and select character set for the password
-2. Use PBKDF2 on the Pass phrase with user name (First name + Family Name) as the salt to generate a key
-3. Join User name, Domain name, Version and Security question (if present) together and use the key to generate a seed array using HMAC256
-4. Work through the seed selecting characters from the available character set
-5. Use the first element of the seed to select a a starting point to check for minimum complexity
-6. From the starting point check that each character type required for complexity exists in the password.  If it doesn't, make sure the next character is the required type.
-7. The generated password is the resulting string
+1. Set the complexity requirements (upper case, lower case, number, symbol) and select character set for the password
+2. Use PBKDF2 on the pass phrase with user name (First name + Family Name) as the salt to generate a key
+3. Join User name, Domain name, Version and Security question (if present) together and use the key to execute HMAC256 which produces an array of numbers
+4. Work through the array using each value to select a character from the available character set
+5. Use the first element of the array to select a starting point to check for requried types (upper, lower, number symbol)
+6. From the starting point check that each required character type (upper / lower / number / symbol) exists in the password.  If the character type doesn't exist at that point, select the next character a reduced charcter set to ensure it will be the required type.
+7. The generated password is returned as a string
 
 
 ## Libraries used
