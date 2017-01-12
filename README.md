@@ -31,20 +31,20 @@ Open sesame uses PBKDF2 and HMAC256 crypto functions.  'window.crypto.subtle' it
 
 The steps to generate a password are:
 
-1. Set the complexity requirements (upper case, lower case, number, symbol) and select character set for the password
-2. Use PBKDF2 on the pass phrase with user name (First name + Family Name) as the salt to generate a key
-3. Join User name, Domain name, Version and Security question (if present) together and use the key to execute HMAC256 which produces an array of numbers
-4. Work through the array using each value to select a character from the available character set
-5. Use the first element of the array to select a starting point to check for requried types (upper, lower, number symbol)
-6. From the starting point check that each required character type (upper / lower / number / symbol) exists in the password.  If the character type doesn't exist at that point, select the next character a reduced charcter set to ensure it will be the required type.
-7. The generated password is returned as a string
+1. Set the complexity requirements (upper case, lower case, number, symbol) and select character set for the password.
+2. Use PBKDF2 on the pass phrase with user name as the salt to generate a key.
+3. Join user name, domain name, password version and (if present) security question together and execute HMAC256 on it using the key generated in step 2.  This returns as an array of numbers.
+4. Work through the array using each value to select a character from the available character set.
+5. Use the first element of the array to select a starting character to check for required types (upper, lower, number symbol).
+6. From the starting character check that each required character type (upper / lower / number / symbol) exists in the password.  If the character type hasn't already been selected, choose the next character from the specific character set required (upper / lower / number / symbol).
+7. The generated password is returned as a string.
 
 
 ## Libraries used
 * Material Design Lite
 
 
-Polyfills:
+Polyfills loaded as required:
 * CryptoJS (aes.js)
 * CryptoJS (pbkdf2.js)
 * CryptoJS (hmac-sha256.js)
