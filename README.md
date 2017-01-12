@@ -48,6 +48,7 @@ The password generation works whether the user is authenticated or not.  If the 
 * Password type
 * Password version
 * (Only for security answer) security question
+* Date / time the combination was used
 
 **Pass phrases and generated passwords are not recorded**.
 
