@@ -52,7 +52,7 @@ The password generation works whether the user is authenticated or not.  If the 
 
 **Pass phrases and generated passwords are not recorded**.
 
-Although recording meta-data represents a source of potential leakage of important information, without the ability to have this information retained and auto-filled, using Open Sesame can becomes unworkable for infrequently visited sites.  In addition, in terms of password versioning, it was extremely difficult to remember which version I was up to with each username / domain name combination.  For these reasons, it was better to have a centralised place secured by a Google sign in for recording meta-data.
+Although recording meta-data represents a source of potential leakage of important information, without the ability to have this information retained and auto-filled, using Open Sesame can become unworkable for infrequently visited sites.  In addition, in terms of password versioning, it was extremely difficult to remember which version I was up to with each username / domain name combination.  For these reasons, it was better to have a centralised place secured by a Google sign in for recording meta-data.
 
 ## Libraries used
 * Material Design Lite
