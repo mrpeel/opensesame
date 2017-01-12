@@ -1,18 +1,17 @@
 # Open Sesame Password Manager
-The Open Sesame Password Manager remembers your passwords without remembering your passwords.  Open Sesame implements a version of the Master Password App ([Lyndir/MasterPassword](https://github.com/Lyndir/MasterPassword)) algorithm (<http://masterpasswordapp.com/algorithm.html>).
+The Open Sesame Password Manager remembers your passwords without remembering your passwords.  Open Sesame is based on the ideas in the Master Password App ([Lyndir/MasterPassword](https://github.com/Lyndir/MasterPassword)) algorithm (<http://masterpasswordapp.com/algorithm.html>).
 
-It is a standalone web-app ([https://mrpeel.github.io/opensesame/]) and a chrome-extension which allows unique passwords to be generated for a website domain.  The generation is deterministic which means that the same set of values will always generate the same password.  This allows Open Sesame to 'remember' your passwords.
+It is a standalone web-app ([https://open-sesame-f1f51.firebaseapp.com/]) and a chrome-extension which allows unique passwords to be generated for a website domain.  The generation is deterministic which means that the same set of values will always generate the same password.  This allows Open Sesame to 'remember' your passwords.
 
 ## What it does
 Open Sesame generates passwords using the combination of fields and password type.  The same combination always generates the same password.  A change to any of the fields or password type will result in a different password being generated.  This means that using the same personal details and pass phrase for different websites will generate a different password for each site.
 
 Open Sesame generates passwords using the following fields:
-* First name
-* Family name
-* Open Sesame Pass phrase
 * Web site domain
+* User name
+* Open Sesame Pass phrase
 * Password type
-* (Optional) User name
+* Password version
 * (Only for security answer) Security question
 
 Open Sesame generates the following types of passwords:
