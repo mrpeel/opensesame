@@ -2764,7 +2764,7 @@ function returnExtAuthToken() {
     chrome.identity.getAuthToken({
       interactive: true,
     }, function(token) {
-      console.log(token);
+      // console.log(token);
       if (chrome.runtime.lastError) {
         reject(chrome.runtime.lastError);
       }
