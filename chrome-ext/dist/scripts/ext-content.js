@@ -27,12 +27,15 @@ chrome.runtime.onMessage.addListener(
         hasUserName = true;
       }
 
-      chrome.runtime.sendMessage({
-        'message': 'set_page_details',
-        'url': document.URL,
-        'hasPassword': hasPassword,
-        'hasUserName': hasUserName,
-      });
+      // Wait half a second to allow pop-up to render
+      setTimeout(function() {
+        chrome.runtime.sendMessage({
+          'message': 'set_page_details',
+          'url': document.URL,
+          'hasPassword': hasPassword,
+          'hasUserName': hasUserName,
+        });
+      }, 500);
     }
   }
 );

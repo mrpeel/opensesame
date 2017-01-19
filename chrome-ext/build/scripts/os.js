@@ -1362,14 +1362,7 @@ window.addEventListener('load', function() {
   passPhrase.disabled = false;
   type.disabled = false;
 
-  /* Put focus on first unpopulated field */
-  if (domainName.value.trim() === '') {
-    domainName.focus();
-  } else if (userName.value.trim() === '') {
-    userName.focus();
-  } else if (passPhrase.value.trim() === '') {
-    passPhrase.focus();
-  }
+  focusFirstUnpopulatedField();
 
   // Set initial pass phrase state
   if (passPhraseState === undefined) {
@@ -1399,6 +1392,20 @@ window.addEventListener('load', function() {
     console.log(err);
   }
 }, false);
+
+/**
+* Sets the focus to the first field without a value in it
+*/
+function focusFirstUnpopulatedField() {
+  /* Put focus on first unpopulated field */
+  if (domainName.value.trim() === '') {
+    domainName.focus();
+  } else if (userName.value.trim() === '') {
+    userName.focus();
+  } else if (passPhrase.value.trim() === '') {
+    passPhrase.focus();
+  }
+}
 
 /**
 * Callback function to receive data when firebase data is loaded
@@ -1611,9 +1618,13 @@ function recordGeneration(domain, userName, passwordType, passwordVersion) {
 * @param {String} pValue - the value for the element
 */
 function populateValue(pElement, pValue) {
-  pElement.value = pValue;
-  if (pValue.length > 0) {
-    pElement.parentElement.classList.add('is-dirty');
+  try {
+    pElement.value = pValue;
+    if (pValue.length > 0) {
+      pElement.parentElement.classList.add('is-dirty');
+    }
+  } catch (err) {
+    console.log('Error populating value: ' + err);
   }
 }
 
@@ -1963,6 +1974,7 @@ function setPassPhraseScreenState(passState) {
     showElement('passphrase-div');
     hideElement('confirm-dialog');
     hideElement('clear-passphrase');
+    focusFirstUnpopulatedField();
   } else if (passState === 'holding') {
     /* The pass phrase characters are hidden and cannot be viewed but
         can be used
@@ -1971,6 +1983,7 @@ function setPassPhraseScreenState(passState) {
           Hide the confirm pass phrase */
     showElement('passphrase-div');
     hideElement('confirm-dialog');
+    focusFirstUnpopulatedField();
   } else if (passState === 'stored') {
     /* The pass phrase characters have been encrypted.  It can be retrieved
       using the first three characters.
@@ -2645,17 +2658,24 @@ document.addEventListener('DOMContentLoaded', function() {
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.message === 'populate_fields') {
-      populateValue(domainName, request.url || '');
-      populateValue(userName, request.userName || '');
-      populateValue(securityQuestion, request.securityQuestion || '');
-      populateValue(version, request.version || '1');
+      try {
+        populateValue(domainName, request.url || '');
+        populateValue(userName, request.userName || '');
+        populateValue(securityQuestion, request.securityQuestion || '');
+        populateValue(version, request.version || '1');
+      } catch (err) {
+        console.log('Error populating extension fields: ' + err);
+      };
       extHasPassword = request.hasPassword;
 
       // console.log('Populate fields password type: ' + request.passwordType);
-      setType(request.passwordType);
+      if (request.passwordType) {
+        setType(request.passwordType);
+      }
 
       // Determine state of password, and set the appropriate values
-      if (request.threeCharHash && request.threeCharHash.length > 0 &&
+      if (request.threeCharHash &&
+        request.threeCharHash.length > 0 &&
         request.phraseStore &&
         request.phraseStore.iv) {
         /* Pass phrase has been encrypted and requires confirmation of the
@@ -2663,7 +2683,7 @@ chrome.runtime.onMessage.addListener(
         let eIV;
         let eCiphertext;
         /* Uint8 values get lost in translation.  Values will need to be
-          converted back tio Uint8Array */
+          converted back to Uint8Array */
         if (!(request.phraseStore.iv instanceof Uint8Array)) {
           let iv = Object.keys(request.phraseStore.iv).map(function(key) {
             return request.phraseStore.iv[key];

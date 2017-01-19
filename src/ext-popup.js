@@ -27,17 +27,24 @@ document.addEventListener('DOMContentLoaded', function() {
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.message === 'populate_fields') {
-      populateValue(domainName, request.url || '');
-      populateValue(userName, request.userName || '');
-      populateValue(securityQuestion, request.securityQuestion || '');
-      populateValue(version, request.version || '1');
+      try {
+        populateValue(domainName, request.url || '');
+        populateValue(userName, request.userName || '');
+        populateValue(securityQuestion, request.securityQuestion || '');
+        populateValue(version, request.version || '1');
+      } catch (err) {
+        console.log('Error populating extension fields: ' + err);
+      };
       extHasPassword = request.hasPassword;
 
       // console.log('Populate fields password type: ' + request.passwordType);
-      setType(request.passwordType);
+      if (request.passwordType) {
+        setType(request.passwordType);
+      }
 
       // Determine state of password, and set the appropriate values
-      if (request.threeCharHash && request.threeCharHash.length > 0 &&
+      if (request.threeCharHash &&
+        request.threeCharHash.length > 0 &&
         request.phraseStore &&
         request.phraseStore.iv) {
         /* Pass phrase has been encrypted and requires confirmation of the
@@ -45,7 +52,7 @@ chrome.runtime.onMessage.addListener(
         let eIV;
         let eCiphertext;
         /* Uint8 values get lost in translation.  Values will need to be
-          converted back tio Uint8Array */
+          converted back to Uint8Array */
         if (!(request.phraseStore.iv instanceof Uint8Array)) {
           let iv = Object.keys(request.phraseStore.iv).map(function(key) {
             return request.phraseStore.iv[key];
