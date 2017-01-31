@@ -1071,7 +1071,7 @@ function setType(passwordSelection) {
   hideElement('security-question-div');
   passwordType = passwordSelection;
 
-  setUserNamePasswordTypeVersion(domain.value, userName.value,
+  setUserNamePasswordTypeVersion(domain.value || '', userName.value || '',
     passwordSelection);
 
   let passwordLabel = document.getElementById('password-selected');
