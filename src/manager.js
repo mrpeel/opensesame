@@ -789,14 +789,15 @@ function generatePassword() {
 
         populateOrCopyPassword();
 
+        // Record meta-data
+        recordGeneration(gDomainName, gUserName, passwordType, gVersion);
+
         passPhraseTimedClear();
 
         setPassPhraseScreenState('holding');
 
         // Clear the generated password after 30 seconds on the screen
         window.setTimeout(function() {
-          // Record meta-data
-          recordGeneration(gDomainName, gUserName, passwordType, gVersion);
           // Clear password from the screen
           clearPassword();
         }, 30000);
