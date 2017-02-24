@@ -1439,6 +1439,7 @@ function setDomainUserNames(domain) {
     let userNames = [];
     let mostRecentTimeStamp = 0;
     let mostRecentUserName = '';
+    let userNameChanged = false;
 
     // Retrieve unique user name values
     Object.keys(domainUsers).forEach(function(domainUser) {
@@ -1458,17 +1459,18 @@ function setDomainUserNames(domain) {
       });
     });
 
-    if (mostRecentUserName !== '') {
+    if (mostRecentUserName !== '' && userName.value !== mostRecentUserName) {
       populateValue(userName, mostRecentUserName);
+      userNameChanged = true;
     }
 
     // Load user names into drop down list
     loadUserNames(userNames);
 
-    if (userName.value !== '') {
+    if (userNameChanged && userName.value !== '') {
       userNameUpdate();
     }
-  } else {
+  } else if (userName.value === '') {
     setType('long-password');
     version.value = 1;
   }
@@ -1594,11 +1596,10 @@ function recordGeneration(domain, userName, passwordType, passwordVersion) {
   if (!fbAuth) {
     return;
   }
-
   let userId = fbAuth.getUserId();
 
-  let domainValue = domain.replace('.', '--dot--');
-  let userNameValue = userName.replace('.', '--dot--');
+  let domainValue = domain.replace(/\./g, '--dot--');
+  let userNameValue = userName.replace(/\./g, '--dot--');
 
   if (userId) {
     firebase.database().ref('users/' + userId + '/domains/' + domainValue +
